@@ -1,33 +1,32 @@
 ### 1. Arsitektur Backend (Layered Pattern)
 
-Dalam arsitektur ini, tugas dibagi secara spesifik agar tidak ada class yang menanggung beban terlalu berat (menghindari *Fat Controller* atau *Fat Livewire Component*).
+Dalam arsitektur ini, tugas dibagi secara spesifik agar tidak ada class yang menanggung beban terlalu berat (menghindari _Fat Controller_ atau _Fat Livewire Component_).
 
 Alur jalannya data: **Route/Livewire Action $\rightarrow$ Validation $\rightarrow$ Service Layer $\rightarrow$ Repository Layer $\rightarrow$ Database**
 
-* **A. Entry Point (Livewire Component / Controller):**
-* Tugas: Menerima *request* atau aksi dari user (misal: klik tombol simpan).
-* Di stack ini, class Livewire akan menggantikan fungsi Controller tradisional untuk fitur-fitur yang reaktif.
+- **A. Entry Point (Livewire Component / Controller):**
+- Tugas: Menerima _request_ atau aksi dari user (misal: klik tombol simpan).
+- Di stack ini, class Livewire akan menggantikan fungsi Controller tradisional untuk fitur-fitur yang reaktif.
 
+- **B. Validation Layer (Form Requests / Livewire Rules):**
+- Tugas: Memastikan data yang masuk sesuai aturan sebelum menyentuh logika bisnis.
+- Implementasi: Di Livewire, Anda bisa menggunakan properti `#[Validate]` (Laravel 11 / Livewire 3) atau mendefinisikan array `$rules`. Jika kompleks, Anda bisa memisahkannya ke dalam class khusus _Validator_ atau Laravel `FormRequest` jika menggunakan Controller API/Biasa.
 
-* **B. Validation Layer (Form Requests / Livewire Rules):**
-* Tugas: Memastikan data yang masuk sesuai aturan sebelum menyentuh logika bisnis.
-* Implementasi: Di Livewire, Anda bisa menggunakan properti `#[Validate]` (Laravel 11 / Livewire 3) atau mendefinisikan array `$rules`. Jika kompleks, Anda bisa memisahkannya ke dalam class khusus *Validator* atau Laravel `FormRequest` jika menggunakan Controller API/Biasa.
+- **C. Logic / Service Layer (Business Logic):**
+- Tugas: Tempat semua "otak" aplikasi Anda berada. Menghitung, memanggil API eksternal, dan merangkai data.
+- Implementasi: Class PHP biasa (misal: `UserService`). Layer ini tidak peduli dari mana data berasal (Web atau API), ia hanya menerima data bersih dari _Validation_, memprosesnya, dan mengirimkan hasilnya.
 
+- **D. Repository Layer (Data Access):**
+- Tugas: Tempat sentralisasi query database. Layer atas (Service) tidak boleh tahu bahwa Anda menggunakan Eloquent atau query builder murni.
+- Implementasi: Interface (misal: `UserRepositoryInterface`) dan implementasinya (misal: `EloquentUserRepository`). Service hanya memanggil method seperti `$this->userRepo->findByEmail($email)`.
 
-* **C. Logic / Service Layer (Business Logic):**
-* Tugas: Tempat semua "otak" aplikasi Anda berada. Menghitung, memanggil API eksternal, dan merangkai data.
-* Implementasi: Class PHP biasa (misal: `UserService`). Layer ini tidak peduli dari mana data berasal (Web atau API), ia hanya menerima data bersih dari *Validation*, memprosesnya, dan mengirimkan hasilnya.
+- **E. Models (Eloquent):**
+- Tugas: Representasi tabel database dan relasinya. Hindari menaruh logika bisnis yang rumit di sini.
 
-
-* **D. Repository Layer (Data Access):**
-* Tugas: Tempat sentralisasi query database. Layer atas (Service) tidak boleh tahu bahwa Anda menggunakan Eloquent atau query builder murni.
-* Implementasi: Interface (misal: `UserRepositoryInterface`) dan implementasinya (misal: `EloquentUserRepository`). Service hanya memanggil method seperti `$this->userRepo->findByEmail($email)`.
-
-
-* **E. Models (Eloquent):**
-* Tugas: Representasi tabel database dan relasinya. Hindari menaruh logika bisnis yang rumit di sini.
-
-
+- **F. Constants Layer (Message & Configuration):**
+- Tugas: Tempat sentralisasi semua pesan feedback (Sukses, Error, dll) dan konfigurasi statis.
+- Implementasi: Class Constants (misal: `App\Constants\GlobalMessages`). Ini menghindari _magic strings_ di dalam Service atau Livewire.
+- Penggunaan: `session()->flash('success', GlobalMessages::SUCCESS_SAVE);`
 
 ---
 
@@ -35,22 +34,17 @@ Alur jalannya data: **Route/Livewire Action $\rightarrow$ Validation $\rightarro
 
 Karena Anda menggunakan Laravel Breeze dengan Livewire, Anda otomatis masuk ke dalam ekosistem **TALL Stack** (Tailwind, Alpine, Laravel, Livewire).
 
-* **A. Livewire Components (The UI Logic):**
-* Penghubung antara Backend dan Frontend. Class PHP tempat Anda menyimpan state (variabel publik) dan *action* (fungsi yang dipanggil dari tombol). State ini akan tersinkronisasi otomatis dengan HTML (Blade).
+- **A. Livewire Components (The UI Logic):**
+- Penghubung antara Backend dan Frontend. Class PHP tempat Anda menyimpan state (variabel publik) dan _action_ (fungsi yang dipanggil dari tombol). State ini akan tersinkronisasi otomatis dengan HTML (Blade).
 
+- **B. Blade Templates (The View):**
+- File `.blade.php` standar Laravel. Menampilkan data dan menambahkan _directive_ Livewire seperti `wire:model` untuk input form atau `wire:click` untuk tombol.
 
-* **B. Blade Templates (The View):**
-* File `.blade.php` standar Laravel. Menampilkan data dan menambahkan *directive* Livewire seperti `wire:model` untuk input form atau `wire:click` untuk tombol.
+- **C. Alpine.js (Lightweight Frontend Interactivity):**
+- Bawaan dari Breeze. Digunakan untuk manipulasi UI sederhana di sisi klien tanpa perlu bolak-balik ke server. Contoh: Membuka/menutup _Dropdown_, _Modal_, _Tabs_, atau menyembunyikan notifikasi setelah beberapa detik.
 
-
-* **C. Alpine.js (Lightweight Frontend Interactivity):**
-* Bawaan dari Breeze. Digunakan untuk manipulasi UI sederhana di sisi klien tanpa perlu bolak-balik ke server. Contoh: Membuka/menutup *Dropdown*, *Modal*, *Tabs*, atau menyembunyikan notifikasi setelah beberapa detik.
-
-
-* **D. Tailwind CSS (Styling):**
-* Utility-first CSS framework bawaan Breeze. Semua styling (warna, layout, grid) dilakukan langsung di dalam class HTML di Blade template.
-
-
+- **D. Tailwind CSS (Styling):**
+- Utility-first CSS framework bawaan Breeze. Semua styling (warna, layout, grid) dilakukan langsung di dalam class HTML di Blade template.
 
 ---
 
@@ -68,10 +62,14 @@ app/
 │   └── Eloquent/          <-- Implementasi Eloquent (misal: UserRepository.php)
 ├── Services/              <-- Service Layer (Business Logic)
 │   └── User/              <-- Misal: UserService.php
+├── Constants/             <-- Centralized Messages & Constants
+│   ├── GlobalMessages.php <-- Pesan Umum (Save, Delete, Access Denied)
+│   └── KonsultasiMessages.php <-- Pesan Spesifik Fitur
 └── Providers/
     └── RepositoryServiceProvider.php <-- Untuk binding Interface ke Implementasi (Dependency Injection)
 
 ```
+
 ---
 
 Sebagai contoh, kita akan membuat fitur **"Create Post" (Membuat Artikel Baru)**. Kita akan menggunakan sintaks Livewire 3 (bawaan Laravel 11/Breeze terbaru) yang sangat elegan.
@@ -120,7 +118,7 @@ class PostRepository implements PostRepositoryInterface
 
 ```
 
-*Catatan: Jangan lupa daftarkan binding interface ke implementasinya di `app/Providers/AppServiceProvider.php` di dalam method `register()`:*
+_Catatan: Jangan lupa daftarkan binding interface ke implementasinya di `app/Providers/AppServiceProvider.php` di dalam method `register()`:_
 
 ```php
 $this->app->bind(
@@ -155,10 +153,10 @@ class PostService
 
     public function createNewPost(array $data)
     {
-        // Contoh Logika Bisnis: 
+        // Contoh Logika Bisnis:
         // 1. Buat slug otomatis dari judul
         $data['slug'] = Str::slug($data['title']);
-        
+
         // 2. Mungkin Anda ingin menambahkan user_id yang sedang login
         $data['user_id'] = auth()->id();
 
@@ -232,31 +230,45 @@ Terakhir, kita buat tampilan formnya. Karena menggunakan Breeze, kita asumsikan 
 ```html
 <div>
     @if (session('status'))
-        <div class="bg-green-100 text-green-700 p-3 mb-4 rounded">
-            {{ session('status') }}
-        </div>
+    <div class="bg-green-100 text-green-700 p-3 mb-4 rounded">
+        {{ session('status') }}
+    </div>
     @endif
 
     <form wire:submit="save" class="space-y-4">
         <div>
             <label class="block text-sm font-medium text-gray-700">Judul</label>
-            <input type="text" wire:model="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-            @error('title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            <input
+                type="text"
+                wire:model="title"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+            @error('title')
+            <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700">Konten</label>
-            <textarea wire:model="content" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-            @error('content') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            <label class="block text-sm font-medium text-gray-700"
+                >Konten</label
+            >
+            <textarea
+                wire:model="content"
+                rows="4"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            ></textarea>
+            @error('content')
+            <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+        <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
             <span wire:loading.remove wire:target="save">Simpan Artikel</span>
             <span wire:loading wire:target="save">Menyimpan...</span>
         </button>
     </form>
 </div>
-
 ```
 
 ---
