@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
-:root {
-    --primary-color: #00627e;
-}
-
-* {
-    font-family: "inter" sans-serif;
+@layer components {
+    input[type="checkbox"] {
+        @apply focus:ring-0 focus:ring-offset-0;
+    }
 }

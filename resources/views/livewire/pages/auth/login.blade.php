@@ -23,49 +23,28 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 }; ?>
 
-<div>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<div class="flex min-h-screen w-full">
+    {{-- Kolom Kiri: Form --}}
+    <div class="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-12 bg-white">
+        <!-- Session Status -->
+        <x-atoms.auth-session-status class="mb-4" :status="session('status')" />
 
-    <form wire:submit="login">
-        <!-- Username -->
-        <div>
-            <x-input-label for="username" :value="__('Username')" />
-            <x-text-input wire:model="form.username" id="username" class="block mt-1 w-full" type="text" name="username"
-                required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('form.username')" class="mt-2" />
-        </div>
+        <form wire:submit="login" class="space-y-6">
+            <x-molecules.auth-header title="Selamat Datang" subtitle="Belum Punya Akun ?"
+                linkText="Buat Disini" linkHref="register" />
+            <x-molecules.input-field label="Username" id="username" type="text" name="username" size="md"
+                placeholder="Masukkan username" wire:model="form.username" />
+            <x-molecules.input-field label="Password" id="password" type="password" name="password" size="md"
+                placeholder="Masukkan password" wire:model="form.password" />
+            <x-molecules.auth-remember wire:model="form.remember" />
+            <x-atoms.button variant="primary" size="md" type="submit" class="w-full">{{ __('Log in') }}</x-atoms.button>
+        </form>
+    </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full" type="password"
-                name="password" required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox"
-                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+    {{-- Kolom Kanan: Gambar --}}
+    <div class="hidden md:block md:w-1/2 relative">
+        <img src="{{ asset("asset\image\BackgroundForest.webp") }}"
+            alt="Background Forest" class="absolute inset-0 w-full h-full object-cover" fetchpriority="high">
+        <div class="absolute inset-0 bg-blue-900 bg-opacity-10 mix-blend-overlay"></div>
+    </div>
 </div>
