@@ -25,6 +25,7 @@
         :name="$name ?? $uniqueId"
         :size="$size"
         :placeholder="$placeholder"
+        {{ $attributes }}
     />
 
     @if($error)

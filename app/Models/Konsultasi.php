@@ -18,4 +18,14 @@ class Konsultasi extends Model
         'id_user',
         'file',
     ];
+
+    public function siswa()
+    {
+        return $this->belongsTo(DataSiswa::class, 'id_siswa');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

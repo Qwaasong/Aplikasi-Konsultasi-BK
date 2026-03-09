@@ -14,7 +14,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 //Guru / Konselor
-Route::middleware(['auth', 'role:guru'])->group(function () {
+Route::middleware(['auth', 'role:konselor'])->group(function () {
     Volt::route('konselor/dashboard', 'pages.konselor.dashboard')->name('konselor.dashboard');
     Volt::route('konselor/konsultasi', 'pages.konselor.konsultasi.index')->name('konselor.konsultasi.index');
 });

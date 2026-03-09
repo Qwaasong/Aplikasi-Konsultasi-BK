@@ -21,9 +21,20 @@ $sizes = [
 
 <div
     x-data="{
-        open:false,
-        value:null,
-        label:'{{ $placeholder }}'
+        open: false,
+        value: @entangle($attributes->wire('model')),
+        label: '{{ $placeholder }}',
+        options: {{ json_encode($options) }},
+        init() {
+            if (this.value) {
+                let selected = this.options.find(o => o.value === this.value);
+                if (selected) this.label = selected.label;
+            }
+            $watch('value', val => {
+                let selected = this.options.find(o => o.value === val);
+                if (selected) this.label = selected.label;
+            });
+        }
     }"
     class="relative w-full"
 >

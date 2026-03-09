@@ -15,6 +15,7 @@
             @foreach($menus as $menu)
 
                 <x-molecules.sidebar-item
+                    :linkHref="$menu['url'] ?? '#'"
                     :active="$menu['active']"
                     :variants="$menu['variants']"
                 >

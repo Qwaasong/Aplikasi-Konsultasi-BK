@@ -1,33 +1,48 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use function Livewire\Volt\{state};
 
 state([
-    'menus' => fn() => [
-        [
-            'label' => 'Dashboard',
-            'active' => request()->routeIs('dashboard'),
-            'variants' => 'dashboard'
-        ],
+    'menus' => function () {
+        $role = Auth::user()->role ?? '';
 
-        [
-            'label' => 'Konsultasi',
-            'active' => request()->routeIs('konsultasi.*'),
-            'variants'  => 'consultation'
-        ],
+        $menus = [];
 
-        [
-            'label' => 'Siswa',
-            'active' => request()->routeIs('siswa.*'),
-            'variants' => 'student'
-        ],
+        if ($role === 'admin' || $role === 'konselor') {
+            $menus[] = [
+                'label' => 'Dashboard',
+                'url' => route($role . '.dashboard'),
+                'active' => request()->routeIs($role . '.dashboard'),
+                'variants' => 'dashboard'
+            ];
 
-        [
-            'label' => 'User',
-            'active' => request()->routeIs('user.*'),
-            'variants' => 'user'
-        ]
-    ]
+            $menus[] = [
+                'label' => 'Konsultasi',
+                'url' => route($role . '.konsultasi.index'),
+                'active' => request()->routeIs($role . '.konsultasi.*'),
+                'variants' => 'consultation'
+            ];
+        }
+
+        if ($role === 'admin') {
+            $menus[] = [
+                'label' => 'Siswa',
+                'url' => route('admin.siswa.index'),
+                'active' => request()->routeIs('admin.siswa.*'),
+                'variants' => 'student'
+            ];
+
+            $menus[] = [
+                'label' => 'User',
+                'url' => route('admin.user.index'),
+                'active' => request()->routeIs('admin.user.*'),
+                'variants' => 'user'
+            ];
+        }
+
+        return $menus;
+    }
 ]);
 
 ?>
@@ -36,7 +51,7 @@ state([
 
     <x-slot:footer>
 
-        <a href=""
+        <a href="{{ route('logout') }}"
             class="flex items-center h-16 w-full bg-brand-teal text-white hover:bg-brand-dark transition-colors overflow-hidden">
             <div class="w-20 flex-shrink-0 flex justify-center items-center">
 

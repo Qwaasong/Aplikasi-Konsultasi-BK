@@ -9,4 +9,5 @@ new #[Layout('layouts.guest')] class extends Component {
 <div>
     {{-- Test Komponen --}}
     <livewire:partials.sidebar />
+    <livewire:partials.siswa-index />
 </div>

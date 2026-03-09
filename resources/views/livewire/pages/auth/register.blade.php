@@ -11,12 +11,12 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component {
     public string $nama = '';
     public string $username = '';
-    public string $role = 'siswa';
+    public string $role = 'konselor';
     public string $password = '';
     public string $password_confirmation = '';
     public $roles = [
-        ['value'=>'admin','label'=>'Admin'],
-        ['value'=>'konselor','label'=>'Konselor'],
+        ['value' => 'admin', 'label' => 'Admin'],
+        ['value' => 'konselor', 'label' => 'Konselor'],
     ];
 
     /**
@@ -27,7 +27,7 @@ new #[Layout('layouts.guest')] class extends Component {
         $validated = $this->validate([
             'nama' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'lowercase', 'max:255', 'unique:' . User::class],
-            'role' => ['required', 'string', 'in:siswa,guru,admin'],
+            'role' => ['required', 'string', 'in:konselor,admin'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -37,7 +37,18 @@ new #[Layout('layouts.guest')] class extends Component {
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $role = Auth::user()->role;
+        $route = 'dashboard';
+
+        if ($role === 'admin') {
+            $route = route('admin.dashboard', absolute: false);
+        } elseif ($role === 'konselor') {
+            $route = route('konselor.dashboard', absolute: false);
+        } else {
+            $route = '/';
+        }
+
+        $this->redirect($route, navigate: true);
     }
 }; ?>
 
@@ -59,11 +70,7 @@ new #[Layout('layouts.guest')] class extends Component {
             {{-- Role --}}
             <div class="mb-4">
                 <x-atoms.input-label for="role" size="md">Role</x-atoms.input-label>
-                <x-molecules.input-dropdown
-                    wire:model="role"
-                    size="md"
-                    :options="$roles"
-                />
+                <x-molecules.input-dropdown wire:model="role" size="md" :options="$roles" />
                 @error('role')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror

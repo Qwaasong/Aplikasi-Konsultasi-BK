@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Livewire\Actions\Logout;
 
 Route::redirect('/', '/login');
 
@@ -13,3 +14,9 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::get('logout', function (Logout $logout) {
+        $logout();
+        return redirect('/');
+    })->name('logout');
+});
