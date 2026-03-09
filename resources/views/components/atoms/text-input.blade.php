@@ -1,5 +1,6 @@
-@props(['disabled' => false,
-        'size' => 'md'
+@props([
+    'disabled' => false,
+    'size' => 'md'
 ])
 
 

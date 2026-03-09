@@ -39,7 +39,8 @@ $sizes = [
             class="text-gray-500"
         ></span>
 
-        <x-atoms.icon-chevron
+        <x-atoms.icon
+            variant="chevron"
             x-bind:class="{ 'rotate-180': open }"
         />
 
