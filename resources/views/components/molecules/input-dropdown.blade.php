@@ -40,7 +40,9 @@ $sizes = [
 >
 
     <!-- Input -->
-    <div
+    <button
+        type="button"
+        @if($attributes->has('id')) id="{{ $attributes->get('id') }}" @endif
         @click="open=!open"
         class="{{ $baseClasses }} {{ $sizes[$size] }}"
     >
@@ -55,7 +57,7 @@ $sizes = [
             x-bind:class="{ 'rotate-180': open }"
         />
 
-    </div>
+    </button>
 
 
     <!-- Dropdown -->

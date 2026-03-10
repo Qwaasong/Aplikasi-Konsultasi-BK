@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->text('hasil_layanan');
             $table->text('tindak_lanjut');
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
-            $table->string('file')->nullable();
+            $table->json('files')->nullable();
             $table->timestamps();
         });
     }

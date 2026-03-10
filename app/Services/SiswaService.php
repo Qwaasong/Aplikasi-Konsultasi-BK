@@ -21,6 +21,11 @@ class SiswaService
         return $this->siswaRepository->findById($id);
     }
 
+    public function search(string $keyword = '', int $limit = 50)
+    {
+        return $this->siswaRepository->search($keyword, $limit);
+    }
+
     public function create(array $data)
     {
         return $this->siswaRepository->create($data);

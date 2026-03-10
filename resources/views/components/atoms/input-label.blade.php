@@ -4,7 +4,6 @@
     'id' => null,
     'size' => 'md'
 ])
-
 @php
     //base class
     $baseClasses = 'block font-medium text-gray-900 mb-2';

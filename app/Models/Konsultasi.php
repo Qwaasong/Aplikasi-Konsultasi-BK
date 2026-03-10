@@ -16,7 +16,11 @@ class Konsultasi extends Model
         'hasil_layanan',
         'tindak_lanjut',
         'id_user',
-        'file',
+        'files',
+    ];
+
+    protected $casts = [
+        'files' => 'array',
     ];
 
     public function siswa()
