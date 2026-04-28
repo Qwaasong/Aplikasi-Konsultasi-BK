@@ -4,14 +4,14 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Livewire\Actions\Logout;
 
-Route::redirect('/', '/login');
-
-Route::middleware('guest')->group(function () {
-    Volt::route('register', 'pages.auth.register')
-        ->name('register');
-
-    Volt::route('login', 'pages.auth.login')
-        ->name('login');
+Route::get('/', function () {
+    if (auth()->check()) {
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('konselor.dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::middleware('auth')->group(function () {
