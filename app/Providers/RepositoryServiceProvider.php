@@ -15,6 +15,10 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\SiswaRepositoryInterface::class,
             \App\Repositories\Eloquent\SiswaRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\UserRepositoryInterface::class,
+            \App\Repositories\Eloquent\UserRepository::class
+        );
     }
 
     /**
