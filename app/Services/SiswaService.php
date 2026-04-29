@@ -137,13 +137,19 @@ class SiswaService
     // ─────────────────────────────────────────
 
     /**
-     * Kembalikan array data siswa yang siap di-export ke CSV.
+     * Kembalikan string CSV dari data siswa sesuai filter.
+     * Filter yang didukung: kelas, jurusan, periode_ajaran.
      */
     public function exportToCsv(array $filters = []): string
     {
+        // Hapus key yang null agar tidak mengganggu query
+        $filters = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+
         $siswaList = empty($filters)
             ? $this->siswaRepository->getAll()
-            : $this->siswaRepository->getPaginated(array_merge($filters, ['per_page' => 99999]))->getCollection();
+            : $this->siswaRepository->getPaginated(
+                array_merge($filters, ['per_page' => 99999])
+              )->getCollection();
 
         $header = ['NIS', 'Nama', 'Kelas', 'Jenis Kelamin', 'Jurusan', 'Periode Ajaran'];
 

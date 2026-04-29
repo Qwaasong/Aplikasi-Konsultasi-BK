@@ -43,6 +43,10 @@ class SiswaRepository implements SiswaRepositoryInterface
             $query->byPeriode($filters['periode_ajaran']);
         }
 
+        if (!empty($filters['periode_ajaran'])) {
+            $query->byPeriode($filters['periode_ajaran']);
+        }
+
         $perPage = (int) ($filters['per_page'] ?? 15);
 
         return $query->orderBy('nama')->paginate($perPage);
