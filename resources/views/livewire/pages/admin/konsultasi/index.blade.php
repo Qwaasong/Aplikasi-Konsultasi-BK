@@ -43,6 +43,12 @@ new #[Layout('layouts.app')] class extends Component {
         session()->flash('success', 'Konsultasi berhasil dihapus!');
     }
 
+    public function goToDetail($id)
+{
+    // Gunakan wire:navigate jika kamu pakai SPA mode di Livewire v3
+    $this->redirectRoute('konsultasi.detail', ['id' => $id], navigate: true);
+}
+
     public function filterAction()
     {
         // Placeholder for filter
@@ -73,6 +79,7 @@ new #[Layout('layouts.app')] class extends Component {
     <x-organisms.data-table empty="Belum ada data konsultasi.">
         @foreach($records as $record)
             <tr wire:key="konsultasi-{{ $record->id }}"
+            wire:click="goToDetail({{ $record->id }})" 
                 class="group border-b border-gray-100 bg-white transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md">
 
                 <td class="w-16 text-center align-middle rounded-l-md py-2" onclick="event.stopPropagation()">

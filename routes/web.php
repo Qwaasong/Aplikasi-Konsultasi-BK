@@ -11,6 +11,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
     Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');
     Volt::route('admin/user', 'pages.admin.user.index')->name('admin.user.index');
+    Volt::route('/konsultasi/{id}/detail', 'pages.admin.konsultasi.detail') // 'detail' adalah nama file detail.blade.php kamu
+    ->name('konsultasi.detail');
 });
 
 //Guru / Konselor
