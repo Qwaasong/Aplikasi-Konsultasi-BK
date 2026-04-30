@@ -19,7 +19,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Siswa diberikan panduan mengenai prospek kerja developer dan rekomendasi kampus.',
                 'tindak_lanjut' => 'Mengikuti workshop bursa kerja minggu depan.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(9),
@@ -29,7 +29,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Penyusunan jadwal harian yang lebih terstruktur.',
                 'tindak_lanjut' => 'Pemantauan jadwal dalam satu minggu ke depan.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(8),
@@ -39,7 +39,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Identifikasi kesulitan pada materi kalkulus.',
                 'tindak_lanjut' => 'Rekomendasi mengikuti bimbingan belajar tambahan.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(7),
@@ -49,7 +49,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Mediasi antara kedua belah pihak.',
                 'tindak_lanjut' => 'Siswa sepakat untuk saling memaafkan.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(6),
@@ -59,7 +59,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Informasi mengenai vendor sertifikasi yang diakui industri.',
                 'tindak_lanjut' => 'Pendaftaran akun di platform sertifikasi terkait.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(5),
@@ -69,7 +69,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Latihan teknik pernapasan dan tips public speaking.',
                 'tindak_lanjut' => 'Berlatih presentasi di depan cermin secara rutin.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(4),
@@ -79,7 +79,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Saran untuk belajar di perpustakaan atau menggunakan earplug.',
                 'tindak_lanjut' => 'Mencoba belajar di perpustakaan sekolah setelah pulang.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(3),
@@ -89,7 +89,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Review project yang sudah dibuat dan cara penulisan README.',
                 'tindak_lanjut' => 'Mengupload project tugas akhir ke GitHub pribadi.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(2),
@@ -99,7 +99,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Diskusi cara beradaptasi di lingkungan profesional.',
                 'tindak_lanjut' => 'Mencoba lebih proaktif bertanya kepada pembimbing industri.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
             [
                 'tanggal' => Carbon::now()->subDays(1),
@@ -109,7 +109,7 @@ class KonsultasiSeeder extends Seeder
                 'hasil_layanan' => 'Konseling penguatan mental dan informasi bantuan siswa.',
                 'tindak_lanjut' => 'Pengajuan berkas untuk beasiswa bantuan sekolah.',
                 'id_user' => 1,
-                'file' => null,
+                'files' => null,
             ],
         ];
 
