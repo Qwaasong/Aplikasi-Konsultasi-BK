@@ -106,7 +106,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function create()
     {
-        $this->dispatch('open-modal', 'tambah-konsultasi');
+        $this->dispatch('create-konsultasi'); 
     }
 
     public function edit($id)
@@ -172,17 +172,8 @@ new #[Layout('layouts.app')] class extends Component {
     @if($showFilters)
         <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
-            
-            {{-- Filter 1: Format Layanan --}}
-            <select wire:model.live="filterFormat"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 bg-white cursor-pointer pr-6 flex-shrink-0">
-                <option value="">Semua Format</option>
-                <option value="Individu">Individu</option>
-                <option value="Klasikal">Klasikal</option>
-                <option value="Kelompok">Kelompok</option>
-            </select>
 
-            {{-- Filter 1b: Jenis Layanan --}}
+            {{-- Filter 1: Jenis Layanan --}}
             <select wire:model.live="filterJenisLayanan"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Layanan</option>
