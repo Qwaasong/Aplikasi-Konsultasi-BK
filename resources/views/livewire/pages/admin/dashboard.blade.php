@@ -15,10 +15,10 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div class="py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <x-molecules.header-card title="Selamat datang di Panel Admin!" badge="Dashboard Admin">
+        <x-molecules.header-card title="Selamat datang di Panel Admin!" badge="Dashboard Admin" class="bg-yellow text-[#086375]">
             <div
-                class="bg-white/10 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-white/20">
-                <div class="p-6 text-white font-medium">
+                class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
+                <div class="p-6 font-medium">
                     {{ __("Anda masuk sebagai Administrator. Kelola konsultasi BK dengan bijak.") }}
                 </div>
             </div>
@@ -47,7 +47,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </x-slot>
             </x-molecules.stat-card>
 
-            
+
             {{-- Isian card masih diperhitungkan card hanyalah contoh jika pun masih ada kelebihan bisa dirauh di card bawah --}}
             {{-- Total Konsultasi --}}
             <x-molecules.stat-card label="Total Konsultasi" value="5" color="yellow">

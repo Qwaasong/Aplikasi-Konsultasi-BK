@@ -12,8 +12,8 @@
         </div>
 
         <div>
-            @if(isset($badge))
-                <span class="bg-red-500 text-white px-4 py-1.5 rounded-full text-xs font-medium">
+            @if (isset($badge))
+                <span class="bg-[#086375] text-white px-4 py-1.5 rounded-full text-xs font-medium">
                     {{ $badge }}
                 </span>
             @endif
@@ -22,7 +22,7 @@
             </h2>
         </div>
 
-        @if(isset($dateValue))
+        @if (isset($dateValue))
             <div class="text-left md:text-right">
                 <p class="text-sm opacity-80 font-medium">{{ $dateLabel ?? 'Hari Ini' }}</p>
                 <p class="text-xl md:text-2xl font-bold mt-1">{{ $dateValue }}</p>
