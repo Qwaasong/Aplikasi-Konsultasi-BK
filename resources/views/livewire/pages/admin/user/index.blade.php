@@ -207,7 +207,7 @@ new #[Layout('layouts.app')] class extends Component {
             <span class="text-gray-400 text-xs">Filter:</span>
 
             <select wire:model.live="filterRole"
-                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Role</option>
                 <option value="admin">Admin</option>
                 <option value="konselor">Konselor</option>

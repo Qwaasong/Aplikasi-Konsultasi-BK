@@ -367,7 +367,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Kelas --}}
             <select wire:model.live="filterKelas"
-                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Kelas</option>
                 @foreach($filterOptions['kelas'] as $k)
                     <option value="{{ $k }}">Kelas {{ $k }}</option>
@@ -376,7 +376,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Jurusan --}}
             <select wire:model.live="filterJurusan"
-                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Jurusan</option>
                 @foreach($filterOptions['jurusan'] as $j)
                     <option value="{{ $j }}">{{ $j }}</option>
@@ -487,7 +487,7 @@ new #[Layout('layouts.app')] class extends Component {
                         wire:model.live="perPage"
                         class="border border-gray-200 rounded px-2 py-1 text-xs text-gray-700
                                focus:outline-none focus:ring-1 focus:ring-brand-teal focus:border-brand-teal
-                               bg-white cursor-pointer">
+                               bg-white cursor-pointer w-16">
                         <option value="15">15</option>
                         <option value="25">25</option>
                         <option value="35">35</option>
