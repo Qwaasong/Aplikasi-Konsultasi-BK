@@ -4,12 +4,12 @@
     'variants' => 'dashboard'
 ])
 
-<a href="{{ $linkHref }}" wire:navigate 
+<a href="{{ $linkHref }}" wire:navigate
     @class([
         'group/menu flex items-center h-12 w-full px-4',
         'text-gray-600' => !$active
     ])>
-    
+
     <div @class([
         'flex items-center rounded-lg transition-all duration-300 w-12 group-hover:w-full h-12 overflow-hidden group-hover/menu:pr-4',
         'bg-brand-teal-light' => $active,
