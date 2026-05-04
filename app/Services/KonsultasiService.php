@@ -16,6 +16,12 @@ class KonsultasiService
         return $this->konsultasiRepository->getAll();
     }
 
+    public function getTotalKonsultasi()
+    {
+        // Memanggil fungsi dari repository
+        return $this->konsultasiRepository->countKonsultasi();
+    }
+
     public function findById(int $id)
     {
         return $this->konsultasiRepository->findById($id);

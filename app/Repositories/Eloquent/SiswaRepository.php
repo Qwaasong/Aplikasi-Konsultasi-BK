@@ -19,6 +19,11 @@ class SiswaRepository implements SiswaRepositoryInterface
         return DataSiswa::orderBy('nama')->get();
     }
 
+    public function countSiswa(): int
+    {
+        return DataSiswa::count();
+    }
+
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
         $query = DataSiswa::query();

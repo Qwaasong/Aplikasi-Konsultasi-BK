@@ -15,6 +15,11 @@ class UserRepository implements UserRepositoryInterface
         return User::orderBy('nama')->get();
     }
 
+    public function countUsers(string $role): int
+    {
+        return User::where('role', $role)->count();
+    }
+
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
         $query = User::query();

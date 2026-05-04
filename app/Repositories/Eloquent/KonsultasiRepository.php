@@ -4,9 +4,14 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Konsultasi;
 use App\Repositories\Contracts\KonsultasiRepositoryInterface;
+use Override;
 
 class KonsultasiRepository implements KonsultasiRepositoryInterface
 {
+    public function countKonsultasi(): int
+    {
+        return Konsultasi::count();
+    }
     public function getAll()
     {
         return Konsultasi::with('siswa')->latest()->get();
@@ -33,4 +38,6 @@ class KonsultasiRepository implements KonsultasiRepositoryInterface
     {
         return Konsultasi::findOrFail($id)->delete();
     }
+
+    // #[Override]
 }

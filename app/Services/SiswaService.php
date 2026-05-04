@@ -25,6 +25,12 @@ class SiswaService
         return $this->siswaRepository->getAll();
     }
 
+    public function getTotalSiswa()
+    {
+        // Memanggil fungsi dari repository
+        return $this->siswaRepository->countSiswa();
+    }
+
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
         return $this->siswaRepository->getPaginated($filters);

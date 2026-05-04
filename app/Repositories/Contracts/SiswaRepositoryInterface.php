@@ -9,8 +9,13 @@ interface SiswaRepositoryInterface
 {
     /**
      * Ambil semua siswa tanpa pagination.
-     */
+    */
     public function getAll(): Collection;
+    
+    /**
+     * Hitung total siswa.
+     */
+    public function countSiswa(): int;
 
     /**
      * Ambil siswa dengan filter + pagination.
@@ -84,4 +89,5 @@ interface SiswaRepositoryInterface
      * @return array{total: int, laki: int, perempuan: int, per_kelas: array, per_jurusan: array}
      */
     public function getStats(): array;
+
 }

@@ -9,7 +9,9 @@ use Illuminate\Support\Collection;
 interface UserRepositoryInterface
 {
     public function getAll(): Collection;
-
+    
+    public function countUsers(String $role): int;
+    
     public function getPaginated(array $filters = []): LengthAwarePaginator;
 
     public function findById(int $id): User;
@@ -23,4 +25,5 @@ interface UserRepositoryInterface
     public function delete(int $id): bool;
 
     public function getRoles(): Collection;
+
 }

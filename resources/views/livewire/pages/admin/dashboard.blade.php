@@ -2,9 +2,26 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Services\UserService;
+use App\Services\SiswaService;
+use App\Services\KonsultasiService;
 
 new #[Layout('layouts.app')] class extends Component {
-    //
+    public int $totalUsers = 0;
+    public int $totalSiswa = 0;
+    public int $totalKonsultasi = 0;
+    public int $totalKonselor = 0;
+
+    public function mount(): void
+    {
+        $userService = app(UserService::class);
+        $stats = $userService->getStats();
+
+        $this->totalUsers = $stats['total'] ?? 0;
+        $this->totalKonselor = $stats['konselor'] ?? 0;
+        $this->totalSiswa = app(SiswaService::class)->getTotalSiswa();
+        $this->totalKonsultasi = app(KonsultasiService::class)->getTotalKonsultasi();
+    }
 }; ?>
 
 {{--<x-slot name="header">
@@ -27,21 +44,21 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 
             {{-- Total Pengguna --}}
-            <x-molecules.stat-card label="Total Pengguna" value="10" color="emerald">
+            <x-molecules.stat-card label="Total Pengguna" :value="$totalUsers" color="emerald" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="user" size="lg" color="white" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konsultasi --}}
-            <x-molecules.stat-card label="Total Konsultasi" value="5" color="ruby">
+            <x-molecules.stat-card label="Total Konsultasi" :value="$totalKonsultasi" color="ruby" url="{{ route('admin.konsultasi.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="consultation" size="lg" color="white" />
                 </x-slot>
             </x-molecules.stat-card>
 
-            {{-- Total Guru --}}
-            <x-molecules.stat-card label="Total Guru" value="20" color="purple">
+            {{-- Total Konselor --}}
+            <x-molecules.stat-card label="Total Konselor" :value="$totalKonselor" color="purple" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="teacher" size="lg" color="white" />
                 </x-slot>
@@ -49,10 +66,10 @@ new #[Layout('layouts.app')] class extends Component {
 
             
             {{-- Isian card masih diperhitungkan card hanyalah contoh jika pun masih ada kelebihan bisa dirauh di card bawah --}}
-            {{-- Total Konsultasi --}}
-            <x-molecules.stat-card label="Total Konsultasi" value="5" color="yellow">
+            {{-- Total Siswa --}}
+            <x-molecules.stat-card label="Total Siswa" :value="$totalSiswa" color="yellow" url="{{ route('admin.siswa.index') }}">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="consultation" size="lg" color="white" />
+                    <x-atoms.icon variant="student" size="lg" color="white" />
                 </x-slot>
             </x-molecules.stat-card>
 

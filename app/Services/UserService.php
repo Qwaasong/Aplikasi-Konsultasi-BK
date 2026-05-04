@@ -19,6 +19,12 @@ class UserService
         return $this->userRepository->getAll();
     }
 
+    public function getTotalUser()
+    {
+        // Memanggil fungsi dari repository
+        return $this->userRepository->countUsers();
+    }
+
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
         return $this->userRepository->getPaginated($filters);
