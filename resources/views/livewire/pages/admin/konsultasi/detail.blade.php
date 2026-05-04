@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Computed;
 use App\Models\Konsultasi; // Pastikan namespace Model kamu benar
+use App\Services\KonsultasiService;
 
 new #[Layout('layouts.app')] class extends Component {
     public $record;
@@ -40,6 +41,20 @@ new #[Layout('layouts.app')] class extends Component {
     public function goBack()
     {
         // Sesuaikan dengan URL halaman utama konsultasi kamu
+        return redirect()->to('/admin/konsultasi');
+    }
+
+    public function edit()
+    {
+        $this->dispatch('edit-konsultasi', id: $this->record->id);
+    }
+
+    public function delete()
+    {
+        $service = app(KonsultasiService::class);
+        $service->delete($this->record->id);
+
+        session()->flash('success', 'Konsultasi berhasil dihapus!');
         return redirect()->to('/admin/konsultasi');
     }
 }; ?>
@@ -101,7 +116,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         <!-- Action Icons -->
         <div class="flex items-center gap-4 text-gray-400">
-            <button class="hover:text-red-500 transition-colors" title="Hapus">
+            <button wire:click="delete" wire:confirm="Yakin ingin menghapus data konsultasi ini?" class="hover:text-red-500 transition-colors" title="Hapus">
                 <!-- Icon Delete -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5">
@@ -109,7 +124,7 @@ new #[Layout('layouts.app')] class extends Component {
                         d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                 </svg>
             </button>
-            <button class="hover:text-brand-teal transition-colors" title="Edit">
+            <button wire:click="edit" class="hover:text-brand-teal transition-colors" title="Edit">
                 <!-- Icon Edit -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5">
@@ -203,4 +218,10 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         </div>
     </div>
+
+    <div class="px-4 py-2">
+        <x-shared.flash-message />
+    </div>
+
+    <livewire:partials.konsultasi.konsultasi-modal />
 </div>
