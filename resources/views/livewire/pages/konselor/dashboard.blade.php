@@ -7,27 +7,28 @@ new #[Layout('layouts.app')] class extends Component {
     //
 }; ?>
 
-<div> <div class="py-8">
+{{-- <x-slot name="header">
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        {{ __('Counselor Dashboard') }}
+</h2>
+</x-slot> --}}
+
+<div>
+    <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <div class="bg-white border border-brand-teal rounded-[1.5rem] p-8 relative overflow-hidden shadow-sm">
-                <div class="relative z-10">
-                    <span class="bg-[#086375] text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-                        Dashboard Konselor
-                    </span>
-                    <h1 class="text-3xl font-bold text-brand-teal mt-5">
-                        Selamat datang di Panel Konselor!
-                    </h1>
-
-                    <div class="mt-5 bg-teal-50/50 border border-teal-100 p-5 rounded-xl max-w-3xl">
-                        <p class="text-brand-teal font-medium">
-                            Anda masuk sebagai Konselor. Kelola bimbingan dan pantau perkembangan siswa dengan bijak.
-                        </p>
+            {{-- Header --}}
+            <x-molecules.header-card
+                title="Selamat datang, {{ auth()->user()->name ?? 'Konselor' }}!"
+                badge="Dashboard Konselor"
+                class="bg-yellow !text-[#086375]">
+                <div
+                    class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
+                    <div class="p-6 font-medium text-[#086375]">
+                        {{ __("Anda masuk sebagai konselor.") }}
                     </div>
                 </div>
-
-                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-50 rounded-full opacity-50"></div>
-            </div>
+            </x-molecules.header-card>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 
