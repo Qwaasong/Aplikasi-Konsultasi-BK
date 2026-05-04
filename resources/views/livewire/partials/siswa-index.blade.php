@@ -14,9 +14,9 @@ $students = computed(function () {
     $data = $service->getAll();
 
     if ($this->search) {
+        $needle = (string) $this->search;
         return $data->filter(
-            fn($item) =>
-            str($item->nama)->contains($this->search, true)
+            fn($item) => mb_stripos((string) $item->nama, $needle) !== false
         )->values();
     }
 

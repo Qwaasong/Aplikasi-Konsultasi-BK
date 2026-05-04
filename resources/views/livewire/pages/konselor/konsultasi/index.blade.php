@@ -14,10 +14,15 @@ new #[Layout('layouts.app')] class extends Component {
         $data = $service->getAll();
 
         if ($this->search) {
-            $data = $data->filter(function ($item) {
-                return str($item->siswa->nama ?? 'Anonim')->contains($this->search, true) ||
-                    str($item->jenis_layanan)->contains($this->search, true) ||
-                    str($item->deskripsi_masalah)->contains($this->search, true);
+            $needle = (string) $this->search;
+            $data = $data->filter(function ($item) use ($needle) {
+                $name  = (string) ($item->siswa->nama ?? 'Anonim');
+                $jenis = (string) ($item->jenis_layanan ?? '');
+                $desc  = (string) ($item->deskripsi_masalah ?? '');
+
+                return (mb_stripos($name, $needle) !== false)
+                    || (mb_stripos($jenis, $needle) !== false)
+                    || (mb_stripos($desc, $needle) !== false);
             })->values();
         }
 

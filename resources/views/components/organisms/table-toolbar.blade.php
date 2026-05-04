@@ -8,7 +8,8 @@
     <div class="flex items-center h-full">
 
         <div class="w-16 h-full flex justify-center items-center border-r-0 border-gray-100">
-            <x-atoms.checkbox />
+            {{-- Tambahkan wire:model.live disini --}}
+            <x-atoms.checkbox wire:model.live="selectAll" />
         </div>
 
         <div class="h-6 w-px bg-gray-300 mx-2"></div>
