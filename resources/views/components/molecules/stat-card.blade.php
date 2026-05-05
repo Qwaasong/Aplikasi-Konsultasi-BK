@@ -1,4 +1,4 @@
-@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald'])
+@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald', 'showButton' => true, 'textColor' => 'text-[#086375]', 'iconBorderColor' => 'border-black'])
 
 @php
     $gradients = [
@@ -7,6 +7,9 @@
         'purple' => 'bg-white',
         'yellow' => 'bg-white',
         'green' => 'bg-white',
+        'teal' => 'bg-green-500',
+        'red' => 'bg-[#FF6B6B]',
+        'kuning' => 'bg-[#FFD93D]',
     ];
     $bgClass = $gradients[$color] ?? $gradients['emerald'];
 @endphp
@@ -14,27 +17,32 @@
 <x-atoms.card :bg="$bgClass"
     {{ $attributes->merge(['class' => 'relative flex flex-col justify-between rounded-[1rem] border-2 border-[#086375] overflow-hidden group']) }}>
     <div class="relative z-10 ">
+
+        {{-- Border ikonnya sekarang menggunakan variabel $iconBorderColor (default hitam) --}}
         <div
-            class="bg-[#086375] rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg border">
+            class="bg-white rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg border {{ $iconBorderColor }}">
             {{ $icon }}
         </div>
 
-        <div class="mt-6 text-[#086375]">
+        {{-- Bagian ini sudah diubah agar warnanya dinamis mengikuti variabel $textColor --}}
+        <div class="mt-6 {{ $textColor }}">
             <p class="text-xs font-semibold opacity-90 uppercase tracking-wider">{{ $label }}</p>
             <h3 class="text-3xl font-bold mt-2">{{ $value }}</h3>
         </div>
 
-        {{-- Tambahan Tombol Redirect --}}
-        <div class="mt-6">
-            <a href="{{ $url }}"
-                class="flex items-center justify-between bg-gray-100 rounded-lg px-4 py-2 text-[#086375] transition-all hover:bg-gray-200">
-                <span class="text-[10px] font-bold uppercase">{{ $label }}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                    stroke="currentColor" class="w-3 h-3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-            </a>
-        </div>
+        {{-- Pengecekan If untuk Tombol Redirect --}}
+        @if ($showButton)
+            <div class="mt-6">
+                <a href="{{ $url }}"
+                    class="flex items-center justify-between bg-gray-100 rounded-lg px-4 py-2 text-[#086375] transition-all hover:bg-gray-200">
+                    <span class="text-[10px] font-bold uppercase">{{ $label }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                        stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                </a>
+            </div>
+        @endif
     </div>
 
     {{-- Decorative Circle --}}
