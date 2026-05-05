@@ -2,7 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
-use App\Models\DataSiswa;
+use App\Models\Konsultasi;
 
 new #[Layout('layouts.app')] class extends Component {
     public int $countKelas10 = 0;
@@ -11,11 +11,20 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount(): void
     {
-        $this->countKelas10 = DataSiswa::byKelas(10)->count();
-        $this->countKelas11 = DataSiswa::byKelas(11)->count();
-        $this->countKelas12 = DataSiswa::byKelas(12)->count();
+        $this->countKelas10 = Konsultasi::whereHas('siswa', fn($q) => $q->where('kelas', 10))
+            ->distinct()
+            ->count('id_siswa');
+
+        $this->countKelas11 = Konsultasi::whereHas('siswa', fn($q) => $q->where('kelas', 11))
+            ->distinct()
+            ->count('id_siswa');
+
+        $this->countKelas12 = Konsultasi::whereHas('siswa', fn($q) => $q->where('kelas', 12))
+            ->distinct()
+            ->count('id_siswa');
     }
-}; ?>
+}; 
+?>
 
 {{-- <x-slot name="header">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
