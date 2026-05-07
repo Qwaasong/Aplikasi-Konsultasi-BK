@@ -46,21 +46,21 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Total Pengguna --}}
             <x-molecules.stat-card label="Total Pengguna" :value="$totalUsers" color="emerald" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="user" size="lg" color="white" />
+                    <x-atoms.icon variant="user" size="lg" color="black" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konsultasi --}}
             <x-molecules.stat-card label="Total Konsultasi" :value="$totalKonsultasi" color="ruby" url="{{ route('admin.konsultasi.index') }}">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="consultation" size="lg" color="white" />
+                    <x-atoms.icon variant="consultation" size="lg" color="black" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konselor --}}
             <x-molecules.stat-card label="Total Konselor" :value="$totalKonselor" color="purple" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="teacher" size="lg" color="white" />
+                    <x-atoms.icon variant="teacher" size="lg" color="black" />
                 </x-slot>
             </x-molecules.stat-card>
 
@@ -69,14 +69,14 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Total Siswa --}}
             <x-molecules.stat-card label="Total Siswa" :value="$totalSiswa" color="yellow" url="{{ route('admin.siswa.index') }}">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="student" size="lg" color="white" />
+                    <x-atoms.icon variant="student" size="lg" color="black" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konsultasi --}}
             <x-molecules.stat-card label="Total Konsultasi" value="5" color="green">
                 <x-slot name="icon">
-                    <x-atoms.icon variant="consultation" size="lg" color="white" />
+                    <x-atoms.icon variant="consultation" size="lg" color="black" />
                 </x-slot>
             </x-molecules.stat-card>
 
