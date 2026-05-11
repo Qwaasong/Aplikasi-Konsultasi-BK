@@ -119,7 +119,7 @@ new #[Layout('layouts.app')] class extends Component {
         $service = app(KonsultasiService::class);
         $service->delete($id);
 
-        session()->flash('success', 'Konsultasi berhasil dihapus!');
+        session()->flash('success', 'data berhasil dihapus!');
         $this->selected = array_diff($this->selected, [(string)$id]);
     }
 

@@ -26,23 +26,17 @@ new #[Layout('layouts.app')] class extends Component {
 }; 
 ?>
 
-{{-- <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        {{ __('Counselor Dashboard') }}
-</h2>
-</x-slot> --}}
-
 <div>
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- Header --}}
-            <x-molecules.header-card title="Selamat datang, {{ auth()->user()->name ?? 'Konselor' }}!"
-                badge="Dashboard Konselor" class="bg-yellow !text-[#086375]">
+            <x-molecules.header-card title="Selamat datang, {{ auth()->user()->nama }}!" badge="Dashboard Konselor"
+                bgBadge="bg-white" textBadge="text-[#086375]" class="!text-white !bg-[#086375]">
                 <div
                     class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
-                    <div class="p-6 font-medium text-[#086375]">
-                        Anda masuk sebagai {{ auth()->user()->nama ?? 'Konselor' }}.
+                    <div class="p-6 font-medium text-white">
+                        Anda masuk sebagai {{ auth()->user()->role }}.
                     </div>
                 </div>
             </x-molecules.header-card>
@@ -50,24 +44,24 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 {{-- Card Kelas 10 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 10" :value="$countKelas10" color="teal" :showButton="false"
-                    textColor="text-[#FCFFFD]">
+                <x-molecules.stat-card label="Pengguna Kelas 10" :value="$countKelas10" class="bg-[#2F6B3F] border-none"
+                    :showButton="false" textColor="text-white" iconBorderColor="border-none">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="black" />
                     </x-slot>
                 </x-molecules.stat-card>
 
                 {{-- Card Kelas 11 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 11" :value="$countKelas11" color="kuning" :showButton="false"
-                    textColor="text-[#FCFFFD]">
+                <x-molecules.stat-card label="Pengguna Kelas 11" :value="$countKelas11" class="bg-[#C89B3C] border-none"
+                    :showButton="false" textColor="text-white" iconBorderColor="border-none">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="black" />
                     </x-slot>
                 </x-molecules.stat-card>
 
                 {{-- Card Kelas 12 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 12" :value="$countKelas12" color="red" :showButton="false"
-                    textColor="text-[#FCFFFD]">
+                <x-molecules.stat-card label="Pengguna Kelas 12" :value="$countKelas12" class="bg-[#A64632] border-none"
+                    iconBorderColor="border-none" :showButton="false" textColor="text-white">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="black" />
                     </x-slot>
@@ -77,4 +71,3 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 </div>
-

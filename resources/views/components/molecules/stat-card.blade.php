@@ -1,4 +1,4 @@
-@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald', 'showButton' => true, 'textColor' => 'text-[#086375]', 'iconBorderColor' => 'border-black'])
+@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald', 'showButton' => true, 'textColor' => 'text-[#086375]', 'iconBorderColor' => 'border-black', 'textContainerClass' => ''])
 
 @php
     $gradients = [
@@ -14,18 +14,18 @@
     $bgClass = $gradients[$color] ?? $gradients['emerald'];
 @endphp
 
-<x-atoms.card :bg="$bgClass"
-    {{ $attributes->merge(['class' => 'relative flex flex-col justify-between rounded-[1rem] border-2 border-[#086375] overflow-hidden group']) }}>
+<x-atoms.card :bg="$bgClass" {{ $attributes->merge(['class' => 'relative flex flex-col justify-between rounded-[1rem] border-2 border-[#086375] overflow-hidden group']) }}>
     <div class="relative z-10 ">
 
         {{-- Border ikonnya sekarang menggunakan variabel $iconBorderColor (default hitam) --}}
         <div
-            class="bg-white rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg border {{ $iconBorderColor }}">
+            class="bg-[#086375] rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg {{ $iconBorderColor }}">
             {{ $icon }}
         </div>
 
-        {{-- Bagian ini sudah diubah agar warnanya dinamis mengikuti variabel $textColor --}}
-        <div class="mt-6 {{ $textColor }}">
+        {{-- Bagian ini sudah diubah agar kontainernya bisa didesain menjadi card terpisah lewat variabel
+        $textContainerClass --}}
+        <div class="mt-6 px-4 py-3 items-center bg-[#086375] rounded-[12px] {{ $textContainerClass }} {{ $textColor }}">
             <p class="text-xs font-semibold opacity-90 uppercase tracking-wider">{{ $label }}</p>
             <h3 class="text-3xl font-bold mt-2">{{ $value }}</h3>
         </div>

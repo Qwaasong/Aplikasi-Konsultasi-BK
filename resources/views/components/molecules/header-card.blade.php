@@ -1,4 +1,4 @@
-@props(['title' => '', 'badge' => null, 'dateValue' => null, 'dateLabel' => null, 'height' => 'h-46'])
+@props(['title' => '', 'badge' => null, 'dateValue' => null, 'dateLabel' => null, 'height' => 'h-46', 'bgBadge' => 'bg-[#086375]', 'textBadge' => 'text-white'])
 
 @php
     $attributes = $attributes->merge(['class' => 'w-full ' . $height]);
@@ -13,7 +13,7 @@
 
         <div>
             @if (isset($badge))
-                <span class="bg-[#086375] text-white px-4 py-1.5 rounded-full text-xs font-medium">
+                <span class="{{ $bgBadge }} {{ $textBadge }} px-4 py-1.5 rounded-full text-xs font-medium">
                     {{ $badge }}
                 </span>
             @endif
