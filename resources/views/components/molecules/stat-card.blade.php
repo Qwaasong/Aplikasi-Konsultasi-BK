@@ -1,4 +1,4 @@
-@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald', 'showButton' => true, 'textColor' => 'text-[#086375]', 'iconBorderColor' => 'border-black', 'textContainerClass' => ''])
+@props(['label', 'value', 'icon', 'url' => '#', 'color' => 'emerald', 'showButton' => true, 'textColor' => 'text-[#086375]', 'iconBorderColor' => 'border-black', 'bgClassIcon' => '', 'textContainerClass' => ''])
 
 @php
     $gradients = [
@@ -19,13 +19,13 @@
 
         {{-- Border ikonnya sekarang menggunakan variabel $iconBorderColor (default hitam) --}}
         <div
-            class="bg-[#086375] rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg {{ $iconBorderColor }}">
+            class="{{ $bgClassIcon }} rounded-xl aspect-square flex items-center justify-center w-12 h-12 backdrop-blur-lg {{ $iconBorderColor }}">
             {{ $icon }}
         </div>
 
         {{-- Bagian ini sudah diubah agar kontainernya bisa didesain menjadi card terpisah lewat variabel
         $textContainerClass --}}
-        <div class="mt-6 px-4 py-3 items-center bg-[#086375] rounded-[12px] {{ $textContainerClass }} {{ $textColor }}">
+        <div class="mt-6 px-4 py-3 items-center rounded-[12px] {{ $textContainerClass }} {{ $textColor }}">
             <p class="text-xs font-semibold opacity-90 uppercase tracking-wider">{{ $label }}</p>
             <h3 class="text-3xl font-bold mt-2">{{ $value }}</h3>
         </div>

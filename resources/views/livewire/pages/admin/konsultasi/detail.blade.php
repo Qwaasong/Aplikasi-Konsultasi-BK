@@ -160,7 +160,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Tanggal Pelaksanaan</h3>
                 <!-- Memformat tanggal menggunakan Carbon (Contoh: Kamis, 24 Maret 2026) -->
                 <p class="text-sm text-gray-600">
-                    {{ \Carbon\Carbon::parse($record->tanggal)->translatedFormat('l, d F Y') }}
+                    {{ \Carbon\Carbon::parse($record->tanggal)->locale('id')->translatedFormat('l, d F Y') }}
                 </p>
             </div>
 
@@ -212,7 +212,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Konselor</h3>
                 <!-- Jika ada relasi konselor/user, panggil namanya. Jika tidak ada, pakai fallback -->
                 <p class="text-lg font-bold text-gray-900 uppercase tracking-wide">
-                    {{ $record->konselor->nama ?? 'Guru BK' }}
+                    {{ Auth::user()->nama }}
                 </p>
                 <p class="text-[11px] text-gray-500 mt-1">Dicatat oleh sistem</p>
             </div>

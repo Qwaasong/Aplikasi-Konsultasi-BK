@@ -39,15 +39,16 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 
             {{-- Total Pengguna --}}
-            <x-molecules.stat-card label="Total Pengguna" textColor='text-white' :value="$totalUsers" color="emerald"
-                url="{{ route('admin.user.index') }}">
+            <x-molecules.stat-card label="Total Pengguna" textColor='text-white' textContainerClass="bg-[#086375]"
+                :value="$totalUsers" bgClassIcon="bg-[#086375]" color="emerald" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="user" size="lg" color="white" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konsultasi --}}
-            <x-molecules.stat-card label="Total Konsultasi" textColor='text-white' :value="$totalKonsultasi" color="ruby"
+            <x-molecules.stat-card label="Total Konsultasi" textColor='text-white' textContainerClass="bg-[#086375]"
+                bgClassIcon="bg-[#086375]" :value="$totalKonsultasi" color="ruby"
                 url="{{ route('admin.konsultasi.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="consultation" size="lg" color="white" />
@@ -55,8 +56,8 @@ new #[Layout('layouts.app')] class extends Component {
             </x-molecules.stat-card>
 
             {{-- Total Konselor --}}
-            <x-molecules.stat-card label="Total Konselor" textColor='text-white' :value="$totalKonselor" color="purple"
-                url="{{ route('admin.user.index') }}">
+            <x-molecules.stat-card label="Total Konselor" textColor='text-white' textContainerClass="bg-[#086375]"
+                :value="$totalKonselor" bgClassIcon="bg-[#086375]" color="purple" url="{{ route('admin.user.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="teacher" size="lg" color="white" />
                 </x-slot>
@@ -66,15 +67,16 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Isian card masih diperhitungkan card hanyalah contoh jika pun masih ada kelebihan bisa dirauh di card
             bawah --}}
             {{-- Total Siswa --}}
-            <x-molecules.stat-card label="Total Siswa" textColor='text-white' :value="$totalSiswa" color="yellow"
-                url="{{ route('admin.siswa.index') }}">
+            <x-molecules.stat-card label="Total Siswa" textColor='text-white' textContainerClass="bg-[#086375]"
+                :value="$totalSiswa" bgClassIcon="bg-[#086375]" color="yellow" url="{{ route('admin.siswa.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="student" size="lg" color="white" />
                 </x-slot>
             </x-molecules.stat-card>
 
             {{-- Total Konsultasi --}}
-            <x-molecules.stat-card label="Total Konsultasi" textColor='text-white' value="5" color="green">
+            <x-molecules.stat-card label="Total Konsultasi" textColor='text-white' bgClassIcon="bg-[#086375]"
+                textContainerClass="bg-[#086375]" value="5" color="green">
                 <x-slot name="icon">
                     <x-atoms.icon variant="consultation" size="lg" color="white" />
                 </x-slot>
