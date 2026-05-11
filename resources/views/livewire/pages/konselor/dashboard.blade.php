@@ -44,8 +44,8 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 {{-- Card Kelas 10 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 10" :value="$countKelas10" textContainerClass="bg-white"
-                    bgClassIcon="bg-white" class="bg-[#2F6B3F] border-none" :showButton="false" textColor="text-[#086375]"
+                <x-molecules.stat-card label="Total Konsultasi Kelas 10" :value="$countKelas10" textContainerClass="bg-white"
+                    bgClassIcon="bg-white" class="!bg-[#2F6B3F] border-none" :showButton="false" textColor="text-[#086375]"
                     iconBorderColor="border-none">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="#086375" />
@@ -53,7 +53,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </x-molecules.stat-card>
 
                 {{-- Card Kelas 11 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 11" :value="$countKelas11" textContainerClass="bg-white" bgClassIcon="bg-white" class="bg-[#C89B3C] border-none"
+                <x-molecules.stat-card label="Total Konsultasi Kelas 11" :value="$countKelas11" textContainerClass="bg-white" bgClassIcon="bg-white" class="!bg-[#C89B3C] border-none"
                     :showButton="false" textColor="text-[#086375]" iconBorderColor="border-none">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="#086375" />
@@ -61,7 +61,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </x-molecules.stat-card>
 
                 {{-- Card Kelas 12 --}}
-                <x-molecules.stat-card label="Pengguna Kelas 12" :value="$countKelas12" textContainerClass="bg-white" bgClassIcon="bg-white" class="bg-[#A64632] border-none"
+                <x-molecules.stat-card label="Total Konsultasi Kelas 12" :value="$countKelas12" textContainerClass="bg-white" bgClassIcon="bg-white" class="!bg-[#A64632] border-none"
                     iconBorderColor="border-none" :showButton="false" textColor="text-[#086375]">
                     <x-slot name="icon">
                         <x-atoms.icon variant="user" size="lg" color="#086375" />
