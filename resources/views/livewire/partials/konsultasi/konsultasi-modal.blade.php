@@ -35,9 +35,10 @@ new class extends Component {
 
     #[Validate([
         'files' => 'array|max:5',
-        'files.*' => 'file|max:5120|mimes:pdf,jpg,png,docx',
+        'files.*' => 'file|max:12288|mimes:pdf,jpg,png,docx',
     ])]
     public $files = [];
+    public $newFiles = [];
 
     public $searchSiswa = '';
     public $showStudentModal = false;
@@ -86,6 +87,20 @@ new class extends Component {
         $this->showStudentModal = false;
     }
 
+    public function updatedNewFiles()
+    {
+        $this->validateOnly('newFiles.*', [
+            'newFiles.*' => 'file|max:12288|mimes:pdf,jpg,png,docx',
+        ]);
+
+        foreach ($this->newFiles as $file) {
+            if (count($this->files) < 5) {
+                $this->files[] = $file;
+            }
+        }
+        $this->newFiles = [];
+    }
+
     public function removeFile($index)
     {
         unset($this->files[$index]);
@@ -126,7 +141,7 @@ new class extends Component {
     public function createKonsultasi()
     {
         $this->resetValidation();
-        $this->reset(['editingId', 'id_siswa', 'jenis_layanan', 'deskripsi_masalah', 'hasil_layanan', 'tindak_lanjut', 'files', 'existingFiles', 'searchSiswa']);
+        $this->reset(['editingId', 'id_siswa', 'jenis_layanan', 'deskripsi_masalah', 'hasil_layanan', 'tindak_lanjut', 'files', 'newFiles', 'existingFiles', 'searchSiswa']);
         
         $this->editingId = null; // Pastikan mode tambah
         $this->jenis_layanan = 'Individu';
@@ -142,7 +157,7 @@ new class extends Component {
     {
         $service = app(KonsultasiService::class);
         $this->resetValidation();
-        $this->reset(['files']);
+        $this->reset(['files', 'newFiles']);
 
         $record = $service->findById($id);
         
@@ -312,14 +327,14 @@ new class extends Component {
                 <div class="mb-6">
                     <label class="block text-[14px] font-bold text-gray-700 mb-2">Pilih File Tambahan</label>
                     <div x-data="{ isDropping: false }" x-on:dragover.prevent="isDropping = true" x-on:dragleave.prevent="isDropping = false" x-on:drop.prevent="isDropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="bg-bg-light border-2 py-16 px-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#e9f3f5] transition-colors border-dashed rounded-xl" :class="isDropping ? 'bg-[#e9f3f5] border-primary' : 'border-icon-bg/40'">
-                        <input type="file" wire:model="files" multiple x-ref="fileInput" class="hidden">
+                        <input type="file" wire:model="newFiles" multiple x-ref="fileInput" class="hidden">
                         <div class="w-[84px] h-[84px] bg-icon-bg/90 rounded-full flex items-center justify-center mb-5">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#044B5F" class="w-10 h-10">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
                             </svg>
                         </div>
                         <h3 class="text-[16px] font-bold text-gray-800 mb-2">Tarik Dan Lepas file disini atau Klik untuk Unggah</h3>
-                        <p class="text-[14px] text-gray-400">Hingga 5 file , Maks 5 MB per file (PDF, JPG, PNG, DOCX)</p>
+                        <p class="text-[14px] text-gray-400">Hingga 5 file , Maks 12 MB per file (PDF, JPG, PNG, DOCX)</p>
                     </div>
                     @error('files.*') <span class="text-red-500 text-[13px] font-medium mt-2 block">{{ $message }}</span> @enderror
                 </div>

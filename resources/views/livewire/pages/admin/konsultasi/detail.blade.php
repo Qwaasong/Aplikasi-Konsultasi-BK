@@ -197,14 +197,27 @@ new #[Layout('layouts.app')] class extends Component {
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Lampiran</h3>
                 <div class="flex gap-4">
-                    <div
-                        class="w-28 h-24 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
-                        <span class="text-xl font-bold text-gray-400">PDF</span>
-                    </div>
-                    <div
-                        class="w-28 h-24 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
-                        <span class="text-xl font-bold text-gray-400">JPG</span>
-                    </div>
+                    @foreach ($record->files as $file)
+
+                        @php
+                            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                        @endphp
+
+                        @if (in_array($extension, ['png', 'jpg', 'jpeg', 'webp']))
+                            <img src="{{ asset('storage/' . $file) }}" class="w-20 h-20 object-cover rounded-lg">
+
+                        @elseif ($extension === 'pdf')
+                            <div class="w-20 h-20 bg-red-100 flex items-center justify-center rounded-lg">
+                                PDF
+                            </div>
+
+                        @elseif (in_array($extension, ['doc', 'docx']))
+                            <div class="w-20 h-20 bg-blue-100 flex items-center justify-center rounded-lg">
+                                DOC
+                            </div>
+                        @endif
+
+                    @endforeach
                 </div>
             </div>
 
