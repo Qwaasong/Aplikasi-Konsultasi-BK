@@ -16,6 +16,11 @@ class KonsultasiService
         return $this->konsultasiRepository->getAll();
     }
 
+    public function getByKonselor(int $konselorId)
+    {
+        return $this->konsultasiRepository->getByKonselor($konselorId);
+    }
+
     public function getTotalKonsultasi()
     {
         // Memanggil fungsi dari repository
@@ -29,7 +34,7 @@ class KonsultasiService
 
     public function create(array $data): void
     {
-        $data['id_user'] = auth()->id() ?? 1; // Fallback to 1 if not logged in (for testing)
+        $data['id_konselor'] = auth()->id(); // Fallback to 1 if not logged in (for testing)
         $this->konsultasiRepository->create($data);
     }
 

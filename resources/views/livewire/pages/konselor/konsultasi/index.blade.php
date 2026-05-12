@@ -23,8 +23,8 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $service = app(KonsultasiService::class);
 
-        // Ambil semua data dulu — opsi filter diambil dari keseluruhan data
-        $all = $service->getAll();
+        // Ambil data konsultasi milik konselor yang sedang login
+        $all = $service->getByKonselor(auth()->id());
 
         // Opsi filter yang tersedia
         $layananOptions = $all->pluck('jenis_layanan')->filter()->unique()->sort()->values()->toArray();
@@ -40,9 +40,9 @@ new #[Layout('layouts.app')] class extends Component {
         if ($this->search) {
             $needle = (string) $this->search;
             $data = $data->filter(function ($item) use ($needle) {
-                $name  = (string) ($item->siswa->nama ?? 'Anonim');
+                $name = (string) ($item->siswa->nama ?? 'Anonim');
                 $jenis = (string) ($item->jenis_layanan ?? '');
-                $desc  = (string) ($item->deskripsi_masalah ?? '');
+                $desc = (string) ($item->deskripsi_masalah ?? '');
 
                 return (mb_stripos($name, $needle) !== false)
                     || (mb_stripos($jenis, $needle) !== false)
@@ -120,7 +120,7 @@ new #[Layout('layouts.app')] class extends Component {
         $service->delete($id);
 
         session()->flash('success', 'data berhasil dihapus!');
-        $this->selected = array_diff($this->selected, [(string)$id]);
+        $this->selected = array_diff($this->selected, [(string) $id]);
     }
 
     // ── Method dipanggil oleh Tombol Filter di Toolbar ──
@@ -161,7 +161,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- Baris Filter Lanjutan --}}
     @if($showFilters)
-        <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
+        <div
+            class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
 
             {{-- Filter 1: Jenis Layanan --}}
@@ -201,7 +202,8 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Tombol Reset --}}
             @if($search !== '' || $filterJenisLayanan !== '' || $filterFormat !== '' || $filterKelas !== '' || $filterJurusan !== '' || $filterJenisKelamin !== '')
-                <button wire:click="resetFilters" class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">
+                <button wire:click="resetFilters"
+                    class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">
                     Reset Semua
                 </button>
             @endif
@@ -231,7 +233,12 @@ new #[Layout('layouts.app')] class extends Component {
                 </td>
 
                 <td class="px-4 py-2 w-1/6 font-semibold text-gray-900 align-middle">
-                    {{ $record->siswa->nama ?? 'Anonim' }}
+                    <a href="{{ route('konselor.konsultasi.detail', $record->id) }}"
+                        class="group block px-4 py-2 w-full h-full">
+                        <span class="font-semibold text-gray-900 transition-colors duration-200 group-hover:text-blue-600">
+                            {{ $record->siswa->nama ?? 'Anonim' }}
+                        </span>
+                    </a>
                 </td>
                 <td class="px-4 py-2 w-1/6 font-semibold text-gray-800 align-middle text-xs">{{ $record->jenis_layanan }}
                 </td>

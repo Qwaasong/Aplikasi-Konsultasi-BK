@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->text('deskripsi_masalah');
             $table->text('hasil_layanan');
             $table->text('tindak_lanjut');
-            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+            $table->foreignId('id_konselor')->constrained('users')->onDelete('cascade');
             // $table->json('files')->nullable();
             $table->timestamps();
         });

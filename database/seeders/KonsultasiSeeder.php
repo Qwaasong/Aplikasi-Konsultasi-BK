@@ -18,7 +18,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Bingung memilih antara kuliah atau langsung kerja setelah lulus RPL.',
                 'hasil_layanan' => 'Siswa diberikan panduan mengenai prospek kerja developer dan rekomendasi kampus.',
                 'tindak_lanjut' => 'Mengikuti workshop bursa kerja minggu depan.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -28,7 +28,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Kesulitan membagi waktu antara hobi dan tugas sekolah.',
                 'hasil_layanan' => 'Penyusunan jadwal harian yang lebih terstruktur.',
                 'tindak_lanjut' => 'Pemantauan jadwal dalam satu minggu ke depan.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -38,7 +38,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Nilai matematika menurun drastis pada semester ini.',
                 'hasil_layanan' => 'Identifikasi kesulitan pada materi kalkulus.',
                 'tindak_lanjut' => 'Rekomendasi mengikuti bimbingan belajar tambahan.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -48,7 +48,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Terjadi perselisihan dengan teman sekelas karena tugas kelompok.',
                 'hasil_layanan' => 'Mediasi antara kedua belah pihak.',
                 'tindak_lanjut' => 'Siswa sepakat untuk saling memaafkan.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -58,7 +58,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Minat untuk mengambil sertifikasi internasional networking.',
                 'hasil_layanan' => 'Informasi mengenai vendor sertifikasi yang diakui industri.',
                 'tindak_lanjut' => 'Pendaftaran akun di platform sertifikasi terkait.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -68,7 +68,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Kecemasan saat akan menghadapi presentasi di depan kelas.',
                 'hasil_layanan' => 'Latihan teknik pernapasan dan tips public speaking.',
                 'tindak_lanjut' => 'Berlatih presentasi di depan cermin secara rutin.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -78,7 +78,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Kurang konsentrasi saat belajar di rumah karena suasana bising.',
                 'hasil_layanan' => 'Saran untuk belajar di perpustakaan atau menggunakan earplug.',
                 'tindak_lanjut' => 'Mencoba belajar di perpustakaan sekolah setelah pulang.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -88,7 +88,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Ingin tahu cara membangun portofolio GitHub yang baik.',
                 'hasil_layanan' => 'Review project yang sudah dibuat dan cara penulisan README.',
                 'tindak_lanjut' => 'Mengupload project tugas akhir ke GitHub pribadi.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -98,7 +98,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Merasa dikucilkan oleh teman-teman di lingkungan PKL.',
                 'hasil_layanan' => 'Diskusi cara beradaptasi di lingkungan profesional.',
                 'tindak_lanjut' => 'Mencoba lebih proaktif bertanya kepada pembimbing industri.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
             [
@@ -108,7 +108,7 @@ class KonsultasiSeeder extends Seeder
                 'deskripsi_masalah' => 'Masalah ekonomi keluarga yang mengganggu konsentrasi sekolah.',
                 'hasil_layanan' => 'Konseling penguatan mental dan informasi bantuan siswa.',
                 'tindak_lanjut' => 'Pengajuan berkas untuk beasiswa bantuan sekolah.',
-                'id_user' => 1,
+                'id_konselor' => 1,
                 'files' => null,
             ],
         ];

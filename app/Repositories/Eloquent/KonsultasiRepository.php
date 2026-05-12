@@ -17,6 +17,14 @@ class KonsultasiRepository implements KonsultasiRepositoryInterface
         return Konsultasi::with('siswa')->latest()->get();
     }
 
+    public function getByKonselor(int $konselorId)
+    {
+        return Konsultasi::with('siswa')
+            ->where('id_konselor', $konselorId)
+            ->latest()
+            ->get();
+    }
+
     public function findById(int $id)
     {
         return Konsultasi::with('siswa')->findOrFail($id);

@@ -15,7 +15,7 @@ class Konsultasi extends Model
         'deskripsi_masalah',
         'hasil_layanan',
         'tindak_lanjut',
-        'id_user',
+        'id_konselor',
         'files',
     ];
 
@@ -30,6 +30,6 @@ class Konsultasi extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'id_konselor');
     }
 }

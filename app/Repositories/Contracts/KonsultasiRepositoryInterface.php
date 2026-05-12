@@ -5,6 +5,7 @@ namespace App\Repositories\Contracts;
 interface KonsultasiRepositoryInterface
 {
     public function getAll();
+    public function getByKonselor(int $konselorId);
     public function countKonsultasi(): int;
     public function findById(int $id);
     public function create(array $data);

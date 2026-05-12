@@ -40,9 +40,9 @@ new #[Layout('layouts.app')] class extends Component {
         if ($this->search) {
             $needle = (string) $this->search;
             $data = $data->filter(function ($item) use ($needle) {
-                $name  = (string) ($item->siswa->nama ?? 'Anonim');
+                $name = (string) ($item->siswa->nama ?? 'Anonim');
                 $jenis = (string) ($item->jenis_layanan ?? '');
-                $desc  = (string) ($item->deskripsi_masalah ?? '');
+                $desc = (string) ($item->deskripsi_masalah ?? '');
 
                 return (mb_stripos($name, $needle) !== false)
                     || (mb_stripos($jenis, $needle) !== false)
@@ -106,7 +106,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function create()
     {
-        $this->dispatch('create-konsultasi'); 
+        $this->dispatch('create-konsultasi');
     }
 
     public function edit($id)
@@ -120,12 +120,12 @@ new #[Layout('layouts.app')] class extends Component {
         $service->delete($id);
 
         session()->flash('success', 'Konsultasi berhasil dihapus!');
-        $this->selected = array_diff($this->selected, [(string)$id]);
+        $this->selected = array_diff($this->selected, [(string) $id]);
     }
 
     public function goToDetail($id)
     {
-        $this->redirectRoute('konsultasi.detail', ['id' => $id], navigate: true);
+        $this->redirectRoute('admin.konsultasi.detail', ['id' => $id], navigate: true);
     }
 
     // ── Method dipanggil oleh Tombol Filter di Toolbar ──
@@ -143,7 +143,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->filterKelas = '';
         $this->filterJurusan = '';
         $this->filterJenisKelamin = '';
-        $this->selected = []; 
+        $this->selected = [];
         $this->selectAll = false;
     }
 }; ?>
@@ -156,8 +156,8 @@ new #[Layout('layouts.app')] class extends Component {
     <x-organisms.header action="create">
         <x-slot:search>
             <x-molecules.search-input model="search" />
-        </x-slot>
-        Konsultasi
+            </x-slot>
+            Konsultasi
     </x-organisms.header>
 
     {{-- Toolbar Bawaan --}}
@@ -165,12 +165,13 @@ new #[Layout('layouts.app')] class extends Component {
     <x-organisms.table-toolbar onFilter="filterAction" onRefresh="$refresh">
         <x-slot:pagination>
             {{ count($records) }} data
-        </x-slot>
+            </x-slot>
     </x-organisms.table-toolbar>
 
     {{-- Baris Filter Lanjutan (Akan Terbuka Jika Ikon Filter di Toolbar Diklik) --}}
     @if($showFilters)
-        <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
+        <div
+            class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
 
             {{-- Filter 1: Jenis Layanan --}}
@@ -210,7 +211,8 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Tombol Reset --}}
             @if($search !== '' || $filterJenisLayanan !== '' || $filterFormat !== '' || $filterKelas !== '' || $filterJurusan !== '' || $filterJenisKelamin !== '')
-                <button wire:click="resetFilters" class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">
+                <button wire:click="resetFilters"
+                    class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">
                     Reset Semua
                 </button>
             @endif
@@ -240,18 +242,19 @@ new #[Layout('layouts.app')] class extends Component {
                 </td>
 
                 <td class="px-4 py-2 w-1/6 font-semibold text-gray-900 align-middle">
-                    <a href="{{ route('konsultasi.detail', $record->id) }}" class="group block px-4 py-2 w-full h-full">
+                    <a href="{{ route('admin.konsultasi.detail', $record->id) }}"
+                        class="group block px-4 py-2 w-full h-full">
                         <span class="font-semibold text-gray-900 transition-colors duration-200 group-hover:text-blue-600">
                             {{ $record->siswa->nama ?? 'Anonim' }}
                         </span>
                     </a>
                 </td>
-                
+
                 {{-- Menampilkan Badge Format & Jenis Layanan --}}
                 <td class="px-4 py-2 w-1/4 font-semibold text-gray-800 align-middle text-xs">
                     {{ $record->jenis_layanan }}
                 </td>
-                
+
                 <td class="px-4 py-2 text-gray-500 max-w-xs align-middle text-xs">
                     <div class="truncate w-full" title="{{ $record->deskripsi_masalah }}">{{ $record->deskripsi_masalah }}
                     </div>
@@ -265,10 +268,10 @@ new #[Layout('layouts.app')] class extends Component {
                     <x-molecules.table-action :id="$record->id">
                         <x-slot:edit>
                             <span class="sr-only">Edit</span>
-                        </x-slot>
-                        <x-slot:delete>
-                            <span class="sr-only">Delete</span>
-                        </x-slot>
+                            </x-slot>
+                            <x-slot:delete>
+                                <span class="sr-only">Delete</span>
+                                </x-slot>
                     </x-molecules.table-action>
                 </td>
             </tr>
@@ -278,5 +281,5 @@ new #[Layout('layouts.app')] class extends Component {
     <livewire:partials.konsultasi.konsultasi-modal />
 
     <div x-show="loading" style="display: none;" ...>
-        </div>
+    </div>
 </div>

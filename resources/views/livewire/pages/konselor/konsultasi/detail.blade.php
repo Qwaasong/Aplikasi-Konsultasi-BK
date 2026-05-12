@@ -35,13 +35,13 @@ new #[Layout('layouts.app')] class extends Component {
     {
         // Mencari data konsultasi beserta relasi siswa (dan konselor jika ada)
         // Sesuaikan nama relasi ('siswa') dengan yang ada di Model Konsultasi kamu
-        $this->record = Konsultasi::with(['siswa', 'user'])->findOrFail($id);
+        $this->record = Konsultasi::with('siswa')->findOrFail($id);
     }
 
     public function goBack()
     {
         // Sesuaikan dengan URL halaman utama konsultasi kamu
-        return redirect()->to('/admin/konsultasi');
+        return redirect()->to('/konselor/konsultasi');
     }
 
     public function edit()
@@ -55,7 +55,7 @@ new #[Layout('layouts.app')] class extends Component {
         $service->delete($this->record->id);
 
         session()->flash('success', 'Konsultasi berhasil dihapus!');
-        return redirect()->to('/admin/konsultasi');
+        return redirect()->to('/konselor/konsultasi');
     }
 }; ?>
 
@@ -72,7 +72,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div
                             class="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden min-w-[300px]">
                             @forelse($this->searchResults as $result)
-                                <a href="{{ route('admin.konsultasi.detail', $result->id) }}" wire:navigate
+                                <a href="{{ route('konselor.konsultasi.detail', $result->id) }}" wire:navigate
                                     class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors">
                                     <div class="font-medium text-gray-900">{{ $result->siswa->nama ?? 'Anonim' }}</div>
                                     <div class="text-xs text-gray-500 mt-0.5">{{ $result->jenis_layanan }} &bull;
@@ -213,7 +213,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Konselor</h3>
                 <!-- Jika ada relasi konselor/user, panggil namanya. Jika tidak ada, pakai fallback -->
                 <p class="text-lg font-bold text-gray-900 uppercase tracking-wide">
-                    {{ $record->user->nama ?? '-' }}
+                    {{ Auth::user()->nama }}
                 </p>
                 <p class="text-[11px] text-gray-500 mt-1">Dicatat oleh sistem</p>
             </div>
