@@ -197,7 +197,7 @@ new #[Layout('layouts.app')] class extends Component {
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Lampiran</h3>
                 <div class="flex gap-4">
-                    @foreach ($record->files as $file)
+                    @forelse ($record->files ?? [] as $file)
 
                         @php
                             $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -217,7 +217,9 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         @endif
 
-                    @endforeach
+                    @empty
+                        <p class="text-sm text-gray-400 italic">Tidak ada lampiran.</p>
+                    @endforelse
                 </div>
             </div>
 
