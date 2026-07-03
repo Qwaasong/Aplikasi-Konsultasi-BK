@@ -10,107 +10,78 @@ class DataSiswa extends Model
     protected $table = 'data_siswa';
 
     protected $fillable = [
+        'user_id',
         'nis',
-        'nama',
-        'kelas',
-        'jenis_kelamin',
-        'jurusan',
-        'periode_ajaran',
+        'kelas_id',
+        'alamat',
     ];
 
     protected $casts = [
-        'nis'   => 'integer',
-        'kelas' => 'integer',
+        'nis' => 'integer',
     ];
 
     // ─────────────────────────────────────────
     // RELATIONS
     // ─────────────────────────────────────────
 
-    /**
-     * Seorang siswa bisa punya banyak konsultasi.
-     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
+    }
+
     public function konsultasis()
     {
-        return $this->hasMany(Konsultasi::class, 'id_siswa');
+        return $this->hasMany(Konsultasi::class, 'siswa_id');
     }
 
     // ─────────────────────────────────────────
-    // SCOPES  (untuk filter di repository)
+    // SCOPES
     // ─────────────────────────────────────────
 
-    /**
-     * Filter berdasarkan kata kunci (nama atau NIS).
-     */
     public function scopeSearch(Builder $query, string $keyword): Builder
     {
         return $query->where(function (Builder $q) use ($keyword) {
-            $q->where('nama', 'like', "%{$keyword}%")
+            $q->whereHas('user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
               ->orWhere('nis', 'like', "%{$keyword}%");
         });
     }
 
-    /**
-     * Filter berdasarkan kelas.
-     */
-    public function scopeByKelas(Builder $query, int $kelas): Builder
+    public function scopeByKelas(Builder $query, int $kelasId): Builder
     {
-        return $query->where('kelas', $kelas);
-    }
-
-    /**
-     * Filter berdasarkan jurusan.
-     */
-    public function scopeByJurusan(Builder $query, string $jurusan): Builder
-    {
-        return $query->where('jurusan', $jurusan);
-    }
-
-    /**
-     * Filter berdasarkan jenis kelamin.
-     */
-    public function scopeByJenisKelamin(Builder $query, string $jenisKelamin): Builder
-    {
-        return $query->where('jenis_kelamin', $jenisKelamin);
-    }
-
-    /**
-     * Filter berdasarkan periode ajaran.
-     */
-    public function scopeByPeriode(Builder $query, string $periode): Builder
-    {
-        return $query->where('periode_ajaran', $periode);
+        return $query->where('kelas_id', $kelasId);
     }
 
     // ─────────────────────────────────────────
     // ACCESSORS
     // ─────────────────────────────────────────
 
-    /**
-     * Inisial nama siswa (untuk avatar).
-     */
+    public function getNamaAttribute()
+    {
+        return $this->user?->nama;
+    }
+
     public function getInitialsAttribute(): string
     {
-        $words = explode(' ', trim($this->nama));
+        $nama = $this->nama;
+        $words = explode(' ', trim($nama));
 
         if (count($words) >= 2) {
             return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
         }
 
-        return strtoupper(substr($this->nama, 0, 2));
+        return strtoupper(substr($nama, 0, 2));
     }
 
-    /**
-     * Label kelas + jurusan, contoh: "12 RPL".
-     */
     public function getKelasLabelAttribute(): string
     {
-        return $this->kelas . ' ' . $this->jurusan;
+        return $this->kelas?->nama_kelas ?? '-';
     }
 
-    /**
-     * Jumlah konsultasi yang pernah diikuti.
-     */
     public function getTotalKonsultasiAttribute(): int
     {
         return $this->konsultasis()->count();

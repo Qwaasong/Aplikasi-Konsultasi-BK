@@ -6,21 +6,25 @@ use function Livewire\Volt\{state};
 state([
     'menus' => function () {
         $role = Auth::user()->role ?? '';
+        $prefix = match ($role) {
+            'Guru_BK' => 'konselor',
+            default  => $role,
+        };
 
         $menus = [];
 
-        if ($role === 'admin' || $role === 'konselor') {
+        if ($role === 'admin' || $role === 'Guru_BK') {
             $menus[] = [
                 'label' => 'Dashboard',
-                'url' => route($role . '.dashboard'),
-                'active' => request()->routeIs($role . '.dashboard'),
+                'url' => route($prefix . '.dashboard'),
+                'active' => request()->routeIs($prefix . '.dashboard'),
                 'variants' => 'dashboard'
             ];
 
             $menus[] = [
                 'label' => 'Konsultasi',
-                'url' => route($role . '.konsultasi.index'),
-                'active' => request()->routeIs($role . '.konsultasi.*'),
+                'url' => route($prefix . '.konsultasi.index'),
+                'active' => request()->routeIs($prefix . '.konsultasi.*'),
                 'variants' => 'consultation'
             ];
         }

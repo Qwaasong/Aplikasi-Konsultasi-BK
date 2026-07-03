@@ -11,12 +11,12 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component {
     public string $nama = '';
     public string $username = '';
-    public string $role = 'konselor';
+    public string $role = 'Guru_BK';
     public string $password = '';
     public string $password_confirmation = '';
     public $roles = [
         ['value' => 'admin', 'label' => 'Admin'],
-        ['value' => 'konselor', 'label' => 'Konselor'],
+        ['value' => 'Guru_BK', 'label' => 'Konselor'],
     ];
 
     /**
@@ -27,7 +27,7 @@ new #[Layout('layouts.guest')] class extends Component {
         $validated = $this->validate([
             'nama' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'lowercase', 'max:255', 'unique:' . User::class],
-            'role' => ['required', 'string', 'in:konselor,admin'],
+            'role' => ['required', 'string', 'in:Guru_BK,admin'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -42,7 +42,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         if ($role === 'admin') {
             $route = route('admin.dashboard', absolute: false);
-        } elseif ($role === 'konselor') {
+        } elseif ($role === 'Guru_BK') {
             $route = route('konselor.dashboard', absolute: false);
         } else {
             $route = '/';

@@ -24,7 +24,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         if ($role === 'admin') {
             $route = route('admin.dashboard', absolute: false);
-        } elseif ($role === 'konselor') {
+        } elseif ($role === 'Guru_BK') {
             $route = route('konselor.dashboard', absolute: false);
         } else {
             // Jika role siswa atu role lain

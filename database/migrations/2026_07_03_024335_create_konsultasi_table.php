@@ -12,10 +12,10 @@ return new class extends Migration {
     {
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('konselor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
+            $table->foreignId('konselor_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
-            $table->foreignId('kategori_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kategori_id')->constrained('kategori_konsultasi')->cascadeOnDelete();
             $table->string('judul');
             $table->string('isi_konsultasi');
             $table->enum('status', ['Menunggu', 'Diproses', 'Ditolak'])->default('Menunggu');
