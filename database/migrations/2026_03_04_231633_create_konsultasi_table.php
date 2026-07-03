@@ -12,14 +12,15 @@ return new class extends Migration {
     {
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('tanggal');
-            $table->foreignId('id_siswa')->constrained('data_siswa')->onDelete('cascade');
-            $table->string('jenis_layanan');
-            $table->text('deskripsi_masalah');
-            $table->text('hasil_layanan');
-            $table->text('tindak_lanjut');
-            $table->foreignId('id_konselor')->constrained('users')->onDelete('cascade');
-            // $table->json('files')->nullable();
+            $table->foreignId('siswa_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('konselor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
+            $table->foreignId('kategori_id')->constrained()->cascadeOnDelete();
+            $table->string('judul');
+            $table->string('isi_konsultasi');
+            $table->enum('status', ['Menunggu', 'Diproses', 'Ditolak'])->default('Menunggu');
+            $table->enum('prioritas', ['Rendah', 'Sedang', 'Tinggi'])->default('Rendah');
+            $table->timestamp('tanggal_konsultasi');
             $table->timestamps();
         });
     }

@@ -12,12 +12,10 @@ return new class extends Migration {
     {
         Schema::create('data_siswa', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->integer('nis')->unique();
-            $table->string('nama');
-            $table->integer('kelas');
-            $table->string('jenis_kelamin');
-            $table->string('jurusan');
-            $table->string('periode_ajaran');
+            $table->foreignId('kelas_id')->constrained()->cascadeOnDelete();
+            $table->string('alamat');
             $table->timestamps();
         });
     }
