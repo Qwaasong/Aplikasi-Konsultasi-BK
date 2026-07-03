@@ -384,12 +384,12 @@ new #[Layout('layouts.app')] class extends Component {
             </select>
 
             {{-- Jenis Kelamin --}}
-            <select wire:model.live="filterJenisKelamin"
-                class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
-                <option value="">Semua</option>
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
-            </select>
+         <select wire:model.live="filterJenisKelamin"
+        class="appearance-none text-xs border border-gray-200 rounded pl-2 pr-7 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+        <option value="">Semua</option>
+        <option value="Laki-laki">Laki-laki</option>
+        <option value="Perempuan">Perempuan</option>
+         </select>
 
             <button wire:click="resetFilters"
                 class="text-xs text-brand-teal hover:underline">Reset</button>

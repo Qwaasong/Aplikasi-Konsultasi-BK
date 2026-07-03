@@ -11,7 +11,7 @@ class TahunAjaran extends Model
     protected $fillable = [
         'tahun',
         'semester',
-        'status',
+        'status_aktif',
     ];
 
     public function konsultasis()
