@@ -10,11 +10,14 @@ class Konsultasi extends Model
 
     protected $fillable = [
         'siswa_id',
-        'konselor_id',
+        'guru_bk_id',
         'tahun_ajaran_id',
         'kategori_id',
         'judul',
         'isi_konsultasi',
+        'hasil_layanan',
+        'tindak_lanjut',
+        'jenis_layanan',
         'status',
         'prioritas',
         'tanggal_konsultasi',
@@ -24,14 +27,18 @@ class Konsultasi extends Model
         'tanggal_konsultasi' => 'datetime',
     ];
 
+    // ─────────────────────────────────────────
+    // RELATIONS
+    // ─────────────────────────────────────────
+
     public function siswa()
     {
         return $this->belongsTo(DataSiswa::class, 'siswa_id');
     }
 
-    public function konselor()
+    public function gurubk()
     {
-        return $this->belongsTo(User::class, 'konselor_id');
+        return $this->belongsTo(Pegawai::class, 'guru_bk_id');
     }
 
     public function tahunAjaran()

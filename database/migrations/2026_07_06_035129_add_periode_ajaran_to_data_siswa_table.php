@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori_konsultasi', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_kategori');
-            $table->string('warna')->nullable()->default('#6366f1');
-            $table->timestamps();
+        Schema::table('data_siswa', function (Blueprint $table) {
+            $table->string('periode_ajaran', 20)->nullable()->after('alamat');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori_konsultasi');
+        Schema::table('data_siswa', function (Blueprint $table) {
+            $table->dropColumn('periode_ajaran');
+        });
     }
 };

@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 }; ?>
 
-<div class="flex min-h-screen w-full">
+<div class="flex h-full w-full">
     {{-- Kolom Kiri: Form --}}
     <div class="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-12 bg-white">
         <!-- Session Status -->
@@ -44,8 +44,8 @@ new #[Layout('layouts.guest')] class extends Component {
         <form wire:submit="login" class="space-y-6">
             <x-molecules.auth-header title="Selamat Datang" subtitle="Belum Punya Akun ?" linkText="Buat Disini"
                 linkHref="register" />
-            <x-molecules.input-field label="Username" id="username" type="text" name="username" size="md"
-                placeholder="Masukkan username" wire:model="form.username" />
+            <x-molecules.input-field label="Username / Email" id="username" type="text" name="username" size="md"
+                placeholder="Masukkan username atau email" wire:model="form.username" />
             <x-molecules.input-field label="Password" id="password" type="password" name="password" size="md"
                 placeholder="Masukkan password" wire:model="form.password" />
             <x-molecules.auth-remember wire:model="form.remember" />

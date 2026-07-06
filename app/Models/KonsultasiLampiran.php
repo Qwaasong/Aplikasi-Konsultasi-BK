@@ -10,9 +10,9 @@ class KonsultasiLampiran extends Model
     protected $fillable = [
         'konsultasi_id',
         'nama_file',
-        'path',
-        'jenis_file',
-        'ukuran_file',
+        'path_file',
+        'tipe_file',
+        'ukuran',
     ];
     public function konsultasi()
     {

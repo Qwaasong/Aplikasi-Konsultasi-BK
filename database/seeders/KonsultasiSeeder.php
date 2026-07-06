@@ -14,7 +14,8 @@ class KonsultasiSeeder extends Seeder
 {
     public function run()
     {
-        $konselor = User::where('role', 'Guru_BK')->first();
+        $konselorUser = User::where('role', 'Guru_BK')->first();
+        $pegawai = \App\Models\Pegawai::where('user_id', $konselorUser->id)->first();
         $tahunAjaran = TahunAjaran::first();
         $kategoris = KategoriKonsultasi::pluck('id', 'nama_kategori');
         $siswaIds = DataSiswa::pluck('id');
@@ -40,7 +41,7 @@ class KonsultasiSeeder extends Seeder
         foreach ($data as $item) {
             Konsultasi::create([
                 'siswa_id'           => $siswaIds[$item['siswa_no']],
-                'konselor_id'        => $konselor->id,
+                'guru_bk_id'         => $pegawai->id,
                 'tahun_ajaran_id'    => $tahunAjaran->id,
                 'kategori_id'        => $kategoris[$item['kategori']],
                 'judul'              => $item['judul'],

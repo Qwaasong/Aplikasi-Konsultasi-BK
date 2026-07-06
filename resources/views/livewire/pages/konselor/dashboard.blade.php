@@ -11,20 +11,22 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount(): void
     {
-        $this->countKelas10 = Konsultasi::where('id_konselor', auth()->id())
-            ->whereHas('siswa', fn($q) => $q->where('kelas', 10))
-            ->distinct()
-            ->count('id_siswa');
+        $pegawaiId = \App\Models\Pegawai::where('user_id', auth()->id())->value('id');
 
-        $this->countKelas11 = Konsultasi::where('id_konselor', auth()->id())
-            ->whereHas('siswa', fn($q) => $q->where('kelas', 11))
+        $this->countKelas10 = Konsultasi::where('guru_bk_id', $pegawaiId)
+            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 10)))
             ->distinct()
-            ->count('id_siswa');
+            ->count('siswa_id');
 
-        $this->countKelas12 = Konsultasi::where('id_konselor', auth()->id())
-            ->whereHas('siswa', fn($q) => $q->where('kelas', 12))
+        $this->countKelas11 = Konsultasi::where('guru_bk_id', $pegawaiId)
+            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 11)))
             ->distinct()
-            ->count('id_siswa');
+            ->count('siswa_id');
+
+        $this->countKelas12 = Konsultasi::where('guru_bk_id', $pegawaiId)
+            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 12)))
+            ->distinct()
+            ->count('siswa_id');
     }
 }; 
 ?>

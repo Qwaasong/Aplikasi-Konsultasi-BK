@@ -7,6 +7,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
 use App\Services\KonsultasiService;
+use App\Models\KategoriKonsultasi;
 
 new class extends Component {
     use WithFileUploads;
@@ -16,22 +17,28 @@ new class extends Component {
     public array $existingFiles = [];
 
     #[Validate('required|integer')]
-    public $id_siswa = '';
+    public $siswa_id = '';
+
+    #[Validate('required|string|max:255')]
+    public $judul = '';
 
     #[Validate('required|string')]
     public $jenis_layanan = 'Individu';
 
     #[Validate('required|date')]
-    public $tanggal = '';
+    public $tanggal_konsultasi = '';
 
     #[Validate('required|string')]
-    public $deskripsi_masalah = '';
+    public $isi_konsultasi = '';
 
     #[Validate('nullable|string')]
     public $hasil_layanan = '';
 
     #[Validate('nullable|string')]
     public $tindak_lanjut = '';
+
+    #[Validate('nullable|integer')]
+    public $kategori_id = '';
 
     #[Validate([
         'files' => 'array|max:5',
@@ -51,16 +58,17 @@ new class extends Component {
 
     public function mount()
     {
-        $this->tanggal = date('Y-m-d');
+        $this->tanggal_konsultasi = date('Y-m-d');
     }
 
     public function nextStep()
     {
         $this->validate([
-            'id_siswa' => 'required|integer',
-            'jenis_layanan' => 'required|string',
-            'tanggal' => 'required|date',
-            'deskripsi_masalah' => 'required|string',
+            'siswa_id'           => 'required|integer',
+            'judul'              => 'required|string|max:255',
+            'jenis_layanan'      => 'required|string',
+            'tanggal_konsultasi' => 'required|date',
+            'isi_konsultasi'     => 'required|string',
         ]);
         $this->step = 2;
     }
@@ -72,7 +80,7 @@ new class extends Component {
 
     public function selectStudent($id)
     {
-        $this->id_siswa = $id;
+        $this->siswa_id = $id;
         $this->showStudentModal = false;
         $this->searchSiswa = '';
     }
@@ -110,8 +118,20 @@ new class extends Component {
     #[Computed]
     public function selectedStudent()
     {
-        if (!$this->id_siswa) return null;
-        return app(SiswaService::class)->findById($this->id_siswa);
+        if (!$this->siswa_id) return null;
+        return app(SiswaService::class)->findById($this->siswa_id);
+    }
+
+    #[Computed]
+    public function kategoriOptions()
+    {
+        $options = KategoriKonsultasi::all()->map(fn($item) => [
+            'value' => $item->id,
+            'label' => $item->nama_kategori,
+        ])->toArray();
+
+        array_unshift($options, ['value' => '', 'label' => 'Pilih Kategori (Opsional)']);
+        return $options;
     }
 
     #[Computed]
@@ -141,11 +161,11 @@ new class extends Component {
     public function createKonsultasi()
     {
         $this->resetValidation();
-        $this->reset(['editingId', 'id_siswa', 'jenis_layanan', 'deskripsi_masalah', 'hasil_layanan', 'tindak_lanjut', 'files', 'newFiles', 'existingFiles', 'searchSiswa']);
+        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_layanan', 'tindak_lanjut', 'kategori_id', 'files', 'newFiles', 'existingFiles', 'searchSiswa']);
         
-        $this->editingId = null; // Pastikan mode tambah
+        $this->editingId = null;
         $this->jenis_layanan = 'Individu';
-        $this->tanggal = date('Y-m-d');
+        $this->tanggal_konsultasi = date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-konsultasi');
@@ -159,17 +179,21 @@ new class extends Component {
         $this->resetValidation();
         $this->reset(['files', 'newFiles']);
 
-        $record = $service->findById($id);
+        $record = $service->findByIdForCurrentUser($id);
         
-        $this->editingId = $id; // Set ID untuk mode edit
-        $this->id_siswa = $record->id_siswa;
-        $this->jenis_layanan = $record->jenis_layanan;
-        $this->tanggal = $record->tanggal;
-        $this->deskripsi_masalah = $record->deskripsi_masalah;
-        $this->hasil_layanan = $record->hasil_layanan;
-        $this->tindak_lanjut = $record->tindak_lanjut;
+        $this->editingId             = $id;
+        $this->siswa_id              = $record->siswa_id;
+        $this->judul                 = $record->judul;
+        $this->jenis_layanan         = $record->jenis_layanan;
+        $this->tanggal_konsultasi    = $record->tanggal_konsultasi
+            ? \Carbon\Carbon::parse($record->tanggal_konsultasi)->format('Y-m-d')
+            : date('Y-m-d');
+        $this->isi_konsultasi        = $record->isi_konsultasi;
+        $this->hasil_layanan         = $record->hasil_layanan;
+        $this->tindak_lanjut         = $record->tindak_lanjut;
+        $this->kategori_id           = $record->kategori_id;
         
-        $this->existingFiles = is_array($record->files) ? $record->files : [];
+        $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-konsultasi');
@@ -181,42 +205,26 @@ new class extends Component {
         $this->validate();
 
         $data = [
-            'id_siswa' => $this->id_siswa,
-            'jenis_layanan' => $this->jenis_layanan,
-            'tanggal' => $this->tanggal,
-            'deskripsi_masalah' => $this->deskripsi_masalah,
-            'hasil_layanan' => $this->hasil_layanan,
-            'tindak_lanjut' => $this->tindak_lanjut,
+            'siswa_id'           => $this->siswa_id,
+            'judul'              => $this->judul,
+            'jenis_layanan'      => $this->jenis_layanan,
+            'tanggal_konsultasi' => $this->tanggal_konsultasi,
+            'isi_konsultasi'     => $this->isi_konsultasi,
+            'hasil_layanan'      => $this->hasil_layanan,
+            'tindak_lanjut'      => $this->tindak_lanjut,
+            'kategori_id'        => $this->kategori_id ?: null,
         ];
 
-        // Mulai dengan existing files yang dipertahankan
-        $finalFiles = $this->existingFiles;
-
-        if (!empty($this->files)) {
-            foreach ($this->files as $file) {
-                $ext = strtolower($file->extension());
-                if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-                    $finalFiles[] = $file->store('data/images', 'public');
-                } else {
-                    $finalFiles[] = $file->store('data/documents', 'public');
-                }
-            }
-        }
-
-        $data['files'] = !empty($finalFiles) ? $finalFiles : null;
-
-        // Cek mode: Jika punya ID, maka Update. Jika tidak, maka Create.
         if ($this->editingId) {
-            $service->update($this->editingId, $data);
+            $service->update($this->editingId, $data, $this->existingFiles, $this->files);
             session()->flash('success', 'Konsultasi berhasil diperbarui!');
         } else {
-            $service->create($data);
+            $service->create($data, $this->files);
             session()->flash('success', 'Konsultasi berhasil ditambahkan!');
         }
 
-        // Reset form setelah sukses
-        $this->reset(['editingId', 'id_siswa', 'jenis_layanan', 'deskripsi_masalah', 'hasil_layanan', 'tindak_lanjut', 'files', 'existingFiles', 'searchSiswa', 'showStudentModal']);
-        $this->tanggal = date('Y-m-d');
+        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_layanan', 'tindak_lanjut', 'kategori_id', 'files', 'existingFiles', 'searchSiswa', 'showStudentModal']);
+        $this->tanggal_konsultasi = date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('close-modal', 'form-konsultasi');
@@ -281,27 +289,38 @@ new class extends Component {
                                 Pilih Siswa
                             </button>
                         </div>
-                        @error('id_siswa') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                        @error('siswa_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                     @endif
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+                <div class="mb-6">
+                    <x-atoms.input-label for="judul" size="sm">Judul Konsultasi</x-atoms.input-label>
+                    <x-atoms.text-input id="judul" wire:model="judul" size="md" placeholder="Masukkan judul konsultasi..." />
+                    @error('judul') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
                     <div>
                         <x-atoms.input-label for="jenis_layanan" size="sm">Jenis Layanan</x-atoms.input-label>
                         <x-molecules.input-dropdown id="jenis_layanan" wire:model="jenis_layanan" size="md" :options="$jenisLayanan"/>
                         @error('jenis_layanan') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <x-atoms.input-label for="tanggal" size="sm">Tanggal</x-atoms.input-label>
-                        <x-atoms.text-input id="tanggal" type="date" wire:model="tanggal" size="md" />
-                        @error('tanggal') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                        <x-atoms.input-label for="kategori_id" size="sm">Kategori</x-atoms.input-label>
+                        <x-molecules.input-dropdown id="kategori_id" wire:model="kategori_id" size="md" :options="$this->kategoriOptions"/>
+                        @error('kategori_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <x-atoms.input-label for="tanggal_konsultasi" size="sm">Tanggal</x-atoms.input-label>
+                        <x-atoms.text-input id="tanggal_konsultasi" type="date" wire:model="tanggal_konsultasi" size="md" />
+                        @error('tanggal_konsultasi') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div class="mb-5">
-                    <x-atoms.input-label for="deskripsi_masalah" size="sm">Deskripsi Masalah</x-atoms.input-label>
-                    <textarea id="deskripsi_masalah" wire:model="deskripsi_masalah" rows="4" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Ceritakan gambaran umum masalah yang dihadapi oleh siswa secara lengkap..."></textarea>
-                    @error('deskripsi_masalah') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                    <x-atoms.input-label for="isi_konsultasi" size="sm">Deskripsi Masalah / Isi Konsultasi</x-atoms.input-label>
+                    <textarea id="isi_konsultasi" wire:model="isi_konsultasi" rows="4" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Ceritakan gambaran umum masalah yang dihadapi oleh siswa secara lengkap..."></textarea>
+                    @error('isi_konsultasi') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="mb-5">
@@ -447,7 +466,7 @@ new class extends Component {
 
                 <div class="flex flex-col gap-3">
                     @forelse($this->filteredStudents as $siswa)
-                        <div wire:click="selectStudent({{ $siswa->id }})" class="student-card border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $id_siswa == $siswa->id ? 'border-primary bg-bg-light' : '' }}">
+                        <div wire:click="selectStudent({{ $siswa->id }})" class="student-card border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa->id ? 'border-primary bg-bg-light' : '' }}">
                             <h4 class="text-[14px] font-bold text-gray-900">{{ $siswa->nama_lengkap ?? $siswa->nama }}</h4>
                             <p class="text-[12px] text-gray-500 mt-1">NIS: {{ $siswa->nis }} <span class="ml-2">Kelas: {{ $siswa->kelas_label }}</span></p>
                         </div>

@@ -23,4 +23,9 @@ class Pegawai extends Model
     {
         return $this->hasMany(Kelas::class, 'wali_kelas_id');
     }
+
+    public function konsultasis()
+    {
+        return $this->hasMany(Konsultasi::class, 'guru_bk_id');
+    }
 }

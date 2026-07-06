@@ -67,6 +67,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->resetForm();
         $this->editingId = null;
         $this->showForm = true;
+        $this->dispatch('open-modal', 'form-user');
     }
 
     public function edit(int $id): void
@@ -81,6 +82,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->password_confirmation = '';
 
         $this->showForm = true;
+        $this->dispatch('open-modal', 'form-user');
     }
 
     public function save(UserService $service): void
@@ -121,6 +123,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             $this->showForm = false;
             $this->resetForm();
+            $this->dispatch('close-modal', 'form-user');
         } catch (\Illuminate\Validation\ValidationException $e) {
             foreach ($e->errors() as $field => $messages) {
                 $this->addError($field, $messages[0]);
@@ -142,6 +145,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->showForm = false;
         $this->resetForm();
+        $this->dispatch('close-modal', 'form-user');
     }
 
     public function toggleShowPassword(): void
@@ -297,105 +301,72 @@ new #[Layout('layouts.app')] class extends Component {
     {{-- ═══════════════════════════════════════════ --}}
     {{-- MODAL FORM (Tambah / Edit) --}}
     {{-- ═══════════════════════════════════════════ --}}
-    @if($showForm)
-        <x-shared.modal name="form-user" :show="true" maxWidth="md">
-            <div class="flex flex-col max-h-[90vh]">
+    <x-shared.modal name="form-user" :show="$showForm" maxWidth="md">
+        <div class="flex flex-col max-h-[90vh]">
 
-                {{-- Header Modal --}}
-                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                    <h2 class="text-base font-bold text-gray-900">
-                        {{ $editingId ? 'Edit Data User' : 'Tambah User Baru' }}
-                    </h2>
-                    <p class="text-xs text-gray-500 mt-0.5">
-                        Isi semua field yang wajib diisi (*)
-                    </p>
+            {{-- Header Modal --}}
+            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                <h2 class="text-base font-bold text-gray-900">
+                    {{ $editingId ? 'Edit Data User' : 'Tambah User Baru' }}
+                </h2>
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Isi semua field yang wajib diisi (*)
+                </p>
+            </div>
+
+            {{-- Body --}}
+            <div class="px-6 py-5 overflow-y-auto modal-scroll grow space-y-4" style="scrollbar-width: thin;">
+
+                {{-- Nama --}}
+                <div>
+                    <x-atoms.input-label for="nama" size="sm">Nama Lengkap *</x-atoms.input-label>
+                    <x-atoms.text-input id="nama" type="text" wire:model="nama" placeholder="Nama lengkap user"
+                        size="md" />
+                    @error('nama')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                {{-- Body --}}
-                <div class="px-6 py-5 overflow-y-auto modal-scroll grow space-y-4" style="scrollbar-width: thin;">
+                {{-- Username --}}
+                <div>
+                    <x-atoms.input-label for="username" size="sm">Username *</x-atoms.input-label>
+                    <x-atoms.text-input id="username" type="text" wire:model="username"
+                        placeholder="Username untuk login" size="md" />
+                    @error('username')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    {{-- Nama --}}
-                    <div>
-                        <x-atoms.input-label for="nama" size="sm">Nama Lengkap *</x-atoms.input-label>
-                        <x-atoms.text-input id="nama" type="text" wire:model="nama" placeholder="Nama lengkap user"
-                            size="md" />
-                        @error('nama')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                {{-- Role --}}
+                <div>
+                    <x-atoms.input-label for="role" size="sm">Role *</x-atoms.input-label>
+                    <x-molecules.input-dropdown id="role" wire:model="role" size="md" :options="$roleOptions" />
+                    @error('role')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    {{-- Username --}}
-                    <div>
-                        <x-atoms.input-label for="username" size="sm">Username *</x-atoms.input-label>
-                        <x-atoms.text-input id="username" type="text" wire:model="username"
-                            placeholder="Username untuk login" size="md" />
-                        @error('username')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                {{-- Divider --}}
+                <div class="border-t border-gray-100 pt-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                        {{ $editingId ? 'Ganti Password (kosongkan jika tidak ingin mengubah)' : '' }}
+                    </p>
 
-                    {{-- Role --}}
-                    <div>
-                        <x-atoms.input-label for="role" size="sm">Role *</x-atoms.input-label>
-                        <x-molecules.input-dropdown id="role" wire:model="role" size="md" :options="$roleOptions" />
-                        @error('role')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Divider --}}
-                    <div class="border-t border-gray-100 pt-2">
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                            {{ $editingId ? 'Ganti Password (kosongkan jika tidak ingin mengubah)' : '' }}
-                        </p>
-
-                        {{-- Password --}}
-                        <div class="mb-4">
-                            <x-atoms.input-label for="password" size="sm">
-                                Password {{ $editingId ? '' : '*' }}
-                            </x-atoms.input-label>
-                            <div class="relative">
-                                <x-atoms.text-input id="password" :type="$showPassword ? 'text' : 'password'"
-                                    wire:model="password"
-                                    placeholder="{{ $editingId ? 'Kosongkan jika tidak diubah' : 'Minimal 6 karakter' }}"
-                                    size="md" class="pr-10" />
-                                <button type="button" wire:click="toggleShowPassword"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                                    @if($showPassword)
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                        </svg>
-                                    @else
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    @endif
-                                </button>
-                            </div>
-                            @error('password')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Konfirmasi Password --}}
-                        <div>
-                            <x-atoms.input-label for="password_confirmation" size="sm">
-                                Konfirmasi Password {{ $editingId ? '' : '*' }}
-                            </x-atoms.input-label>
-                            <div class="relative">
-                                <x-atoms.text-input id="password_confirmation" :type="$showPassword ? 'text' : 'password'"
-                                    wire:model="password_confirmation" placeholder="Ulangi password" size="md" />
-                                <button type="button" wire:click="toggleShowPassword"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                                    @if($showPassword)
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor">
+                    {{-- Password --}}
+                    <div class="mb-4">
+                        <x-atoms.input-label for="password" size="sm">
+                            Password {{ $editingId ? '' : '*' }}
+                        </x-atoms.input-label>
+                        <div class="relative">
+                            <x-atoms.text-input id="password" :type="$showPassword ? 'text' : 'password'"
+                                wire:model="password"
+                                placeholder="{{ $editingId ? 'Kosongkan jika tidak diubah' : 'Minimal 6 karakter' }}"
+                                size="md" class="pr-10" />
+                            <button type="button" wire:click="toggleShowPassword"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                @if($showPassword)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                                     </svg>
@@ -410,22 +381,36 @@ new #[Layout('layouts.app')] class extends Component {
                                 @endif
                             </button>
                         </div>
+                        @error('password')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    {{-- Konfirmasi Password --}}
+                    <div>
+                        <x-atoms.input-label for="password_confirmation" size="sm">
+                            Konfirmasi Password {{ $editingId ? '' : '*' }}
+                        </x-atoms.input-label>
+                        <div class="relative">
+                            <x-atoms.text-input id="password_confirmation" :type="$showPassword ? 'text' : 'password'"
+                                wire:model="password_confirmation" placeholder="Ulangi password" size="md" />
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Footer --}}
-                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 shrink-0 rounded-b-xl">
-                    <x-atoms.button variant="secondary" wire:click="cancelForm">Batal</x-atoms.button>
-                    <x-atoms.button wire:click="save">
-                        <span wire:loading.remove wire:target="save">
-                            {{ $editingId ? 'Perbarui' : 'Simpan' }}
-                        </span>
-                        <span wire:loading wire:target="save">Menyimpan...</span>
-                    </x-atoms.button>
-                </div>
             </div>
-        </x-shared.modal>
-    @endif
+
+            {{-- Footer --}}
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 shrink-0 rounded-b-xl">
+                <x-atoms.button variant="secondary" wire:click="cancelForm">Batal</x-atoms.button>
+                <x-atoms.button wire:click="save">
+                    <span wire:loading.remove wire:target="save">
+                        {{ $editingId ? 'Perbarui' : 'Simpan' }}
+                    </span>
+                    <span wire:loading wire:target="save">Menyimpan...</span>
+                </x-atoms.button>
+            </div>
+        </div>
+    </x-shared.modal>
 
 </div>

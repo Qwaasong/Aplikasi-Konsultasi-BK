@@ -10,6 +10,7 @@ class KategoriKonsultasi extends Model
 
     protected $fillable = [
         'nama_kategori',
+        'warna',
     ];
 
     /**

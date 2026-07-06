@@ -23,13 +23,13 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $service = app(KonsultasiService::class);
 
-        // Ambil data konsultasi milik konselor yang sedang login
-        $all = $service->getByKonselor(auth()->id());
+        // Ambil data konsultasi milik guru BK yang sedang login
+        $all = $service->getByGurubk();
 
         // Opsi filter yang tersedia
         $layananOptions = $all->pluck('jenis_layanan')->filter()->unique()->sort()->values()->toArray();
-        $kelasOptions = $all->pluck('siswa.kelas')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('siswa.jurusan')->filter()
+        $kelasOptions = $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
+        $jurusanOptions = $all->pluck('siswa.jurusan_label')->filter()
             ->unique()->map(fn($j) => (string) $j)->sort()->values()->toArray();
         $jenisKelaminOptions = $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray();
 
@@ -42,7 +42,7 @@ new #[Layout('layouts.app')] class extends Component {
             $data = $data->filter(function ($item) use ($needle) {
                 $name = (string) ($item->siswa->nama ?? 'Anonim');
                 $jenis = (string) ($item->jenis_layanan ?? '');
-                $desc = (string) ($item->deskripsi_masalah ?? '');
+                $desc = (string) ($item->isi_konsultasi ?? '');
 
                 return (mb_stripos($name, $needle) !== false)
                     || (mb_stripos($jenis, $needle) !== false)
@@ -66,12 +66,12 @@ new #[Layout('layouts.app')] class extends Component {
 
         // 4. Filter berdasarkan Kelas (ambil dari relation siswa)
         if ($this->filterKelas !== '') {
-            $data = $data->filter(fn($item) => (string) ($item->siswa->kelas ?? '') === (string) $this->filterKelas);
+            $data = $data->filter(fn($item) => (string) ($item->siswa->kelas_label ?? '') === (string) $this->filterKelas);
         }
 
         // 5. Filter berdasarkan Jurusan (normalisasi besar kecil)
         if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jurusan ?? ''), $this->filterJurusan) === 0);
+            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jurusan_label ?? ''), $this->filterJurusan) === 0);
         }
 
         // 6. Filter berdasarkan Jenis Kelamin
@@ -117,7 +117,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function delete($id)
     {
         $service = app(KonsultasiService::class);
-        $service->delete($id);
+        $service->deleteForCurrentUser($id);
 
         session()->flash('success', 'data berhasil dihapus!');
         $this->selected = array_diff($this->selected, [(string) $id]);
@@ -243,13 +243,13 @@ new #[Layout('layouts.app')] class extends Component {
                 <td class="px-4 py-2 w-1/6 font-semibold text-gray-800 align-middle text-xs">{{ $record->jenis_layanan }}
                 </td>
                 <td class="px-4 py-2 text-gray-500 max-w-xs align-middle text-xs">
-                    <div class="truncate w-full" title="{{ $record->deskripsi_masalah }}">{{ $record->deskripsi_masalah }}
+                    <div class="truncate w-full" title="{{ $record->isi_konsultasi }}">{{ $record->isi_konsultasi }}
                     </div>
                 </td>
 
                 <td class="px-4 py-2 w-40 text-right align-middle relative rounded-r-md">
                     <span class="group-hover:opacity-0 font-medium text-gray-900 pr-2 transition-opacity text-xs">
-                        {{ \Carbon\Carbon::parse($record->tanggal)->format('d M y') }}
+                        {{ \Carbon\Carbon::parse($record->tanggal_konsultasi)->format('d M y') }}
                     </span>
 
                     <x-molecules.table-action :id="$record->id">

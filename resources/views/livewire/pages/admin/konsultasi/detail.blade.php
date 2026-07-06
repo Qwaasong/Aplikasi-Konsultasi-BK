@@ -20,7 +20,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         return Konsultasi::with('siswa')
             ->where(function ($query) {
-                $query->whereHas('siswa', function ($q) {
+                $query->whereHas('siswa.user', function ($q) {
                     $q->where('nama', 'like', '%' . $this->search . '%');
                 })
                     ->orWhere('jenis_layanan', 'like', '%' . $this->search . '%');
@@ -29,13 +29,9 @@ new #[Layout('layouts.app')] class extends Component {
             ->get();
     }
 
-    // Method mount otomatis berjalan pertama kali komponen dimuat, 
-    // menangkap {id} dari parameter URL
     public function mount($id)
     {
-        // Mencari data konsultasi beserta relasi siswa (dan konselor jika ada)
-        // Sesuaikan nama relasi ('siswa') dengan yang ada di Model Konsultasi kamu
-        $this->record = Konsultasi::with(['siswa', 'user'])->findOrFail($id);
+        $this->record = Konsultasi::with(['siswa.kelas.jurusan', 'lampirans', 'gurubk.user'])->findOrFail($id);
     }
 
     public function goBack()
@@ -76,7 +72,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors">
                                     <div class="font-medium text-gray-900">{{ $result->siswa->nama ?? 'Anonim' }}</div>
                                     <div class="text-xs text-gray-500 mt-0.5">{{ $result->jenis_layanan }} &bull;
-                                        {{ \Carbon\Carbon::parse($result->tanggal)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($result->tanggal_konsultasi)->format('d M Y') }}
                                     </div>
                                 </a>
                             @empty
@@ -108,8 +104,8 @@ new #[Layout('layouts.app')] class extends Component {
                 <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $record->siswa->nama ?? 'Anonim' }}</h1>
                 <!-- Sesuaikan field nis dan kelas dengan kolom di tabel siswa kamu -->
                 <p class="text-sm text-gray-500 mt-1">NIS {{ $record->siswa->nis ?? '-' }}</p>
-                <p class="text-sm text-gray-500">Kelas {{ $record->siswa->kelas ?? '-' }} -
-                    {{ $record->siswa->jurusan ?? '-' }}
+                <p class="text-sm text-gray-500">Kelas {{ $record->siswa->kelas_label }} -
+                    {{ $record->siswa->jurusan_label }}
                 </p>
             </div>
         </div>
@@ -161,7 +157,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Tanggal Pelaksanaan</h3>
                 <!-- Memformat tanggal menggunakan Carbon (Contoh: Kamis, 24 Maret 2026) -->
                 <p class="text-sm text-gray-600">
-                    {{ \Carbon\Carbon::parse($record->tanggal)->locale('id')->translatedFormat('l, d F Y') }}
+                    {{ \Carbon\Carbon::parse($record->tanggal_konsultasi)->locale('id')->translatedFormat('l, d F Y') }}
                 </p>
             </div>
 
@@ -169,7 +165,7 @@ new #[Layout('layouts.app')] class extends Component {
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Deskripsi Masalah</h3>
                 <p class="text-sm text-gray-600 leading-relaxed text-justify">
-                    {{ $record->deskripsi_masalah }}
+                    {{ $record->isi_konsultasi }}
                 </p>
             </div>
 
@@ -196,39 +192,41 @@ new #[Layout('layouts.app')] class extends Component {
             <!-- Lampiran (Opsional, jika sistem kamu punya fitur upload) -->
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Lampiran</h3>
-                <div class="flex gap-4">
-                    @forelse ($record->files ?? [] as $file)
-
-                        @php
-                            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                        @endphp
-
-                        @if (in_array($extension, ['png', 'jpg', 'jpeg', 'webp']))
-                            <img src="{{ asset('storage/' . $file) }}" class="w-20 h-20 object-cover rounded-lg">
-
-                        @elseif ($extension === 'pdf')
-                            <div class="w-20 h-20 bg-red-100 flex items-center justify-center rounded-lg">
-                                PDF
-                            </div>
-
-                        @elseif (in_array($extension, ['doc', 'docx']))
-                            <div class="w-20 h-20 bg-blue-100 flex items-center justify-center rounded-lg">
-                                DOC
-                            </div>
-                        @endif
-
-                    @empty
-                        <p class="text-sm text-gray-400 italic">Tidak ada lampiran.</p>
-                    @endforelse
-                </div>
+                @if($record->lampirans && $record->lampirans->isNotEmpty())
+                    <div class="flex flex-wrap gap-4">
+                        @foreach($record->lampirans as $lampiran)
+                            @php
+                                $ext = strtolower(pathinfo($lampiran->nama_file, PATHINFO_EXTENSION));
+                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png']);
+                                $fileUrl = asset('storage/' . $lampiran->path_file);
+                            @endphp
+                            <a href="{{ $fileUrl }}" target="_blank"
+                                class="w-28 h-24 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 hover:border-brand-teal transition-all p-2 text-center">
+                                @if($isImage)
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-purple-500 mb-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                    </svg>
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-orange-500 mb-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                    </svg>
+                                @endif
+                                <span class="text-[10px] text-gray-500 font-medium truncate w-full" title="{{ $lampiran->nama_file }}">
+                                    {{ $lampiran->nama_file }}
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-xs text-gray-400">Tidak ada lampiran.</p>
+                @endif
             </div>
 
             <!-- Konselor -->
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Konselor</h3>
-                <!-- Jika ada relasi konselor/user, panggil namanya. Jika tidak ada, pakai fallback -->
                 <p class="text-lg font-bold text-gray-900 uppercase tracking-wide">
-                    {{ $record->user->nama ?? '-' }}
+                    {{ $record->gurubk->user->nama ?? '-' }}
                 </p>
                 <p class="text-[11px] text-gray-500 mt-1">Dicatat oleh sistem</p>
             </div>

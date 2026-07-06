@@ -9,9 +9,10 @@ class KonsultasiBalasan extends Model
     protected $table = 'konsultasi_balasan';
     protected $fillable = [
         'konsultasi_id',
-        'jawaban',
-        'tanggal_balasan',
-        'id_konselor',
+        'user_id',
+        'pesan',
+        'lampiran',
+        'dibaca',
     ];
 
     public function konsultasi()
@@ -21,6 +22,6 @@ class KonsultasiBalasan extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_konselor');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -14,6 +14,7 @@ class DataSiswa extends Model
         'nis',
         'kelas_id',
         'alamat',
+        'periode_ajaran',
     ];
 
     protected $casts = [
@@ -56,6 +57,21 @@ class DataSiswa extends Model
         return $query->where('kelas_id', $kelasId);
     }
 
+    public function scopeByJurusan(Builder $query, string $jurusan): Builder
+    {
+        return $query->whereHas('kelas.jurusan', fn($q) => $q->where('nama_jurusan', $jurusan));
+    }
+
+    public function scopeByJenisKelamin(Builder $query, string $jenisKelamin): Builder
+    {
+        return $query->whereHas('user', fn($q) => $q->where('jenis_kelamin', $jenisKelamin));
+    }
+
+    public function scopeByPeriode(Builder $query, string $periode): Builder
+    {
+        return $query->where('periode_ajaran', $periode);
+    }
+
     // ─────────────────────────────────────────
     // ACCESSORS
     // ─────────────────────────────────────────
@@ -63,6 +79,11 @@ class DataSiswa extends Model
     public function getNamaAttribute()
     {
         return $this->user?->nama;
+    }
+
+    public function getJenisKelaminAttribute(): string
+    {
+        return $this->user?->jenis_kelamin ?? '-';
     }
 
     public function getInitialsAttribute(): string

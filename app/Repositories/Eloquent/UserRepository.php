@@ -54,6 +54,12 @@ class UserRepository implements UserRepositoryInterface
     public function create(array $data): User
     {
         $data['password'] = Hash::make($data['password']);
+        // Default values untuk kolom yang tidak dikirim form
+        $data['email'] ??= $data['username'] . '@sekolah.sch.id';
+        $data['jenis_kelamin'] ??= 'Laki-laki';
+        $data['no_hp'] ??= '-';
+        $data['foto'] ??= '';
+        $data['status'] ??= 'Aktif';
         return User::create($data);
     }
 

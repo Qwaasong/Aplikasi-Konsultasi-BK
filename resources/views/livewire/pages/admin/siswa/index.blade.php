@@ -29,7 +29,7 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|string|max:255')]
     public string $nama          = '';
 
-    #[Validate('required|integer|in:10,11,12')]
+    #[Validate('required|integer|exists:kelas,id')]
     public string $kelas         = '';
 
     #[Validate('required|in:Laki-laki,Perempuan')]
@@ -55,7 +55,6 @@ new #[Layout('layouts.app')] class extends Component {
     public ?int   $exportPreviewCount = null;
 
     // ── Options untuk dropdown ───────────────
-    public array $kelasOptions    = [10, 11, 12];
     public array $jenisKelaminOptions = [
         ['value' => 'Laki-laki', 'label' => 'Laki-laki'],
         ['value' => 'Perempuan', 'label' => 'Perempuan'],
@@ -111,9 +110,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->editingId       = $id;
         $this->nis             = (string) $siswa->nis;
         $this->nama            = $siswa->nama;
-        $this->kelas           = (string) $siswa->kelas;
+        $this->kelas           = (string) $siswa->kelas_id;
         $this->jenis_kelamin   = $siswa->jenis_kelamin;
-        $this->jurusan         = $siswa->jurusan;
+        $this->jurusan         = $siswa->kelas?->jurusan?->nama_jurusan ?? '';
         $this->periode_ajaran  = $siswa->periode_ajaran;
 
         $this->showForm = true;
@@ -369,8 +368,8 @@ new #[Layout('layouts.app')] class extends Component {
             <select wire:model.live="filterKelas"
                 class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Kelas</option>
-                @foreach($filterOptions['kelas'] as $k)
-                    <option value="{{ $k }}">Kelas {{ $k }}</option>
+                @foreach($filterOptions['kelas'] as $kelasId => $kelasNama)
+                    <option value="{{ $kelasId }}">{{ $kelasNama }}</option>
                 @endforeach
             </select>
 
@@ -634,12 +633,15 @@ new #[Layout('layouts.app')] class extends Component {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <x-atoms.input-label for="kelas" size="sm">Kelas *</x-atoms.input-label>
-                            <x-molecules.input-dropdown
-                                id="kelas"
-                                wire:model="kelas"
-                                size="md"
-                                :options="collect($kelasOptions)->map(fn($k) => ['value' => (string)$k, 'label' => 'Kelas ' . $k])->toArray()"
-                            />
+                            <select id="kelas" wire:model="kelas"
+                                class="w-full border border-gray-300 rounded-md px-4 py-2 text-sm
+                                       focus:outline-none focus:ring-1 focus:ring-brand-teal focus:border-brand-teal
+                                       transition duration-150 bg-white">
+                                <option value="">Pilih Kelas</option>
+                                @foreach($filterOptions['kelas'] as $kelasId => $kelasNama)
+                                    <option value="{{ $kelasId }}">{{ $kelasNama }}</option>
+                                @endforeach
+                            </select>
                             @error('kelas')
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                             @enderror
@@ -847,8 +849,8 @@ new #[Layout('layouts.app')] class extends Component {
                                    focus:outline-none focus:ring-1 focus:ring-brand-teal focus:border-brand-teal
                                    transition duration-150 bg-white">
                             <option value="">Semua Kelas</option>
-                            @foreach($filterOptions['kelas'] as $k)
-                                <option value="{{ $k }}">Kelas {{ $k }}</option>
+                            @foreach($filterOptions['kelas'] as $kelasId => $kelasNama)
+                                <option value="{{ $kelasId }}">{{ $kelasNama }}</option>
                             @endforeach
                         </select>
                     </div>

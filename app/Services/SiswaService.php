@@ -66,17 +66,40 @@ class SiswaService
 
     /**
      * Buat siswa baru.
+     * Otomatis membuat User akun dan menghubungkan ke Kelas yang dipilih.
      * Lempar ValidationException jika NIS sudah dipakai.
      */
     public function create(array $data): DataSiswa
     {
         $this->ensureNisUnique($data['nis']);
 
-        return $this->siswaRepository->create($data);
+        // Buat user terlebih dahulu
+        $user = \App\Models\User::create([
+            'nama' => $data['nama'],
+            'username' => $data['username'] ?? 'siswa_' . $data['nis'],
+            'email' => $data['email'] ?? $data['nis'] . '@sekolah.sch.id',
+            'jenis_kelamin' => $data['jenis_kelamin'] ?? 'Laki-laki',
+            'no_hp' => $data['no_hp'] ?? '-',
+            'foto' => '',
+            'password' => bcrypt('password'),
+            'role' => 'Siswa',
+            'status' => 'Aktif',
+        ]);
+
+        // Siapkan data untuk tabel data_siswa
+        $siswaData = [
+            'user_id' => $user->id,
+            'nis' => (int) $data['nis'],
+            'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? 0),
+            'alamat' => $data['alamat'] ?? '',
+            'periode_ajaran' => $data['periode_ajaran'] ?? '',
+        ];
+
+        return $this->siswaRepository->create($siswaData);
     }
 
     /**
-     * Perbarui data siswa.
+     * Perbarui data siswa dan user terkait.
      * Lempar ValidationException jika NIS baru sudah dipakai siswa lain.
      */
     public function update(int $id, array $data): DataSiswa
@@ -88,7 +111,22 @@ class SiswaService
             $this->ensureNisUnique($data['nis']);
         }
 
-        return $this->siswaRepository->update($id, $data);
+        // Update data user
+        if ($existing->user) {
+            $existing->user->update([
+                'nama' => $data['nama'] ?? $existing->user->nama,
+                'jenis_kelamin' => $data['jenis_kelamin'] ?? $existing->user->jenis_kelamin,
+            ]);
+        }
+
+        // Siapkan data untuk tabel data_siswa
+        $siswaData = [
+            'nis' => (int) $data['nis'],
+            'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? $existing->kelas_id),
+            'periode_ajaran' => $data['periode_ajaran'] ?? $existing->periode_ajaran,
+        ];
+
+        return $this->siswaRepository->update($id, $siswaData);
     }
 
     /**
@@ -166,10 +204,10 @@ class SiswaService
             fputcsv($output, [
                 $siswa->nis,
                 $siswa->nama,
-                $siswa->kelas,
+                $siswa->kelas_label,
                 $siswa->jenis_kelamin,
-                $siswa->jurusan,
-                $siswa->periode_ajaran,
+                $siswa->kelas?->jurusan?->nama_jurusan ?? '',
+                $siswa->periode_ajaran ?? '',
             ]);
         }
 

@@ -3,6 +3,8 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\DataSiswa;
+use App\Models\Kelas;
+use App\Models\Jurusan;
 use App\Repositories\Contracts\SiswaRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -16,7 +18,9 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getAll(): Collection
     {
-        return DataSiswa::orderBy('nama')->get();
+        return DataSiswa::with(['user', 'kelas.jurusan'])
+            ->orderBy(DataSiswa::select('nama')->from('users')->whereColumn('users.id', 'data_siswa.user_id'))
+            ->get();
     }
 
     public function countSiswa(): int
@@ -26,14 +30,14 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
-        $query = DataSiswa::query();
+        $query = DataSiswa::with(['user', 'kelas.jurusan']);
 
         if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
         if (! empty($filters['kelas'])) {
-            $query->byKelas((int) $filters['kelas']);
+            $query->whereHas('kelas', fn($q) => $q->where('id', (int) $filters['kelas']));
         }
 
         if (! empty($filters['jurusan'])) {
@@ -48,13 +52,11 @@ class SiswaRepository implements SiswaRepositoryInterface
             $query->byPeriode($filters['periode_ajaran']);
         }
 
-        if (! empty($filters['periode_ajaran'])) {
-            $query->byPeriode($filters['periode_ajaran']);
-        }
-
         $perPage = (int) ($filters['per_page'] ?? 15);
 
-        return $query->orderBy('nama')->paginate($perPage);
+        return $query->orderBy(
+            DataSiswa::select('nama')->from('users')->whereColumn('users.id', 'data_siswa.user_id')
+        )->paginate($perPage);
     }
 
     public function search(string $keyword = '', int $limit = 50): Collection
@@ -65,7 +67,7 @@ class SiswaRepository implements SiswaRepositoryInterface
             $query->search($keyword);
         }
 
-        return $query->orderBy('nama')->take($limit)->get();
+        return $query->take($limit)->get();
     }
 
     public function findById(int $id): DataSiswa
@@ -115,7 +117,6 @@ class SiswaRepository implements SiswaRepositoryInterface
 
         $now = now();
 
-        // Tambahkan timestamp ke setiap baris
         $rows = array_map(function (array $row) use ($now) {
             return array_merge($row, [
                 'created_at' => $now,
@@ -123,11 +124,10 @@ class SiswaRepository implements SiswaRepositoryInterface
             ]);
         }, $rows);
 
-        // Upsert by NIS – kolom yang di-update jika NIS sudah ada
         DataSiswa::upsert(
             $rows,
-            ['nis'],                                  // unique key
-            ['nama', 'kelas', 'jenis_kelamin', 'jurusan', 'periode_ajaran', 'updated_at']
+            ['nis'],
+            ['kelas_id', 'alamat', 'periode_ajaran', 'updated_at']
         );
 
         return count($rows);
@@ -139,23 +139,18 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getJurusan(): Collection
     {
-        return DataSiswa::select('jurusan')
-            ->distinct()
-            ->orderBy('jurusan')
-            ->pluck('jurusan');
+        return Jurusan::orderBy('nama_jurusan')->pluck('nama_jurusan');
     }
 
     public function getKelas(): Collection
     {
-        return DataSiswa::select('kelas')
-            ->distinct()
-            ->orderBy('kelas')
-            ->pluck('kelas');
+        return Kelas::orderBy('nama_kelas')->pluck('nama_kelas', 'id');
     }
 
     public function getPeriode(): Collection
     {
         return DataSiswa::select('periode_ajaran')
+            ->whereNotNull('periode_ajaran')
             ->distinct()
             ->orderByDesc('periode_ajaran')
             ->pluck('periode_ajaran');
@@ -168,21 +163,24 @@ class SiswaRepository implements SiswaRepositoryInterface
     public function getStats(): array
     {
         $total = DataSiswa::count();
-        $laki = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
-        $perempuan = DataSiswa::where('jenis_kelamin', 'Perempuan')->count();
 
-        $perKelas = DataSiswa::select('kelas', DB::raw('count(*) as total'))
-            ->groupBy('kelas')
-            ->orderBy('kelas')
+        $laki = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'Laki-laki'))->count();
+        $perempuan = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'Perempuan'))->count();
+
+        $perKelas = DataSiswa::select('kelas_id', DB::raw('count(*) as total'))
+            ->groupBy('kelas_id')
             ->get()
-            ->mapWithKeys(fn ($row) => [$row->kelas => $row->total])
+            ->mapWithKeys(function ($row) {
+                $kelas = Kelas::find($row->kelas_id);
+                return [$kelas?->nama_kelas ?? $row->kelas_id => $row->total];
+            })
             ->toArray();
 
-        $perJurusan = DataSiswa::select('jurusan', DB::raw('count(*) as total'))
-            ->groupBy('jurusan')
-            ->orderBy('jurusan')
+        $perJurusan = DataSiswa::select('kelas_id', DB::raw('count(*) as total'))
+            ->groupBy('kelas_id')
             ->get()
-            ->mapWithKeys(fn ($row) => [$row->jurusan => $row->total])
+            ->groupBy(fn($row) => Kelas::with('jurusan')->find($row->kelas_id)?->jurusan?->nama_jurusan ?? 'Unknown')
+            ->map(fn($group) => $group->sum('total'))
             ->toArray();
 
         return compact('total', 'laki', 'perempuan', 'perKelas', 'perJurusan');
