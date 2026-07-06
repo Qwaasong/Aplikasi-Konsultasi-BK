@@ -82,6 +82,16 @@ class DataSiswa extends Model
         return $this->kelas?->nama_kelas ?? '-';
     }
 
+    public function getJurusanLabelAttribute(): string
+    {
+        return $this->kelas?->jurusan?->nama_jurusan ?? '-';
+    }
+
+    public function getNamaLengkapAttribute(): string
+    {
+        return $this->user?->nama ?? '-';
+    }
+
     public function getTotalKonsultasiAttribute(): int
     {
         return $this->konsultasis()->count();

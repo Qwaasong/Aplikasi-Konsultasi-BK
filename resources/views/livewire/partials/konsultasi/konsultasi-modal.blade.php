@@ -260,8 +260,8 @@ new class extends Component {
                                 <div>
                                     <h3 class="text-[14px] font-bold text-gray-900">
                                         {{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}</h3>
-                                    <p class="text-[12px] text-gray-400 mt-0.5">Kelas {{ $this->selectedStudent->kelas }}
-                                        {{ $this->selectedStudent->jurusan }} - NIS {{ $this->selectedStudent->nis }}</p>
+                                    <p class="text-[12px] text-gray-400 mt-0.5">Kelas {{ $this->selectedStudent->kelas_label }}
+                                        {{ $this->selectedStudent->jurusan_label }} - NIS {{ $this->selectedStudent->nis }}</p>
                                 </div>
                             </div>
                             <button type="button" wire:click="openStudentModal" class="text-[13px] font-bold text-gray-500 hover:text-gray-800 transition-colors">
@@ -449,7 +449,7 @@ new class extends Component {
                     @forelse($this->filteredStudents as $siswa)
                         <div wire:click="selectStudent({{ $siswa->id }})" class="student-card border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $id_siswa == $siswa->id ? 'border-primary bg-bg-light' : '' }}">
                             <h4 class="text-[14px] font-bold text-gray-900">{{ $siswa->nama_lengkap ?? $siswa->nama }}</h4>
-                            <p class="text-[12px] text-gray-500 mt-1">NIS: {{ $siswa->nis }} <span class="ml-2">Kelas: {{ $siswa->kelas }} {{ $siswa->jurusan }}</span></p>
+                            <p class="text-[12px] text-gray-500 mt-1">NIS: {{ $siswa->nis }} <span class="ml-2">Kelas: {{ $siswa->kelas_label }}</span></p>
                         </div>
                     @empty
                         <div class="p-6 text-center text-gray-500 text-sm">Tidak ada siswa ditemukan.</div>

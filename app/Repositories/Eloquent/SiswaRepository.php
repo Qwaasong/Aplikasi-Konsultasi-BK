@@ -28,27 +28,27 @@ class SiswaRepository implements SiswaRepositoryInterface
     {
         $query = DataSiswa::query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
-        if (!empty($filters['kelas'])) {
+        if (! empty($filters['kelas'])) {
             $query->byKelas((int) $filters['kelas']);
         }
 
-        if (!empty($filters['jurusan'])) {
+        if (! empty($filters['jurusan'])) {
             $query->byJurusan($filters['jurusan']);
         }
 
-        if (!empty($filters['jenis_kelamin'])) {
+        if (! empty($filters['jenis_kelamin'])) {
             $query->byJenisKelamin($filters['jenis_kelamin']);
         }
 
-        if (!empty($filters['periode_ajaran'])) {
+        if (! empty($filters['periode_ajaran'])) {
             $query->byPeriode($filters['periode_ajaran']);
         }
 
-        if (!empty($filters['periode_ajaran'])) {
+        if (! empty($filters['periode_ajaran'])) {
             $query->byPeriode($filters['periode_ajaran']);
         }
 
@@ -59,9 +59,9 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function search(string $keyword = '', int $limit = 50): Collection
     {
-        $query = DataSiswa::query();
+        $query = DataSiswa::with(['user', 'kelas.jurusan']);
 
-        if (!empty($keyword)) {
+        if (! empty($keyword)) {
             $query->search($keyword);
         }
 
@@ -70,7 +70,7 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function findById(int $id): DataSiswa
     {
-        return DataSiswa::findOrFail($id);
+        return DataSiswa::with(['user', 'kelas.jurusan'])->findOrFail($id);
     }
 
     public function findByNis(int $nis): ?DataSiswa
@@ -91,12 +91,14 @@ class SiswaRepository implements SiswaRepositoryInterface
     {
         $siswa = DataSiswa::findOrFail($id);
         $siswa->update($data);
+
         return $siswa->fresh();
     }
 
     public function delete(int $id): bool
     {
         $siswa = DataSiswa::findOrFail($id);
+
         return $siswa->delete();
     }
 
@@ -165,8 +167,8 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getStats(): array
     {
-        $total     = DataSiswa::count();
-        $laki      = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
+        $total = DataSiswa::count();
+        $laki = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
         $perempuan = DataSiswa::where('jenis_kelamin', 'Perempuan')->count();
 
         $perKelas = DataSiswa::select('kelas', DB::raw('count(*) as total'))
