@@ -8,12 +8,13 @@ state([
         $role = Auth::user()->role ?? '';
         $prefix = match ($role) {
             'Guru_BK' => 'konselor',
+            'Admin' => 'admin',
             default  => $role,
         };
 
         $menus = [];
 
-        if ($role === 'admin' || $role === 'Guru_BK') {
+        if ($role === 'Admin' || $role === 'Guru_BK') {
             $menus[] = [
                 'label' => 'Dashboard',
                 'url' => route($prefix . '.dashboard'),
@@ -29,7 +30,7 @@ state([
             ];
         }
 
-        if ($role === 'admin') {
+        if ($role === 'Admin') {
             $menus[] = [
                 'label' => 'Siswa',
                 'url' => route('admin.siswa.index'),

@@ -39,7 +39,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <div
                     class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
                     <div class="p-6 font-medium text-white">
-                        Anda masuk sebagai {{ auth()->user()->role }}.
+                        Anda masuk sebagai {{ auth()->user()->nama }}.
                     </div>
                 </div>
             </x-molecules.header-card>

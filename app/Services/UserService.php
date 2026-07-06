@@ -44,7 +44,7 @@ class UserService
     {
         $all   = $this->userRepository->getAll();
         $total = $all->count();
-        $admin = $all->where('role', 'admin')->count();
+        $admin = $all->where('role', 'Admin')->count();
         $konselor = $all->where('role', 'Guru_BK')->count();
 
         return compact('total', 'admin', 'konselor');

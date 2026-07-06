@@ -6,7 +6,7 @@ use Livewire\Volt\Volt;
 Volt::route('test', 'pages.test');
 
 //Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:Admin'])->group(function () {
     Volt::route('admin/dashboard', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
     Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');

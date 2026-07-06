@@ -7,7 +7,7 @@ use App\Livewire\Actions\Logout;
 // 1. Logic halaman depan
 Route::get('/', function () {
     if (auth()->check()) {
-        if (auth()->user()->role == 'admin') {
+        if (auth()->user()->role == 'Admin') {
             return redirect()->route('admin.dashboard');
         }
         return redirect()->route('konselor.dashboard');

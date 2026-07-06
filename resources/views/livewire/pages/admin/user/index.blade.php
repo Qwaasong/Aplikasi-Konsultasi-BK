@@ -25,7 +25,7 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|string|max:100')]
     public string $username = '';
 
-    #[Validate('required|in:admin,Guru_BK')]
+    #[Validate('required|in:Admin,Guru_BK')]
     public string $role = 'Guru_BK';
 
     // Password: wajib saat create, opsional saat edit
@@ -34,7 +34,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     // ── Options ─────────────────────────────
     public array $roleOptions = [
-        ['value' => 'admin', 'label' => 'Admin'],
+        ['value' => 'Admin', 'label' => 'Admin'],
         ['value' => 'Guru_BK', 'label' => 'Konselor'],
     ];
 
@@ -89,7 +89,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'nama' => 'required|string|max:255',
             'username' => 'required|string|max:100',
-            'role' => 'required|in:admin,Guru_BK',
+            'role' => 'required|in:Admin,Guru_BK',
         ]);
 
         // Validasi password: wajib saat create, min 6 jika diisi saat edit
@@ -209,7 +209,7 @@ new #[Layout('layouts.app')] class extends Component {
             <select wire:model.live="filterRole"
                 class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Role</option>
-                <option value="admin">Admin</option>
+                <option value="Admin">Admin</option>
                 <option value="Guru_BK">Konselor</option>
             </select>
 
@@ -256,7 +256,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <td class="px-4 py-2 align-middle">
                     <span @class([
                         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
-                        'bg-blue-100 text-blue-700' => $user->role === 'admin',
+                        'bg-blue-100 text-blue-700' => $user->role === 'Admin',
                         'bg-teal-100 text-teal-700' => $user->role === 'Guru_BK',
                     ])>
                         {{ $user->role === 'Guru_BK' ? 'Konselor' : ucfirst($user->role) }}

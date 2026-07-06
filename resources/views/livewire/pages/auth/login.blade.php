@@ -22,7 +22,7 @@ new #[Layout('layouts.guest')] class extends Component {
         $role = Auth::user()->role;
         $route = 'dashboard'; // fallback
 
-        if ($role === 'admin') {
+        if ($role === 'Admin') {
             $route = route('admin.dashboard', absolute: false);
         } elseif ($role === 'Guru_BK') {
             $route = route('konselor.dashboard', absolute: false);
