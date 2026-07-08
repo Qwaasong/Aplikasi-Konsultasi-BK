@@ -1,5 +1,5 @@
 @props([
-    'menus' => [],
+'menus' => [],
 ])
 
 <aside x-data="{
@@ -17,16 +17,28 @@
         </div>
 
         <nav class="flex flex-col mt-4 w-full space-y-2">
+
             @foreach ($menus as $menu)
-                <x-molecules.sidebar-item :linkHref="$menu['url'] ?? '#'" :active="$menu['active']" :variants="$menu['variants']">
 
-                    <span :class="open ? 'opacity-100 w-auto ml-3' : 'opacity-0 w-0 overflow-hidden'"
-                        class="transition-all duration-200 whitespace-nowrap block">
-                        {{ $menu['label'] }}
-                    </span>
+            @if (!empty($menu['children']))
 
-                </x-molecules.sidebar-item>
+            <x-molecules.sidebar-dropdown :menu="$menu" />
+
+            @else
+
+            <x-molecules.sidebar-item
+                :linkHref="$menu['url'] ?? '#'"
+                :active="$menu['active']"
+                :variants="$menu['variants']">
+
+                {{ $menu['label'] }}
+
+            </x-molecules.sidebar-item>
+
+            @endif
+
             @endforeach
+
         </nav>
 
     </div>

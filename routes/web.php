@@ -15,12 +15,23 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         ->name('admin.konsultasi.detail');
 });
 
-//Guru / Konselor
+// Guru / Konselor
 Route::middleware(['auth', 'role:Guru_BK'])->group(function () {
+
+    // Dashboard
     Volt::route('konselor/dashboard', 'pages.konselor.dashboard')->name('konselor.dashboard');
+    // Konsultasi (lama)
     Volt::route('konselor/konsultasi', 'pages.konselor.konsultasi.index')->name('konselor.konsultasi.index');
-    Volt::route('/konselor/konsultasi/{id}/detail', 'pages.konselor.konsultasi.detail')
-        ->name('konselor.konsultasi.detail');
+    Volt::route('konselor/konsultasi/{id}/detail', 'pages.konselor.konsultasi.detail')->name('konselor.konsultasi.detail');
+
+    // Pembinaan Siswa
+    Volt::route('konselor/kehadiran-siswa', 'pages.konselor.kehadiran-siswa.index')->name('konselor.kehadiran-siswa.index');
+    Volt::route('konselor/layanan-konseling/individu', 'pages.konselor.layanan-konseling.individu')->name('konselor.layanan-konseling.individu');
+    Volt::route('konselor/layanan-konseling/kelompok', 'pages.konselor.layanan-konseling.kelompok')->name('konselor.layanan-konseling.kelompok');
+    Volt::route('konselor/kunjungan-rumah', 'pages.konselor.kunjungan-rumah.index')->name('konselor.kunjungan-rumah.index');
+    Volt::route('konselor/alih-tangan-kasus', 'pages.konselor.alih-tangan-kasus.index')->name('konselor.alih-tangan-kasus.index');
+    Volt::route('konselor/konferensi-kasus', 'pages.konselor.konferensi-kasus.index')->name('konselor.konferensi-kasus.index');
+    Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
 });
 
 require __DIR__ . '/auth.php';

@@ -14,23 +14,117 @@ state([
 
         $menus = [];
 
-        if ($role === 'Admin' || $role === 'Guru_BK') {
+        // Guru BK
+        if ($role === 'Guru_BK') {
+
             $menus[] = [
                 'label' => 'Dashboard',
-                'url' => route($prefix . '.dashboard'),
-                'active' => request()->routeIs($prefix . '.dashboard'),
+                'url' => route('konselor.dashboard'),
+                'active' => request()->routeIs('konselor.dashboard'),
+                'variants' => 'dashboard',
+                'children' => [],
+            ];
+
+            $menus[] = [
+                'label' => 'Pembinaan Siswa',
+                'url' => '#',
+                'active' =>
+                request()->routeIs('konselor.kehadiran-siswa.*') ||
+                    request()->routeIs('konselor.layanan-konseling.*') ||
+                    request()->routeIs('konselor.kunjungan-rumah.*') ||
+                    request()->routeIs('konselor.alih-tangan-kasus.*') ||
+                    request()->routeIs('konselor.konferensi-kasus.*') ||
+                    request()->routeIs('konselor.peminatan.*'),
+
+                'variants' => 'consultation',
+
+                'children' => [
+
+                    [
+                        'label' => 'Kehadiran Siswa',
+                        'url' => route('konselor.kehadiran-siswa.index'),
+                        'active' => request()->routeIs('konselor.kehadiran-siswa.*'),
+                        'variants' => 'attendance',
+                    ],
+
+                    [
+                        'label' => 'Konseling Siswa',
+                        'url' => '#',
+
+                        'active' =>
+                        request()->routeIs('konselor.layanan-konseling.individu') ||
+                            request()->routeIs('konselor.layanan-konseling.kelompok'),
+
+                        'variants' => 'consultation',
+
+                        'children' => [
+
+                            [
+                                'label' => 'Individu',
+                                'url' => route('konselor.layanan-konseling.individu'),
+                                'active' => request()->routeIs('konselor.layanan-konseling.individu'),
+                                'variants' => 'consultation',
+                            ],
+
+                            [
+                                'label' => 'Kelompok',
+                                'url' => route('konselor.layanan-konseling.kelompok'),
+                                'active' => request()->routeIs('konselor.layanan-konseling.kelompok'),
+                                'variants' => 'consultation',
+                            ],
+
+                        ],
+                    ],
+
+                    [
+                        'label' => 'Kunjungan Rumah',
+                        'url' => route('konselor.kunjungan-rumah.index'),
+                        'active' => request()->routeIs('konselor.kunjungan-rumah.*'),
+                        'variants' => 'home',
+                    ],
+
+                    [
+                        'label' => 'Alih Tangan Kasus',
+                        'url' => route('konselor.alih-tangan-kasus.index'),
+                        'active' => request()->routeIs('konselor.alih-tangan-kasus.*'),
+                        'variants' => 'swap',
+                    ],
+
+                    [
+                        'label' => 'Konferensi Kasus',
+                        'url' => route('konselor.konferensi-kasus.index'),
+                        'active' => request()->routeIs('konselor.konferensi-kasus.*'),
+                        'variants' => 'group',
+                    ],
+
+                    [
+                        'label' => 'Peminatan',
+                        'url' => route('konselor.peminatan.index'),
+                        'active' => request()->routeIs('konselor.peminatan.*'),
+                        'variants' => 'target',
+                    ],
+
+                ],
+            ];
+        }
+
+        // Admin
+        if ($role === 'Admin') {
+
+            $menus[] = [
+                'label' => 'Dashboard',
+                'url' => route('admin.dashboard'),
+                'active' => request()->routeIs('admin.dashboard'),
                 'variants' => 'dashboard'
             ];
 
             $menus[] = [
                 'label' => 'Konsultasi',
-                'url' => route($prefix . '.konsultasi.index'),
-                'active' => request()->routeIs($prefix . '.konsultasi.*'),
+                'url' => route('admin.konsultasi.index'),
+                'active' => request()->routeIs('admin.konsultasi.*'),
                 'variants' => 'consultation'
             ];
-        }
 
-        if ($role === 'Admin') {
             $menus[] = [
                 'label' => 'Siswa',
                 'url' => route('admin.siswa.index'),
