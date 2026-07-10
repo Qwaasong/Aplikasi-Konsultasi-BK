@@ -11,7 +11,7 @@
         "livewire/livewire": "^3.6.4",
         "livewire/volt": "^1.7.0",
         "phpoffice/phpspreadsheet": "^5.7",
-        "phpoffice/phpword": "*"
+        "phpoffice/phpword": "^1.4"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.1",
