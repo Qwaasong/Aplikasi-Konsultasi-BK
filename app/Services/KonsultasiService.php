@@ -43,22 +43,30 @@ class KonsultasiService
 
     /**
      * Cari konsultasi by ID dan pastikan kepemilikan.
-     * Hanya konselor pemilik data yang bisa mengakses.
+     * Admin bisa mengakses semua, konselor hanya data miliknya.
      */
     public function findByIdForCurrentUser(int $id): Konsultasi
     {
         $konsultasi = $this->konsultasiRepository->findById($id);
-        $this->ensureOwnership($konsultasi);
+
+        if (!$this->isAdmin()) {
+            $this->ensureOwnership($konsultasi);
+        }
+
         return $konsultasi;
     }
 
     /**
      * Hapus konsultasi dengan pengecekan kepemilikan terlebih dahulu.
+     * Admin bisa menghapus semua, konselor hanya data miliknya.
      */
     public function deleteForCurrentUser(int $id): void
     {
         $konsultasi = $this->konsultasiRepository->findById($id);
-        $this->ensureOwnership($konsultasi);
+
+        if (!$this->isAdmin()) {
+            $this->ensureOwnership($konsultasi);
+        }
 
         // Hapus semua file lampiran terlebih dahulu
         foreach ($konsultasi->lampirans as $lampiran) {
@@ -100,9 +108,12 @@ class KonsultasiService
      */
     public function update(int $id, array $data, array $keptPaths = [], array $newFiles = []): void
     {
-        // Verifikasi kepemilikan sebelum update
+        // Verifikasi kepemilikan sebelum update (skip untuk admin)
         $konsultasi = $this->konsultasiRepository->findById($id);
-        $this->ensureOwnership($konsultasi);
+
+        if (!$this->isAdmin()) {
+            $this->ensureOwnership($konsultasi);
+        }
 
         $this->konsultasiRepository->update($id, $data);
 
@@ -134,6 +145,14 @@ class KonsultasiService
     // ─────────────────────────────────────────
     // PRIVATE HELPERS
     // ─────────────────────────────────────────
+
+    /**
+     * Cek apakah user yang sedang login adalah admin.
+     */
+    private function isAdmin(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'Admin';
+    }
 
     /**
      * Resolve ID pegawai dari user yang sedang login.
