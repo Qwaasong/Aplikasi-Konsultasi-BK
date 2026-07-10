@@ -20,3 +20,4 @@ yarn-error.log
 /_agents
 .sqlite
 CLAUDE.md
+.claude
