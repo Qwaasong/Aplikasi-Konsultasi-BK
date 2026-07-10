@@ -256,6 +256,16 @@ new #[Layout('layouts.app')] class extends Component {
                     {{ $user->username }}
                 </td>
 
+                {{-- Email --}}
+                <td class="px-4 py-2 text-sm text-gray-500 align-middle">
+                    {{ $user->email ?? '-' }}
+                </td>
+
+                {{-- No. HP --}}
+                <td class="px-4 py-2 text-sm text-gray-500 align-middle">
+                    {{ $user->no_hp ?? '-' }}
+                </td>
+
                 {{-- Role Badge --}}
                 <td class="px-4 py-2 align-middle">
                     <span @class([
@@ -264,6 +274,17 @@ new #[Layout('layouts.app')] class extends Component {
                         'bg-teal-100 text-teal-700' => $user->role === 'Guru_BK',
                     ])>
                         {{ $user->role === 'Guru_BK' ? 'Konselor' : ucfirst($user->role) }}
+                    </span>
+                </td>
+
+                {{-- Status --}}
+                <td class="px-4 py-2 align-middle">
+                    <span @class([
+                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
+                        'bg-green-100 text-green-700' => ($user->status ?? 'Aktif') === 'Aktif',
+                        'bg-red-100 text-red-700' => ($user->status ?? 'Aktif') !== 'Aktif',
+                    ])>
+                        {{ $user->status ?? 'Aktif' }}
                     </span>
                 </td>
 

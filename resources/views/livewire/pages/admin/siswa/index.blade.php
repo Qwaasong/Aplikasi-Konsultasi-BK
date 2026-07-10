@@ -434,6 +434,18 @@ new #[Layout('layouts.app')] class extends Component {
                             {{ $siswa->kelas_label }}
                         </td>
 
+                        {{-- Foto --}}
+                        <td class="px-4 py-2 align-middle">
+                            @if($siswa->user->foto)
+                                <img src="{{ asset('storage/' . $siswa->user->foto) }}" alt="{{ $siswa->nama }}"
+                                    class="w-8 h-8 rounded-full object-cover border border-gray-200">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-icon-bg text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                                    {{ strtoupper(substr($siswa->nama, 0, 1)) }}{{ strtoupper(substr(strstr($siswa->nama, ' ') ?: '_', 1, 1)) }}
+                                </div>
+                            @endif
+                        </td>
+
                         {{-- Jenis Kelamin --}}
                         <td class="px-4 py-2 align-middle">
                             <span @class([
@@ -445,9 +457,25 @@ new #[Layout('layouts.app')] class extends Component {
                             </span>
                         </td>
 
+                        {{-- Alamat --}}
+                        <td class="px-4 py-2 text-xs text-gray-500 align-middle max-w-[200px] truncate" title="{{ $siswa->alamat }}">
+                            {{ $siswa->alamat ?? '-' }}
+                        </td>
+
                         {{-- Periode Ajaran --}}
                         <td class="px-4 py-2 text-xs text-gray-500 align-middle">
                             {{ $siswa->periode_ajaran }}
+                        </td>
+
+                        {{-- Status --}}
+                        <td class="px-4 py-2 align-middle">
+                            <span @class([
+                                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                                'bg-green-100 text-green-700' => ($siswa->user->status ?? 'Aktif') === 'Aktif',
+                                'bg-red-100 text-red-700'     => ($siswa->user->status ?? 'Aktif') !== 'Aktif',
+                            ])>
+                                {{ $siswa->user->status ?? 'Aktif' }}
+                            </span>
                         </td>
 
                         {{-- Aksi --}}
