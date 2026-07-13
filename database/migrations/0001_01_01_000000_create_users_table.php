@@ -14,20 +14,19 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['Guru_BK', 'Siswa', 'Admin']);
-            $table->string('jenis_kelamin');
+            $table->enum('role', ['admin', 'guru_bk', 'siswa']);
+            $table->enum('jenis_kelamin', ['L', 'P']);
             $table->string('no_hp');
-            $table->string('foto');
-            $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
+            $table->string('foto')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->rememberToken();
             $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('username')->primary();
+            $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });

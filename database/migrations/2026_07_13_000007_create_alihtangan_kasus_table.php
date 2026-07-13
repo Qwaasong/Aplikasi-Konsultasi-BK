@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('konsultasi_balasan', function (Blueprint $table) {
+        Schema::create('alihtangan_kasus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('konsultasi_id')->constrained('konsultasi')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('pesan');
-            $table->string('lampiran')->nullable();
-            $table->boolean('dibaca')->default(false);
+            $table->foreignId('guru_bk_asal_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->string('pihak_penerima');
+            $table->date('tanggal_alih');
+            $table->text('alasan_alih')->nullable();
+            $table->text('tindak_lanjut')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('konsultasi_balasan');
+        Schema::dropIfExists('alihtangan_kasus');
     }
 };
