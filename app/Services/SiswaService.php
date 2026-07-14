@@ -78,12 +78,12 @@ class SiswaService
             'nama' => $data['nama'],
             'username' => $data['username'] ?? 'siswa_' . $data['nis'],
             'email' => $data['email'] ?? $data['nis'] . '@sekolah.sch.id',
-            'jenis_kelamin' => $data['jenis_kelamin'] ?? 'Laki-laki',
+            'jenis_kelamin' => $data['jenis_kelamin'] ?? 'L',
             'no_hp' => $data['no_hp'] ?? '-',
             'foto' => '',
             'password' => bcrypt('password'),
-            'role' => 'Siswa',
-            'status' => 'Aktif',
+            'role' => 'siswa',
+            'status' => 'aktif',
         ]);
 
         // Siapkan data untuk tabel data_siswa
@@ -92,7 +92,6 @@ class SiswaService
             'nis' => (int) $data['nis'],
             'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? 0),
             'alamat' => $data['alamat'] ?? '',
-            'periode_ajaran' => $data['periode_ajaran'] ?? '',
         ];
 
         return $this->siswaRepository->create($siswaData);
@@ -123,7 +122,6 @@ class SiswaService
         $siswaData = [
             'nis' => (int) $data['nis'],
             'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? $existing->kelas_id),
-            'periode_ajaran' => $data['periode_ajaran'] ?? $existing->periode_ajaran,
         ];
 
         return $this->siswaRepository->update($id, $siswaData);
@@ -354,19 +352,15 @@ class SiswaService
             }
 
             // Validasi jenis kelamin
-            $jenisKelamin = ucfirst(strtolower($normalized['jenis_kelamin']));
-            if (!in_array($jenisKelamin, ['Laki-laki', 'Perempuan'], true)) {
-                // Coba normalisasi singkatan umum
-                $jenisKelamin = match (strtolower($normalized['jenis_kelamin'])) {
-                    'l', 'lk', 'laki'                    => 'Laki-laki',
-                    'p', 'pr', 'perempuan', 'wanita', 'w' => 'Perempuan',
-                    default                               => null,
-                };
+            $jenisKelamin = match (strtolower($normalized['jenis_kelamin'])) {
+                'l', 'lk', 'laki', 'laki-laki'         => 'L',
+                'p', 'pr', 'perempuan', 'wanita', 'w'  => 'P',
+                default                                 => null,
+            };
 
-                if ($jenisKelamin === null) {
-                    $errors[] = "Baris {$lineNumber}: Jenis kelamin tidak valid (isi: Laki-laki atau Perempuan).";
-                    continue;
-                }
+            if ($jenisKelamin === null) {
+                $errors[] = "Baris {$lineNumber}: Jenis kelamin tidak valid (isi: Laki-laki atau Perempuan).";
+                continue;
             }
 
             $validRows[] = [

@@ -151,7 +151,7 @@ class KonsultasiService
      */
     private function isAdmin(): bool
     {
-        return auth()->check() && auth()->user()->role === 'Admin';
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 
     /**

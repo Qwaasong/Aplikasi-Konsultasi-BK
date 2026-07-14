@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswa')->cascadeOnDelete();
+            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
             $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
             $table->foreignId('kategori_id')->nullable()->constrained('kategori_konsultasi')->nullOnDelete();

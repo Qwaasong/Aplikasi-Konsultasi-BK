@@ -25,8 +25,8 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|string|max:100')]
     public string $username = '';
 
-    #[Validate('required|in:Admin,Guru_BK')]
-    public string $role = 'Guru_BK';
+    #[Validate('required|in:admin,guru_bk')]
+    public string $role = 'guru_bk';
 
     // Password: wajib saat create, opsional saat edit
     public string $password = '';
@@ -34,8 +34,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     // ── Options ─────────────────────────────
     public array $roleOptions = [
-        ['value' => 'Admin', 'label' => 'Admin'],
-        ['value' => 'Guru_BK', 'label' => 'Konselor'],
+        ['value' => 'admin', 'label' => 'Admin'],
+        ['value' => 'guru_bk', 'label' => 'Konselor'],
     ];
 
     // ─────────────────────────────────────────
@@ -91,7 +91,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'nama' => 'required|string|max:255',
             'username' => 'required|string|max:100',
-            'role' => 'required|in:Admin,Guru_BK',
+            'role' => 'required|in:admin,guru_bk',
         ]);
 
         // Validasi password: wajib saat create, min 6 jika diisi saat edit
@@ -178,7 +178,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->resetValidation();
         $this->nama = '';
         $this->username = '';
-        $this->role = 'Guru_BK';
+        $this->role = 'guru_bk';
         $this->password = '';
         $this->password_confirmation = '';
         $this->showPassword = false;
@@ -213,8 +213,8 @@ new #[Layout('layouts.app')] class extends Component {
             <select wire:model.live="filterRole"
                 class="text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0">
                 <option value="">Semua Role</option>
-                <option value="Admin">Admin</option>
-                <option value="Guru_BK">Konselor</option>
+                <option value="admin">Admin</option>
+                <option value="guru_bk">Konselor</option>
             </select>
 
             <button wire:click="resetFilters" class="text-xs text-brand-teal hover:underline">
@@ -270,10 +270,10 @@ new #[Layout('layouts.app')] class extends Component {
                 <td class="px-4 py-2 align-middle">
                     <span @class([
                         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
-                        'bg-blue-100 text-blue-700' => $user->role === 'Admin',
-                        'bg-teal-100 text-teal-700' => $user->role === 'Guru_BK',
+                        'bg-blue-100 text-blue-700' => $user->role === 'admin',
+                        'bg-teal-100 text-teal-700' => $user->role === 'guru_bk',
                     ])>
-                        {{ $user->role === 'Guru_BK' ? 'Konselor' : ucfirst($user->role) }}
+                        {{ $user->role === 'guru_bk' ? 'Konselor' : ucfirst($user->role) }}
                     </span>
                 </td>
 
@@ -281,10 +281,10 @@ new #[Layout('layouts.app')] class extends Component {
                 <td class="px-4 py-2 align-middle">
                     <span @class([
                         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
-                        'bg-green-100 text-green-700' => ($user->status ?? 'Aktif') === 'Aktif',
-                        'bg-red-100 text-red-700' => ($user->status ?? 'Aktif') !== 'Aktif',
+                        'bg-green-100 text-green-700' => ($user->status ?? 'aktif') === 'aktif',
+                        'bg-red-100 text-red-700' => ($user->status ?? 'aktif') !== 'aktif',
                     ])>
-                        {{ $user->status ?? 'Aktif' }}
+                        {{ $user->status ?? 'aktif' }}
                     </span>
                 </td>
 

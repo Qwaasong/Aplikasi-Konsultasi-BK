@@ -32,8 +32,8 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|integer|exists:kelas,id')]
     public string $kelas         = '';
 
-    #[Validate('required|in:Laki-laki,Perempuan')]
-    public string $jenis_kelamin = 'Laki-laki';
+    #[Validate('required|in:L,P')]
+    public string $jenis_kelamin = 'L';
 
     #[Validate('required|string|max:50')]
     public string $jurusan       = '';
@@ -56,8 +56,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     // ── Options untuk dropdown ───────────────
     public array $jenisKelaminOptions = [
-        ['value' => 'Laki-laki', 'label' => 'Laki-laki'],
-        ['value' => 'Perempuan', 'label' => 'Perempuan'],
+        ['value' => 'L', 'label' => 'Laki-laki'],
+        ['value' => 'P', 'label' => 'Perempuan'],
     ];
 
     // ─────────────────────────────────────────
@@ -113,7 +113,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->kelas           = (string) $siswa->kelas_id;
         $this->jenis_kelamin   = $siswa->jenis_kelamin;
         $this->jurusan         = $siswa->kelas?->jurusan?->nama_jurusan ?? '';
-        $this->periode_ajaran  = $siswa->periode_ajaran;
 
         $this->showForm = true;
     }
@@ -128,7 +127,6 @@ new #[Layout('layouts.app')] class extends Component {
             'kelas'          => (int) $this->kelas,
             'jenis_kelamin'  => $this->jenis_kelamin,
             'jurusan'        => strtoupper($this->jurusan),
-            'periode_ajaran' => $this->periode_ajaran,
         ];
 
         try {
@@ -302,7 +300,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nis            = '';
         $this->nama           = '';
         $this->kelas          = '';
-        $this->jenis_kelamin  = 'Laki-laki';
+        $this->jenis_kelamin  = 'L';
         $this->jurusan        = '';
         $this->periode_ajaran = $this->defaultPeriode();
         $this->editingId      = null;
@@ -386,8 +384,8 @@ new #[Layout('layouts.app')] class extends Component {
          <select wire:model.live="filterJenisKelamin"
         class="appearance-none text-xs border border-gray-200 rounded pl-2 pr-7 py-1 focus:outline-none focus:ring-1 focus:ring-brand-teal">
         <option value="">Semua</option>
-        <option value="Laki-laki">Laki-laki</option>
-        <option value="Perempuan">Perempuan</option>
+        <option value="L">Laki-laki</option>
+        <option value="P">Perempuan</option>
          </select>
 
             <button wire:click="resetFilters"
@@ -450,10 +448,10 @@ new #[Layout('layouts.app')] class extends Component {
                         <td class="px-4 py-2 align-middle">
                             <span @class([
                                 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
-                                'bg-blue-100 text-blue-700'   => $siswa->jenis_kelamin === 'Laki-laki',
-                                'bg-pink-100 text-pink-700'   => $siswa->jenis_kelamin === 'Perempuan',
+                                'bg-blue-100 text-blue-700'   => $siswa->jenis_kelamin === 'L',
+                                'bg-pink-100 text-pink-700'   => $siswa->jenis_kelamin === 'P',
                             ])>
-                                {{ $siswa->jenis_kelamin }}
+                                {{ $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}
                             </span>
                         </td>
 
@@ -462,19 +460,14 @@ new #[Layout('layouts.app')] class extends Component {
                             {{ $siswa->alamat ?? '-' }}
                         </td>
 
-                        {{-- Periode Ajaran --}}
-                        <td class="px-4 py-2 text-xs text-gray-500 align-middle">
-                            {{ $siswa->periode_ajaran }}
-                        </td>
-
                         {{-- Status --}}
                         <td class="px-4 py-2 align-middle">
                             <span @class([
                                 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
-                                'bg-green-100 text-green-700' => ($siswa->user->status ?? 'Aktif') === 'Aktif',
-                                'bg-red-100 text-red-700'     => ($siswa->user->status ?? 'Aktif') !== 'Aktif',
+                                'bg-green-100 text-green-700' => ($siswa->user->status ?? 'aktif') === 'aktif',
+                                'bg-red-100 text-red-700'     => ($siswa->user->status ?? 'aktif') !== 'aktif',
                             ])>
-                                {{ $siswa->user->status ?? 'Aktif' }}
+                                {{ $siswa->user->status ?? 'aktif' }}
                             </span>
                         </td>
 
@@ -689,35 +682,19 @@ new #[Layout('layouts.app')] class extends Component {
                         </div>
                     </div>
 
-                    {{-- Jurusan + Periode (2 kolom) --}}
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <x-atoms.input-label for="jurusan" size="sm">Jurusan *</x-atoms.input-label>
-                            <x-atoms.text-input
-                                id="jurusan"
-                                type="text"
-                                wire:model="jurusan"
-                                placeholder="Contoh: RPL"
-                                size="md"
-                            />
-                            @error('jurusan')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <x-atoms.input-label for="periode_ajaran" size="sm">Periode Ajaran *</x-atoms.input-label>
-                            <x-atoms.text-input
-                                id="periode_ajaran"
-                                type="text"
-                                wire:model="periode_ajaran"
-                                placeholder="Contoh: 2024/2025"
-                                size="md"
-                            />
-                            @error('periode_ajaran')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    {{-- Jurusan --}}
+                    <div>
+                        <x-atoms.input-label for="jurusan" size="sm">Jurusan *</x-atoms.input-label>
+                        <x-atoms.text-input
+                            id="jurusan"
+                            type="text"
+                            wire:model="jurusan"
+                            placeholder="Contoh: RPL"
+                            size="md"
+                        />
+                        @error('jurusan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                 </div>
@@ -756,7 +733,7 @@ new #[Layout('layouts.app')] class extends Component {
                     {{-- Panduan format --}}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
                         <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
-                        <code class="block">nis | nama | kelas | jenis_kelamin | jurusan | periode_ajaran</code>
+                        <code class="block">nis | nama | kelas | jenis_kelamin | jurusan</code>
                         <p class="mt-1 text-blue-500">NIS yang sudah ada akan diperbarui (upsert).</p>
                     </div>
 

@@ -14,17 +14,17 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $username = '';
     public string $email = '';
     public string $no_hp = '';
-    public string $jenis_kelamin = 'Laki-laki';
-    public string $role = 'Guru_BK';
+    public string $jenis_kelamin = 'L';
+    public string $role = 'guru_bk';
     public string $password = '';
     public string $password_confirmation = '';
     public $roles = [
-        ['value' => 'Admin', 'label' => 'Admin'],
-        ['value' => 'Guru_BK', 'label' => 'Konselor'],
+        ['value' => 'admin', 'label' => 'Admin'],
+        ['value' => 'guru_bk', 'label' => 'Konselor'],
     ];
     public $jenisKelaminOptions = [
-        ['value' => 'Laki-laki', 'label' => 'Laki-laki'],
-        ['value' => 'Perempuan', 'label' => 'Perempuan'],
+        ['value' => 'L', 'label' => 'Laki-laki'],
+        ['value' => 'P', 'label' => 'Perempuan'],
     ];
 
     /**
@@ -37,8 +37,8 @@ new #[Layout('layouts.guest')] class extends Component {
             'username' => ['required', 'string', 'lowercase', 'max:255', 'unique:' . User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'no_hp' => ['required', 'string', 'max:20'],
-            'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
-            'role' => ['required', 'string', 'in:Guru_BK,Admin'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
+            'role' => ['required', 'string', 'in:guru_bk,admin'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -48,11 +48,11 @@ new #[Layout('layouts.guest')] class extends Component {
         $user = User::create($validated);
 
         // Buat entri pegawai otomatis untuk role Guru_BK dan Admin
-        if (in_array($user->role, ['Guru_BK', 'Admin'])) {
+        if (in_array($user->role, ['guru_bk', 'admin'])) {
             Pegawai::create([
                 'user_id' => $user->id,
                 'nip' => $this->generateNip($user),
-                'jabatan' => $user->role === 'Admin' ? 'Admin' : 'Guru BK',
+                'jabatan' => $user->role === 'admin' ? 'Admin' : 'Guru BK',
             ]);
         }
 
@@ -63,9 +63,9 @@ new #[Layout('layouts.guest')] class extends Component {
         $role = Auth::user()->role;
         $route = 'dashboard';
 
-        if ($role === 'Admin') {
+        if ($role === 'admin') {
             $route = route('admin.dashboard', absolute: false);
-        } elseif ($role === 'Guru_BK') {
+        } elseif ($role === 'guru_bk') {
             $route = route('konselor.dashboard', absolute: false);
         } else {
             $route = '/';
@@ -79,7 +79,7 @@ new #[Layout('layouts.guest')] class extends Component {
      */
     private function generateNip(User $user): string
     {
-        $prefix = $user->role === 'Admin' ? 'ADM' : 'GBK';
+        $prefix = $user->role === 'admin' ? 'ADM' : 'GBK';
         $count = Pegawai::count() + 1;
         $date = date('Ymd');
 

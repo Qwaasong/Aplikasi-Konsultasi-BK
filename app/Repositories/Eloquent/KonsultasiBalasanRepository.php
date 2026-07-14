@@ -11,7 +11,7 @@ class KonsultasiBalasanRepository implements KonsultasiBalasanRepositoryInterfac
     public function getByKonsultasi(int $konsultasiId): Collection
     {
         return KonsultasiBalasan::where('konsultasi_id', $konsultasiId)
-            ->orderBy('tanggal_balasan')
+            ->orderBy('created_at')
             ->get();
     }
 

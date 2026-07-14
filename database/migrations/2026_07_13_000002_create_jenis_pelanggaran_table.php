@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kehadiran', function (Blueprint $table) {
+        Schema::create('jenis_pelanggaran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
-            $table->date('tanggal_kehadiran');
-            $table->enum('status', ['Hadir', 'Sakit', 'Izin', 'Alpha']);
+            $table->string('nama');
+            $table->text('deskripsi')->nullable();
+            $table->integer('poin')->default(0);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kehadiran');
+        Schema::dropIfExists('jenis_pelanggaran');
     }
 };

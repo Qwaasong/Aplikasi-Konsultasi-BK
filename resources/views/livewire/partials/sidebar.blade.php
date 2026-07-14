@@ -7,15 +7,15 @@ state([
     'menus' => function () {
         $role = Auth::user()->role ?? '';
         $prefix = match ($role) {
-            'Guru_BK' => 'konselor',
-            'Admin' => 'admin',
+            'guru_bk' => 'konselor',
+            'admin' => 'admin',
             default  => $role,
         };
 
         $menus = [];
 
         // Guru BK
-        if ($role === 'Guru_BK') {
+        if ($role === 'guru_bk') {
 
             $menus[] = [
                 'label' => 'Dashboard',
@@ -109,7 +109,7 @@ state([
         }
 
         // Admin
-        if ($role === 'Admin') {
+        if ($role === 'admin') {
 
             $menus[] = [
                 'label' => 'Dashboard',

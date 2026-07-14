@@ -12,10 +12,21 @@ class KeluargaSiswa extends Model
         'siswa_id',
         'nama_ayah',
         'nama_ibu',
+        'pendidikan_ayah',
+        'pendidikan_ibu',
         'pekerjaan_ayah',
         'pekerjaan_ibu',
-        'alamat',
-        'nomor_telepon',
+        'telp_ortu',
+        'status_rumah',
+        'dinding_rumah',
+        'lantai_rumah',
+        'jml_kamar',
+        'punya_kamar_sendiri',
+        'jml_tv',
+        'kendaraan_mobil',
+        'kendaraan_motor',
+        'biaya_sekolah_dari',
+        'kendaraan_ke_sekolah',
     ];
 
     public function siswa()

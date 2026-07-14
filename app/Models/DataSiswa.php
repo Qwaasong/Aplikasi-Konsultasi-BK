@@ -14,7 +14,16 @@ class DataSiswa extends Model
         'nis',
         'kelas_id',
         'alamat',
-        'periode_ajaran',
+        'tempat_lahir',
+        'tgl_lahir',
+        'anak_ke',
+        'jml_saudara',
+        'asal_smp',
+        'agama',
+        'hobi',
+        'bakat',
+        'rencana_lulus',
+        'detail_rencana_lulus',
     ];
 
     protected $casts = [
@@ -69,7 +78,15 @@ class DataSiswa extends Model
 
     public function scopeByPeriode(Builder $query, string $periode): Builder
     {
-        return $query->where('periode_ajaran', $periode);
+        // Filter siswa yang punya konsultasi di periode tertentu
+        // Format periode: "2025/2026" → tahun = 2025
+        $tahun = (int) explode('/', $periode)[0];
+
+        return $query->whereHas('konsultasis', function ($q) use ($tahun) {
+            $q->whereHas('tahunAjaran', function ($q2) use ($tahun) {
+                $q2->where('tahun', $tahun);
+            });
+        });
     }
 
     // ─────────────────────────────────────────

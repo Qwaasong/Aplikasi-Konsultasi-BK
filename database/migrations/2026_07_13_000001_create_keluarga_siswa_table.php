@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('keluarga_siswa', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswa')->cascadeOnDelete();
+            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
             $table->string('nama_ayah')->nullable();
             $table->string('nama_ibu')->nullable();
             $table->string('pendidikan_ayah')->nullable();

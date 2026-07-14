@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\DataSiswa;
 use App\Models\Kelas;
 use App\Models\Jurusan;
+use App\Models\TahunAjaran;
 use App\Repositories\Contracts\SiswaRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -127,7 +128,7 @@ class SiswaRepository implements SiswaRepositoryInterface
         DataSiswa::upsert(
             $rows,
             ['nis'],
-            ['kelas_id', 'alamat', 'periode_ajaran', 'updated_at']
+            ['kelas_id', 'alamat', 'updated_at']
         );
 
         return count($rows);
@@ -149,11 +150,11 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getPeriode(): Collection
     {
-        return DataSiswa::select('periode_ajaran')
-            ->whereNotNull('periode_ajaran')
-            ->distinct()
-            ->orderByDesc('periode_ajaran')
-            ->pluck('periode_ajaran');
+        return TahunAjaran::selectRaw("CONCAT(tahun, '/', tahun + 1) as periode")
+            ->orderByDesc('tahun')
+            ->pluck('periode')
+            ->unique()
+            ->values();
     }
 
     // ─────────────────────────────────────────
@@ -164,8 +165,8 @@ class SiswaRepository implements SiswaRepositoryInterface
     {
         $total = DataSiswa::count();
 
-        $laki = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'Laki-laki'))->count();
-        $perempuan = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'Perempuan'))->count();
+        $laki = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'L'))->count();
+        $perempuan = DataSiswa::whereHas('user', fn($q) => $q->where('jenis_kelamin', 'P'))->count();
 
         $perKelas = DataSiswa::select('kelas_id', DB::raw('count(*) as total'))
             ->groupBy('kelas_id')

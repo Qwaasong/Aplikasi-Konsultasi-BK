@@ -22,28 +22,28 @@ class FirstDatabaseSeeder extends Seeder
 
         // Admin
         $admin = User::create([
-            'role' => 'Admin',
+            'role' => 'admin',
             'nama' => 'Administrator Utama',
             'username' => 'admin',
             'email' => 'admin@sekolah.sch.id',
             'password' => Hash::make('password123'),
-            'jenis_kelamin' => 'Laki-laki',
+            'jenis_kelamin' => 'L',
             'no_hp' => '081234567890',
             'foto' => '',
-            'status' => 'Aktif',
+            'status' => 'aktif',
         ]);
 
         // Konselor
         $konselor = User::create([
-            'role' => 'Guru_BK',
+            'role' => 'guru_bk',
             'nama' => 'Budi Guru BK',
             'username' => 'konselor1',
             'email' => 'budi@sekolah.sch.id',
             'password' => Hash::make('password123'),
-            'jenis_kelamin' => 'Laki-laki',
+            'jenis_kelamin' => 'L',
             'no_hp' => '081234567891',
             'foto' => '',
-            'status' => 'Aktif',
+            'status' => 'aktif',
         ]);
 
         // ─────────────────────────────────────────
@@ -112,9 +112,9 @@ class FirstDatabaseSeeder extends Seeder
         // ─────────────────────────────────────────
 
         TahunAjaran::create([
-            'tahun' => 2025,
+            'tahun' => '2025',
             'semester' => 'Genap',
-            'status' => 'Aktif',
+            'status_aktif' => true,
         ]);
 
         // ─────────────────────────────────────────

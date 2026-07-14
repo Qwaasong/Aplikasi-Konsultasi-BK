@@ -56,10 +56,10 @@ class UserRepository implements UserRepositoryInterface
         $data['password'] = Hash::make($data['password']);
         // Default values untuk kolom yang tidak dikirim form
         $data['email'] ??= $data['username'] . '@sekolah.sch.id';
-        $data['jenis_kelamin'] ??= 'Laki-laki';
+        $data['jenis_kelamin'] ??= 'L';
         $data['no_hp'] ??= '-';
         $data['foto'] ??= '';
-        $data['status'] ??= 'Aktif';
+        $data['status'] ??= 'aktif';
         return User::create($data);
     }
 

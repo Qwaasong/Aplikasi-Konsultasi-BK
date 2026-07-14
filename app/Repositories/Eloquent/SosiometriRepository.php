@@ -25,7 +25,7 @@ class SosiometriRepository implements SosiometriRepositoryInterface
 
     public function getBySiswa(int $siswaId): ?Sosiometri
     {
-        return Sosiometri::where('siswa_pemilih_id', $siswaId)->first();
+        return Sosiometri::where('pemilih_siswa_id', $siswaId)->first();
     }
 
     public function create(array $data): Sosiometri

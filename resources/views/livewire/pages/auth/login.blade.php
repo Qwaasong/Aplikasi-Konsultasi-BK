@@ -22,9 +22,9 @@ new #[Layout('layouts.guest')] class extends Component {
         $role = Auth::user()->role;
         $route = 'dashboard'; // fallback
 
-        if ($role === 'Admin') {
+        if ($role === 'admin') {
             $route = route('admin.dashboard', absolute: false);
-        } elseif ($role === 'Guru_BK') {
+        } elseif ($role === 'guru_bk') {
             $route = route('konselor.dashboard', absolute: false);
         } else {
             // Jika role siswa atu role lain

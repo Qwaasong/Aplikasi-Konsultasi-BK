@@ -48,11 +48,8 @@ new class extends Component {
     {
         $this->validate([
             'siswa_id' => 'required|integer',
-            'tanggal_peminatan' => 'required|date',
-            'jurusan_pilihan' => 'required|string|max:255',
-            'minat' => 'required|string|max:255',
-            'bakat' => 'required|string|max:255',
-            'catatan' => 'nullable|string',
+            'tanggal_kehadiran' => 'required|date',
+            'status' => 'required|in:Hadir,Sakit,Izin,Alpha',
         ]);
         $this->step = 2;
     }
@@ -416,7 +413,7 @@ new class extends Component {
                 <div class="{{ $step === 2 ? 'flex' : 'hidden' }} gap-3">
                     <x-atoms.button variant="secondary" size="md" wire:click="previousStep">Kembali</x-atoms.button>
                     <x-atoms.button wire:click="save">
-                        {{ $editingId ? 'Perbarui Peminatan Siswa' : 'Simpan Peminatan Siswa' }}
+                        {{ $editingId ? 'Perbarui Kehadiran Siswa' : 'Simpan Kehadiran Siswa' }}
                     </x-atoms.button>
                 </div>
             </div>

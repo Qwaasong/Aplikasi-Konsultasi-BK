@@ -12,9 +12,10 @@ class PelanggaranSiswa extends Model
         'siswa_id',
         'jenis_pelanggaran_id',
         'jumlah_poin',
-        'tanggal_pelanggaran',
+        'tanggal_pernyataan',
+        'deskripsi_pelanggaran',
+        'sanksi',
         'bukti_foto',
-        'deskripsi_tindakan',
     ];
 
     public function siswa()

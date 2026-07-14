@@ -73,8 +73,7 @@ class WordExportService
                 ? \Carbon\Carbon::parse($konsultasi->tanggal_konsultasi)->format('d/m/Y')
                 : '-',
             'isi_konsultasi'     => $konsultasi->isi_konsultasi ?? '-',
-            'hasil_layanan'      => $konsultasi->hasil_layanan ?? '-',
-            'tindak_lanjut'      => $konsultasi->tindak_lanjut ?? '-',
+            'hasil_tindak_lanjut' => $konsultasi->hasil_tindak_lanjut ?? '-',
             'status'             => $konsultasi->status ?? '-',
             'prioritas'          => $konsultasi->prioritas ?? '-',
             'nama_konselor'      => $konsultasi->gurubk->user->nama ?? '-',

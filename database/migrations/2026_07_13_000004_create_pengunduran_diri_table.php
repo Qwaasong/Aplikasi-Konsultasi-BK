@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pengunduran_diri', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswa')->cascadeOnDelete();
+            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
             $table->string('nama_ortu_wali');
             $table->text('alamat_ortu_wali');
             $table->text('alasan_pengunduran');

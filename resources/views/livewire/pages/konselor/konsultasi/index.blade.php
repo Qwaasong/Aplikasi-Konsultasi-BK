@@ -60,7 +60,7 @@ new #[Layout('layouts.app')] class extends Component {
         // 3. Filter Format Layanan (Individu, Klasikal, Kelompok)
         if ($this->filterFormat) {
             $data = $data->filter(function ($item) {
-                return strtolower($item->format_layanan ?? '') === strtolower($this->filterFormat);
+                return strtolower($item->jenis_layanan ?? '') === strtolower($this->filterFormat);
             });
         }
 
@@ -196,8 +196,8 @@ new #[Layout('layouts.app')] class extends Component {
             <select wire:model.live="filterJenisKelamin"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua</option>
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
             </select>
 
             {{-- Tombol Reset --}}

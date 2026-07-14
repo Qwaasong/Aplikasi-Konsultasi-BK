@@ -13,7 +13,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //Admin
-Route::middleware(['auth', 'role:Admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('admin/dashboard', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
     Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');
@@ -23,7 +23,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 });
 
 // Guru / Konselor
-Route::middleware(['auth', 'role:Guru_BK'])->group(function () {
+Route::middleware(['auth', 'role:guru_bk'])->group(function () {
 
     // Dashboard
     Volt::route('konselor/dashboard', 'pages.konselor.dashboard')->name('konselor.dashboard');

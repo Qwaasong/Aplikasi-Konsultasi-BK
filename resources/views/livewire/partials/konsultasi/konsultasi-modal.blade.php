@@ -32,10 +32,7 @@ new class extends Component {
     public $isi_konsultasi = '';
 
     #[Validate('nullable|string')]
-    public $hasil_layanan = '';
-
-    #[Validate('nullable|string')]
-    public $tindak_lanjut = '';
+    public $hasil_tindak_lanjut = '';
 
     #[Validate('nullable|integer')]
     public $kategori_id = '';
@@ -161,7 +158,7 @@ new class extends Component {
     public function createKonsultasi()
     {
         $this->resetValidation();
-        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_layanan', 'tindak_lanjut', 'kategori_id', 'files', 'newFiles', 'existingFiles', 'searchSiswa']);
+        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_tindak_lanjut', 'kategori_id', 'files', 'newFiles', 'existingFiles', 'searchSiswa']);
         
         $this->editingId = null;
         $this->jenis_layanan = 'Individu';
@@ -189,8 +186,7 @@ new class extends Component {
             ? \Carbon\Carbon::parse($record->tanggal_konsultasi)->format('Y-m-d')
             : date('Y-m-d');
         $this->isi_konsultasi        = $record->isi_konsultasi;
-        $this->hasil_layanan         = $record->hasil_layanan;
-        $this->tindak_lanjut         = $record->tindak_lanjut;
+        $this->hasil_tindak_lanjut         = $record->hasil_tindak_lanjut;
         $this->kategori_id           = $record->kategori_id;
         
         $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
@@ -210,8 +206,7 @@ new class extends Component {
             'jenis_layanan'      => $this->jenis_layanan,
             'tanggal_konsultasi' => $this->tanggal_konsultasi,
             'isi_konsultasi'     => $this->isi_konsultasi,
-            'hasil_layanan'      => $this->hasil_layanan,
-            'tindak_lanjut'      => $this->tindak_lanjut,
+            'hasil_tindak_lanjut'      => $this->hasil_tindak_lanjut,
             'kategori_id'        => $this->kategori_id ?: null,
         ];
 
@@ -223,7 +218,7 @@ new class extends Component {
             session()->flash('success', 'Konsultasi berhasil ditambahkan!');
         }
 
-        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_layanan', 'tindak_lanjut', 'kategori_id', 'files', 'existingFiles', 'searchSiswa', 'showStudentModal']);
+        $this->reset(['editingId', 'siswa_id', 'judul', 'jenis_layanan', 'isi_konsultasi', 'hasil_tindak_lanjut', 'kategori_id', 'files', 'existingFiles', 'searchSiswa', 'showStudentModal']);
         $this->tanggal_konsultasi = date('Y-m-d');
         $this->step = 1;
 
@@ -324,13 +319,8 @@ new class extends Component {
                 </div>
 
                 <div class="mb-5">
-                    <x-atoms.input-label for="hasil_layanan" size="sm">Hasil Layanan</x-atoms.input-label>
-                    <textarea id="hasil_layanan" wire:model="hasil_layanan" rows="4" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Ceritakan bagaimana hasil setelah layanan diberikan..."></textarea>
-                </div>
-
-                <div class="mb-2">
-                    <x-atoms.input-label for="tindak_lanjut" size="sm">Tindak Lanjut</x-atoms.input-label>
-                    <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="4" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Langkah konkrit apa yang akan diambil setelah ini..."></textarea>
+                    <x-atoms.input-label for="hasil_tindak_lanjut" size="sm">Hasil & Tindak Lanjut</x-atoms.input-label>
+                    <textarea id="hasil_tindak_lanjut" wire:model="hasil_tindak_lanjut" rows="4" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Ceritakan hasil layanan dan langkah tindak lanjut..."></textarea>
                 </div>
             </div>
 

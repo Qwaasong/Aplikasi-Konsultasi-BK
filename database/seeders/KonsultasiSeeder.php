@@ -14,7 +14,7 @@ class KonsultasiSeeder extends Seeder
 {
     public function run()
     {
-        $konselorUser = User::where('role', 'Guru_BK')->first();
+        $konselorUser = User::where('role', 'guru_bk')->first();
         $pegawai = \App\Models\Pegawai::where('user_id', $konselorUser->id)->first();
         $tahunAjaran = TahunAjaran::first();
         $kategoris = KategoriKonsultasi::pluck('id', 'nama_kategori');
@@ -26,16 +26,16 @@ class KonsultasiSeeder extends Seeder
         }
 
         $data = [
-            ['siswa_no' => 0, 'kategori' => 'Karir',  'judul' => 'Bingung memilih karir',           'isi' => 'Bingung memilih antara kuliah atau langsung kerja setelah lulus RPL.',                          'status' => 'Diproses', 'hari' => 10],
-            ['siswa_no' => 1, 'kategori' => 'Pribadi', 'judul' => 'Kesulitan mengatur waktu',         'isi' => 'Kesulitan membagi waktu antara hobi dan tugas sekolah.',                                        'status' => 'Diproses', 'hari' => 9],
-            ['siswa_no' => 2, 'kategori' => 'Belajar', 'judul' => 'Nilai matematika menurun',         'isi' => 'Nilai matematika menurun drastis pada semester ini.',                                           'status' => 'Diproses', 'hari' => 8],
-            ['siswa_no' => 3, 'kategori' => 'Sosial',  'judul' => 'Perselisihan dengan teman',        'isi' => 'Terjadi perselisihan dengan teman sekelas karena tugas kelompok.',                               'status' => 'Diproses', 'hari' => 7],
-            ['siswa_no' => 4, 'kategori' => 'Karir',   'judul' => 'Sertifikasi internasional',        'isi' => 'Minat untuk mengambil sertifikasi internasional networking.',                                    'status' => 'Menunggu', 'hari' => 6],
-            ['siswa_no' => 5, 'kategori' => 'Pribadi',  'judul' => 'Cemas saat presentasi',           'isi' => 'Kecemasan saat akan menghadapi presentasi di depan kelas.',                                       'status' => 'Menunggu', 'hari' => 5],
-            ['siswa_no' => 6, 'kategori' => 'Belajar', 'judul' => 'Sulit konsentrasi belajar',        'isi' => 'Kurang konsentrasi saat belajar di rumah karena suasana bising.',                                 'status' => 'Menunggu', 'hari' => 4],
-            ['siswa_no' => 7, 'kategori' => 'Karir',   'judul' => 'Portofolio GitHub',                'isi' => 'Ingin tahu cara membangun portofolio GitHub yang baik.',                                          'status' => 'Ditolak',  'hari' => 3],
-            ['siswa_no' => 8, 'kategori' => 'Sosial',  'judul' => 'Dikucilkan di lingkungan PKL',     'isi' => 'Merasa dikucilkan oleh teman-teman di lingkungan PKL.',                                          'status' => 'Menunggu', 'hari' => 2],
-            ['siswa_no' => 9, 'kategori' => 'Pribadi',  'judul' => 'Masalah ekonomi keluarga',        'isi' => 'Masalah ekonomi keluarga yang mengganggu konsentrasi sekolah.',                                   'status' => 'Menunggu', 'hari' => 1],
+            ['siswa_no' => 0, 'kategori' => 'Karir',  'judul' => 'Bingung memilih karir',           'isi' => 'Bingung memilih antara kuliah atau langsung kerja setelah lulus RPL.',                          'status' => 'Pending', 'hari' => 10],
+            ['siswa_no' => 1, 'kategori' => 'Pribadi', 'judul' => 'Kesulitan mengatur waktu',         'isi' => 'Kesulitan membagi waktu antara hobi dan tugas sekolah.',                                        'status' => 'Pending', 'hari' => 9],
+            ['siswa_no' => 2, 'kategori' => 'Belajar', 'judul' => 'Nilai matematika menurun',         'isi' => 'Nilai matematika menurun drastis pada semester ini.',                                           'status' => 'Pending', 'hari' => 8],
+            ['siswa_no' => 3, 'kategori' => 'Sosial',  'judul' => 'Perselisihan dengan teman',        'isi' => 'Terjadi perselisihan dengan teman sekelas karena tugas kelompok.',                               'status' => 'Pending', 'hari' => 7],
+            ['siswa_no' => 4, 'kategori' => 'Karir',   'judul' => 'Sertifikasi internasional',        'isi' => 'Minat untuk mengambil sertifikasi internasional networking.',                                    'status' => 'Open', 'hari' => 6],
+            ['siswa_no' => 5, 'kategori' => 'Pribadi',  'judul' => 'Cemas saat presentasi',           'isi' => 'Kecemasan saat akan menghadapi presentasi di depan kelas.',                                       'status' => 'Open', 'hari' => 5],
+            ['siswa_no' => 6, 'kategori' => 'Belajar', 'judul' => 'Sulit konsentrasi belajar',        'isi' => 'Kurang konsentrasi saat belajar di rumah karena suasana bising.',                                 'status' => 'Open', 'hari' => 4],
+            ['siswa_no' => 7, 'kategori' => 'Karir',   'judul' => 'Portofolio GitHub',                'isi' => 'Ingin tahu cara membangun portofolio GitHub yang baik.',                                          'status' => 'Closed',  'hari' => 3],
+            ['siswa_no' => 8, 'kategori' => 'Sosial',  'judul' => 'Dikucilkan di lingkungan PKL',     'isi' => 'Merasa dikucilkan oleh teman-teman di lingkungan PKL.',                                          'status' => 'Open', 'hari' => 2],
+            ['siswa_no' => 9, 'kategori' => 'Pribadi',  'judul' => 'Masalah ekonomi keluarga',        'isi' => 'Masalah ekonomi keluarga yang mengganggu konsentrasi sekolah.',                                   'status' => 'Open', 'hari' => 1],
         ];
 
         foreach ($data as $item) {
