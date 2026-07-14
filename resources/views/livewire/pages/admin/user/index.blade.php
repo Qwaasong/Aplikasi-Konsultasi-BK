@@ -28,6 +28,15 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|in:admin,guru_bk')]
     public string $role = 'guru_bk';
 
+    #[Validate('required|email|max:255')]
+    public string $email = '';
+
+    #[Validate('required|in:L,P')]
+    public string $jenis_kelamin = 'L';
+
+    #[Validate('required|string|max:20')]
+    public string $no_hp = '';
+
     // Password: wajib saat create, opsional saat edit
     public string $password = '';
     public string $password_confirmation = '';
@@ -36,6 +45,10 @@ new #[Layout('layouts.app')] class extends Component {
     public array $roleOptions = [
         ['value' => 'admin', 'label' => 'Admin'],
         ['value' => 'guru_bk', 'label' => 'Konselor'],
+    ];
+    public array $jenisKelaminOptions = [
+        ['value' => 'L', 'label' => 'Laki-laki'],
+        ['value' => 'P', 'label' => 'Perempuan'],
     ];
 
     // ─────────────────────────────────────────
@@ -78,6 +91,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nama = $user->nama;
         $this->username = $user->username;
         $this->role = $user->role;
+        $this->email = $user->email;
+        $this->jenis_kelamin = $user->jenis_kelamin;
+        $this->no_hp = $user->no_hp;
         $this->password = '';
         $this->password_confirmation = '';
 
@@ -92,6 +108,9 @@ new #[Layout('layouts.app')] class extends Component {
             'nama' => 'required|string|max:255',
             'username' => 'required|string|max:100',
             'role' => 'required|in:admin,guru_bk',
+            'email' => 'required|email|max:255',
+            'jenis_kelamin' => 'required|in:L,P',
+            'no_hp' => 'required|string|max:20',
         ]);
 
         // Validasi password: wajib saat create, min 6 jika diisi saat edit
@@ -108,7 +127,10 @@ new #[Layout('layouts.app')] class extends Component {
         $data = [
             'nama' => $this->nama,
             'username' => $this->username,
+            'email' => $this->email,
             'role' => $this->role,
+            'jenis_kelamin' => $this->jenis_kelamin,
+            'no_hp' => $this->no_hp,
             'password' => $this->password,
         ];
 
@@ -179,6 +201,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nama = '';
         $this->username = '';
         $this->role = 'guru_bk';
+        $this->email = '';
+        $this->jenis_kelamin = 'L';
+        $this->no_hp = '';
         $this->password = '';
         $this->password_confirmation = '';
         $this->showPassword = false;
@@ -358,13 +383,42 @@ new #[Layout('layouts.app')] class extends Component {
                     @enderror
                 </div>
 
-                {{-- Role --}}
+                {{-- Email --}}
                 <div>
-                    <x-atoms.input-label for="role" size="sm">Role *</x-atoms.input-label>
-                    <x-molecules.input-dropdown id="role" wire:model="role" size="md" :options="$roleOptions" />
-                    @error('role')
+                    <x-atoms.input-label for="email" size="sm">Email *</x-atoms.input-label>
+                    <x-atoms.text-input id="email" type="email" wire:model="email"
+                        placeholder="Email untuk login" size="md" />
+                    @error('email')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- No. HP --}}
+                <div>
+                    <x-atoms.input-label for="no_hp" size="sm">No. HP *</x-atoms.input-label>
+                    <x-atoms.text-input id="no_hp" type="text" wire:model="no_hp"
+                        placeholder="Nomor telepon" size="md" />
+                    @error('no_hp')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Role + Jenis Kelamin --}}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <x-atoms.input-label for="role" size="sm">Role *</x-atoms.input-label>
+                        <x-molecules.input-dropdown id="role" wire:model="role" size="md" :options="$roleOptions" />
+                        @error('role')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <x-atoms.input-label for="jenis_kelamin" size="sm">Jenis Kelamin *</x-atoms.input-label>
+                        <x-molecules.input-dropdown id="jenis_kelamin" wire:model="jenis_kelamin" size="md" :options="$jenisKelaminOptions" />
+                        @error('jenis_kelamin')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 {{-- Divider --}}

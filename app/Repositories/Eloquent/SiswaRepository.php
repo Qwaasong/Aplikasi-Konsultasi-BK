@@ -73,7 +73,7 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function findById(int $id): DataSiswa
     {
-        return DataSiswa::with(['user', 'kelas.jurusan'])->findOrFail($id);
+        return DataSiswa::with(['user', 'kelas.jurusan', 'keluarga'])->findOrFail($id);
     }
 
     public function findByNis(int $nis): ?DataSiswa

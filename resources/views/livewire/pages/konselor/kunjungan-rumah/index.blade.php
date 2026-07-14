@@ -38,8 +38,8 @@ new #[Layout('layouts.app')] class extends Component {
 
         <x-slot:actions>
             <x-atoms.button
-                wire:click="$dispatch('create-')">
-                Tambah Alih Tangan Kasus
+                wire:click="$dispatch('create-home-visit')">
+                Tambah Kunjungan Rumah
             </x-atoms.button>
         </x-slot:actions>
     </x-organisms.table-toolbar>

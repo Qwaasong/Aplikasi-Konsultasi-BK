@@ -7,7 +7,9 @@ use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
 use App\Services\KonsultasiService;
+use App\Services\BimbinganIndividuService;
 use App\Models\KategoriKonsultasi;
+use App\Models\TahunAjaran;
 
 new class extends Component {
     use WithFileUploads;
@@ -46,6 +48,9 @@ new class extends Component {
     public function mount()
     {
         $this->tanggal_layanan = date('Y-m-d');
+        $this->tahun_ajaran_id = TahunAjaran::where('status_aktif', true)->value('id')
+            ?? TahunAjaran::latest()->value('id')
+            ?? '';
     }
 
     public function nextStep()
@@ -112,7 +117,7 @@ new class extends Component {
     #[Computed]
     public function kategoriOptions()
     {
-        $options = KategoriLayananKelompok::all()->map(fn($item) => [
+        $options = KategoriKonsultasi::all()->map(fn($item) => [
             'value' => $item->id,
             'label' => $item->nama_kategori,
         ])->toArray();
@@ -168,14 +173,13 @@ new class extends Component {
     {
         $service = app(BimbinganIndividuService::class);
         $this->resetValidation();
-        $service = app(BimbinganIndividuService::class);
 
         $record = $service->findById($id);
 
         $this->editingId = $id;
         $this->tahun_ajaran_id = $record->tahun_ajaran_id;
 
-        $this->tanggal_layanan = Carbon\Carbon::parse(
+        $this->tanggal_layanan = \Carbon\Carbon::parse(
             $record->tanggal_layanan
         )->format('Y-m-d');
 
@@ -309,11 +313,16 @@ new class extends Component {
                             Tahun Ajaran
                         </x-atoms.input-label>
 
-                        <x-atoms.text-input
-                            id="tahun_ajaran_id"
-                            wire:model="tahun_ajaran_id"
-                            size="md"
-                            placeholder="Pilih Tahun Ajaran" />
+                        <select id="tahun_ajaran_id" wire:model="tahun_ajaran_id"
+                            class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm
+                                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Tahun Ajaran</option>
+                            @foreach(TahunAjaran::orderByDesc('tahun')->get() as $ta)
+                                <option value="{{ $ta->id }}">
+                                    {{ $ta->tahun }} - {{ $ta->semester }} {{ $ta->status_aktif ? '(Aktif)' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
 
                         @error('tahun_ajaran_id')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">

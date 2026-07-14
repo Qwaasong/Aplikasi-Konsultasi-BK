@@ -6,8 +6,8 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
-// use App\Services\KonferensiKasusService;
-// use App\Models\KategoriKonferensi;
+use App\Services\KehadiranService;
+use App\Models\TahunAjaran;
 
 new class extends Component {
     use WithFileUploads;
@@ -42,6 +42,9 @@ new class extends Component {
     public function mount()
     {
         $this->tanggal_kehadiran = date('Y-m-d');
+        $this->tahun_ajaran_id = TahunAjaran::where('status_aktif', true)->value('id')
+            ?? TahunAjaran::latest()->value('id')
+            ?? '';
     }
 
     public function nextStep()
@@ -187,9 +190,11 @@ new class extends Component {
         ];
 
         if ($this->editingId) {
-            //...
+            app(KehadiranService::class)->update($this->editingId, $data);
+            session()->flash('success', 'Kehadiran berhasil diperbarui!');
         } else {
-            //...
+            app(KehadiranService::class)->create($data);
+            session()->flash('success', 'Kehadiran berhasil ditambahkan!');
         }
 
         $this->reset([
@@ -288,17 +293,45 @@ new class extends Component {
                         @enderror
                     </div>
 
+                    {{-- Tahun Ajaran --}}
+                    <div class="mb-6">
+                        <x-atoms.input-label for="tahun_ajaran_id" size="sm">
+                            Tahun Ajaran
+                        </x-atoms.input-label>
+
+                        <select id="tahun_ajaran_id" wire:model="tahun_ajaran_id"
+                            class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm
+                                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Tahun Ajaran</option>
+                            @foreach(TahunAjaran::orderByDesc('tahun')->get() as $ta)
+                                <option value="{{ $ta->id }}">
+                                    {{ $ta->tahun }} - {{ $ta->semester }} {{ $ta->status_aktif ? '(Aktif)' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('tahun_ajaran_id')
+                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                            {{ $message }}
+                        </span>
+                        @enderror
+                    </div>
+
                     {{-- Status Kehadiran --}}
                     <div class="mb-6">
                         <x-atoms.input-label for="status" size="sm">
                             Status Kehadiran
                         </x-atoms.input-label>
 
-                        <x-atoms.text-input
-                            id="status"
-                            wire:model="status"
-                            size="md"
-                            placeholder="Contoh : RPL" />
+                        <select id="status" wire:model="status"
+                            class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm
+                                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Status</option>
+                            <option value="Hadir">Hadir</option>
+                            <option value="Sakit">Sakit</option>
+                            <option value="Izin">Izin</option>
+                            <option value="Alpha">Alpha</option>
+                        </select>
 
                         @error('status')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
@@ -306,6 +339,7 @@ new class extends Component {
                         </span>
                         @enderror
                     </div>
+                </div>
                 <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
                     <div class="mb-6">
                         <p class="text-[14px] font-bold text-primary mb-2.5">Langkah 2 Dari 2</p>

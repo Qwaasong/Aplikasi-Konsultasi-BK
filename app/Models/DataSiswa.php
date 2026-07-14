@@ -49,6 +49,11 @@ class DataSiswa extends Model
         return $this->hasMany(Konsultasi::class, 'siswa_id');
     }
 
+    public function keluarga()
+    {
+        return $this->hasOne(KeluargaSiswa::class, 'siswa_id');
+    }
+
     // ─────────────────────────────────────────
     // SCOPES
     // ─────────────────────────────────────────

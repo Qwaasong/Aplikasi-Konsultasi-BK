@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\SiswaService;
+use App\Models\DataSiswa;
 use App\Constants\GlobalMessages;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
@@ -35,12 +36,6 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|in:L,P')]
     public string $jenis_kelamin = 'L';
 
-    #[Validate('required|string|max:50')]
-    public string $jurusan       = '';
-
-    #[Validate('required|string|max:20')]
-    public string $periode_ajaran = '';
-
     // ── Import ──────────────────────────────
     public bool   $showImportModal  = false;
     public        $importFile       = null;
@@ -54,6 +49,10 @@ new #[Layout('layouts.app')] class extends Component {
     public string $exportPeriode      = '';
     public ?int   $exportPreviewCount = null;
 
+    // ── Detail modal ─────────────────────────
+    public bool     $showDetail    = false;
+    public ?DataSiswa $detailSiswa = null;
+
     // ── Options untuk dropdown ───────────────
     public array $jenisKelaminOptions = [
         ['value' => 'L', 'label' => 'Laki-laki'],
@@ -63,11 +62,6 @@ new #[Layout('layouts.app')] class extends Component {
     // ─────────────────────────────────────────
     // LIFECYCLE
     // ─────────────────────────────────────────
-
-    public function mount(): void
-    {
-        $this->periode_ajaran = $this->defaultPeriode();
-    }
 
     // ─────────────────────────────────────────
     // DATA UNTUK TEMPLATE
@@ -112,7 +106,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nama            = $siswa->nama;
         $this->kelas           = (string) $siswa->kelas_id;
         $this->jenis_kelamin   = $siswa->jenis_kelamin;
-        $this->jurusan         = $siswa->kelas?->jurusan?->nama_jurusan ?? '';
 
         $this->showForm = true;
     }
@@ -126,7 +119,6 @@ new #[Layout('layouts.app')] class extends Component {
             'nama'           => $this->nama,
             'kelas'          => (int) $this->kelas,
             'jenis_kelamin'  => $this->jenis_kelamin,
-            'jurusan'        => strtoupper($this->jurusan),
         ];
 
         try {
@@ -156,6 +148,20 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->showForm = false;
         $this->resetForm();
+    }
+
+    public function openDetail(int $id): void
+    {
+        $this->detailSiswa = app(SiswaService::class)->findById($id);
+        $this->showDetail = true;
+        $this->dispatch('open-modal', 'detail-siswa');
+    }
+
+    public function closeDetail(): void
+    {
+        $this->detailSiswa = null;
+        $this->showDetail = false;
+        $this->dispatch('close-modal', 'detail-siswa');
     }
 
     // ─────────────────────────────────────────
@@ -301,8 +307,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nama           = '';
         $this->kelas          = '';
         $this->jenis_kelamin  = 'L';
-        $this->jurusan        = '';
-        $this->periode_ajaran = $this->defaultPeriode();
         $this->editingId      = null;
     }
 
@@ -408,6 +412,7 @@ new #[Layout('layouts.app')] class extends Component {
             <x-organisms.data-table class="w-full" empty="Belum ada data siswa.">
                 @foreach($records as $siswa)
                     <tr wire:key="siswa-{{ $siswa->id }}"
+                        wire:click="openDetail({{ $siswa->id }})"
                         class="group border-b border-gray-100 bg-white transition-all duration-200 h-12 relative
                                hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1)] hover:z-10 cursor-pointer">
 
@@ -682,21 +687,6 @@ new #[Layout('layouts.app')] class extends Component {
                         </div>
                     </div>
 
-                    {{-- Jurusan --}}
-                    <div>
-                        <x-atoms.input-label for="jurusan" size="sm">Jurusan *</x-atoms.input-label>
-                        <x-atoms.text-input
-                            id="jurusan"
-                            type="text"
-                            wire:model="jurusan"
-                            placeholder="Contoh: RPL"
-                            size="md"
-                        />
-                        @error('jurusan')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                 </div>
 
                 {{-- Footer --}}
@@ -938,5 +928,77 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         </x-shared.modal>
     @endif
+
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- MODAL DETAIL SISWA                          --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    <x-shared.modal name="detail-siswa" :show="$showDetail" maxWidth="lg">
+        <div class="flex flex-col max-h-[90vh]">
+            {{-- Header --}}
+            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                <h2 class="text-base font-bold text-gray-900">Detail Siswa</h2>
+            </div>
+
+            {{-- Body --}}
+            <div class="px-6 py-5 overflow-y-auto grow space-y-5">
+                @if($detailSiswa)
+                    {{-- Data Pribadi --}}
+                    <div>
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Data Pribadi</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div><span class="text-gray-500">NIS</span><p class="font-medium">{{ $detailSiswa->nis }}</p></div>
+                            <div><span class="text-gray-500">Nama</span><p class="font-medium">{{ $detailSiswa->nama }}</p></div>
+                            <div><span class="text-gray-500">Jenis Kelamin</span><p class="font-medium">{{ $detailSiswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</p></div>
+                            <div><span class="text-gray-500">Kelas</span><p class="font-medium">{{ $detailSiswa->kelas_label }}</p></div>
+                            <div><span class="text-gray-500">Jurusan</span><p class="font-medium">{{ $detailSiswa->jurusan_label }}</p></div>
+                            <div><span class="text-gray-500">Alamat</span><p class="font-medium">{{ $detailSiswa->alamat ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Tempat Lahir</span><p class="font-medium">{{ $detailSiswa->tempat_lahir ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Tanggal Lahir</span><p class="font-medium">{{ $detailSiswa->tgl_lahir ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Agama</span><p class="font-medium">{{ $detailSiswa->agama ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Asal SMP</span><p class="font-medium">{{ $detailSiswa->asal_smp ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Anak Ke</span><p class="font-medium">{{ $detailSiswa->anak_ke ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Jml Saudara</span><p class="font-medium">{{ $detailSiswa->jml_saudara ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Hobi</span><p class="font-medium">{{ $detailSiswa->hobi ?? '-' }}</p></div>
+                            <div><span class="text-gray-500">Bakat</span><p class="font-medium">{{ $detailSiswa->bakat ?? '-' }}</p></div>
+                            <div class="col-span-2"><span class="text-gray-500">Rencana Setelah Lulus</span><p class="font-medium">{{ $detailSiswa->rencana_lulus ?? '-' }}</p></div>
+                            @if($detailSiswa->detail_rencana_lulus)
+                                <div class="col-span-2"><span class="text-gray-500">Detail Rencana</span><p class="font-medium">{{ $detailSiswa->detail_rencana_lulus }}</p></div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Data Keluarga --}}
+                    @if($detailSiswa->keluarga)
+                        <hr class="border-gray-100">
+                        <div>
+                            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Data Keluarga</h3>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div><span class="text-gray-500">Ayah</span><p class="font-medium">{{ $detailSiswa->keluarga->nama_ayah ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Ibu</span><p class="font-medium">{{ $detailSiswa->keluarga->nama_ibu ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Pendidikan Ayah</span><p class="font-medium">{{ $detailSiswa->keluarga->pendidikan_ayah ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Pendidikan Ibu</span><p class="font-medium">{{ $detailSiswa->keluarga->pendidikan_ibu ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Pekerjaan Ayah</span><p class="font-medium">{{ $detailSiswa->keluarga->pekerjaan_ayah ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Pekerjaan Ibu</span><p class="font-medium">{{ $detailSiswa->keluarga->pekerjaan_ibu ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">No. Telepon</span><p class="font-medium">{{ $detailSiswa->keluarga->telp_ortu ?? '-' }}</p></div>
+                                <div><span class="text-gray-500">Status Rumah</span><p class="font-medium">{{ $detailSiswa->keluarga->status_rumah ?? '-' }}</p></div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Total Konsultasi --}}
+                    <hr class="border-gray-100">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500">Total Konsultasi:</span>
+                        <span class="font-semibold text-brand-teal">{{ $detailSiswa->total_konsultasi }}</span>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Footer --}}
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl">
+                <x-atoms.button variant="secondary" wire:click="closeDetail">Tutup</x-atoms.button>
+            </div>
+        </div>
+    </x-shared.modal>
 
 </div>

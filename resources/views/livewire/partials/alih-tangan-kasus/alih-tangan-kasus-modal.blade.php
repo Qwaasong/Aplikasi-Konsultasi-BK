@@ -6,8 +6,8 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
-// use App\Services\AlihTanganKasusService;
-// use App\Models\KategoriAlihTanganKasus;
+use App\Services\AlihTanganKasusService;
+use App\Models\KategoriKonsultasi;
 
 new class extends Component {
     use WithFileUploads;

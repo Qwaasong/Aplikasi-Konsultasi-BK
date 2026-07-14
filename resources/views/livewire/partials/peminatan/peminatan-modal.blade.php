@@ -6,8 +6,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
-// use App\Services\KonferensiKasusService;
-// use App\Models\KategoriKonferensi;
+use App\Services\PeminatanService;
 
 new class extends Component {
     use WithFileUploads;
@@ -184,7 +183,7 @@ new class extends Component {
     }
 
     // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
-    public function save()
+    public function save(PeminatanService $service)
     {
         $this->validate();
 
@@ -346,20 +345,20 @@ new class extends Component {
                         @enderror
                     </div>
 
-                    {{-- Catatan Konselor --}}
+                    {{-- Catatan --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="catatan_konselor" size="sm">
-                            Catatan Konselor
+                        <x-atoms.input-label for="catatan" size="sm">
+                            Catatan
                         </x-atoms.input-label>
 
                         <textarea
-                            id="catatan_konselor"
-                            wire:model="catatan_konselor"
+                            id="catatan"
+                            wire:model="catatan"
                             rows="4"
                             class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
                             placeholder="Tuliskan catatan tambahan..."></textarea>
 
-                        @error('catatan_konselor')
+                        @error('catatan')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>

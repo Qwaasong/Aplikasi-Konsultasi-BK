@@ -210,7 +210,7 @@ new #[Layout('layouts.app')] class extends Component {
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Tindak Lanjut</h3>
                 <p class="text-sm text-gray-600 leading-relaxed text-justify">
-                    {{ $record->tindak_lanjut ?? 'Belum ada catatan tindak lanjut.' }}
+                    {{ $record->hasil_tindak_lanjut ?? 'Belum ada catatan tindak lanjut.' }}
                 </p>
             </div>
         </div>
