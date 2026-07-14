@@ -10,12 +10,22 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('data_siswa', function (Blueprint $table) {
+        Schema::create('siswa', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->integer('nis')->unique();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
+            $table->string('nis')->unique();
             $table->foreignId('kelas_id')->constrained('kelas')->cascadeOnDelete();
-            $table->string('alamat');
+            $table->text('alamat')->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tgl_lahir')->nullable();
+            $table->integer('anak_ke')->nullable();
+            $table->integer('jml_saudara')->nullable();
+            $table->string('asal_smp')->nullable();
+            $table->string('agama')->nullable();
+            $table->string('hobi')->nullable();
+            $table->string('bakat')->nullable();
+            $table->enum('rencana_lulus', ['Bekerja', 'Kuliah', 'Menikah'])->nullable();
+            $table->text('detail_rencana_lulus')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +35,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('data_siswa');
+        Schema::dropIfExists('siswa');
     }
 };

@@ -12,16 +12,20 @@ return new class extends Migration {
     {
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
+            $table->foreignId('siswa_id')->constrained('siswa')->cascadeOnDelete();
             $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
             $table->foreignId('kategori_id')->nullable()->constrained('kategori_konsultasi')->nullOnDelete();
             $table->string('judul');
             $table->text('isi_konsultasi');
-            $table->string('jenis_layanan')->nullable();
-            $table->enum('status', ['Menunggu', 'Diproses', 'Selesai', 'Ditolak'])->default('Menunggu');
+            $table->enum('status', ['Open', 'Pending', 'Closed'])->default('Open');
             $table->enum('prioritas', ['Rendah', 'Sedang', 'Tinggi'])->default('Rendah');
-            $table->timestamp('tanggal_konsultasi');
+            $table->date('tanggal_konsultasi');
+            $table->enum('jenis_layanan', ['Individu', 'Kunjungan Rumah'])->nullable();
+            $table->enum('fokus_masalah', ['Pribadi', 'Sosial', 'Belajar', 'Karir'])->nullable();
+            $table->text('hasil_tindak_lanjut')->nullable();
+            $table->text('tanda_tangan_siswa')->nullable();
+            $table->text('tanda_tangan_guru')->nullable();
             $table->timestamps();
         });
     }

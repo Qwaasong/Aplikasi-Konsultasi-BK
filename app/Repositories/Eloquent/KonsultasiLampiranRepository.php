@@ -2,31 +2,43 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\KonsultasiBalasan;
-use App\Repositories\Contracts\KonsultasiBalasanRepositoryInterface;
+use App\Models\KonsultasiLampiran;
+use App\Repositories\Contracts\KonsultasiLampiranRepositoryInterface;
 use Illuminate\Support\Collection;
 
-class KonsultasiBalasanRepository implements KonsultasiBalasanRepositoryInterface
+class KonsultasiLampiranRepository implements KonsultasiLampiranRepositoryInterface
 {
+    /**
+     * Ambil lampiran berdasarkan ID konsultasi.
+     */
     public function getByKonsultasi(int $konsultasiId): Collection
     {
-        return KonsultasiBalasan::where('konsultasi_id', $konsultasiId)
-            ->orderBy('tanggal_balasan')
+        return KonsultasiLampiran::where('konsultasi_id', $konsultasiId)
+            ->orderBy('created_at')
             ->get();
     }
 
-    public function findById(int $id): KonsultasiBalasan
+    /**
+     * Cari lampiran berdasarkan ID.
+     */
+    public function findById(int $id): KonsultasiLampiran
     {
-        return KonsultasiBalasan::findOrFail($id);
+        return KonsultasiLampiran::findOrFail($id);
     }
 
-    public function create(array $data): KonsultasiBalasan
+    /**
+     * Tambah lampiran.
+     */
+    public function create(array $data): KonsultasiLampiran
     {
-        return KonsultasiBalasan::create($data);
+        return KonsultasiLampiran::create($data);
     }
 
+    /**
+     * Hapus lampiran.
+     */
     public function delete(int $id): bool
     {
-        return KonsultasiBalasan::findOrFail($id)->delete();
+        return KonsultasiLampiran::findOrFail($id)->delete();
     }
 }

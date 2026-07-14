@@ -2,8 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\WordExportController;
 
 Volt::route('test', 'pages.test');
+
+// ── Export Word ──────────────────────────────────────────────
+Route::middleware(['auth'])->group(function () {
+    Route::get('/konsultasi/{id}/export/{template}', [WordExportController::class, 'export'])
+        ->name('konsultasi.export');
+});
 
 //Admin
 Route::middleware(['auth', 'role:Admin'])->group(function () {

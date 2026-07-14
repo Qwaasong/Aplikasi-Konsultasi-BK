@@ -17,7 +17,7 @@ class KategoriKonsultasiRepository implements KategoriKonsultasiRepositoryInterf
     }
 
     /**
-     * Hitung jumlah kategori
+     * Hitung jumlah kategori.
      */
     public function countKategori(): int
     {
