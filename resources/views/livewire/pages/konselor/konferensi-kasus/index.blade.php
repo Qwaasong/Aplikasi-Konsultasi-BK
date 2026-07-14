@@ -11,6 +11,12 @@ new #[Layout('layouts.app')] class extends Component {
     // Placeholder sementara
     public array $records = [];
 
+    public function create()
+    {
+        $this->dispatch('create-konferensi-kasus');
+    }
+
+
 };
 
 ?>
@@ -18,7 +24,7 @@ new #[Layout('layouts.app')] class extends Component {
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full">
 
     {{-- Header --}}
-    <x-organisms.header>
+    <x-organisms.header  action="create">
         <x-slot:search>
             <x-molecules.search-input model="search" />
         </x-slot:search>
@@ -31,6 +37,14 @@ new #[Layout('layouts.app')] class extends Component {
         <x-slot:pagination>
             {{ count($records) }} data
         </x-slot:pagination>
+
+        <x-slot:actions>
+            <x-atoms.button
+                wire:click="create">
+                Tambah Konferensi Kasus
+            </x-atoms.button>
+        </x-slot:actions>
+
     </x-organisms.table-toolbar>
 
     {{-- Flash Message --}}
@@ -79,5 +93,7 @@ new #[Layout('layouts.app')] class extends Component {
         @endforelse
 
     </x-organisms.data-table>
+
+    <livewire:partials.konferensi-kasus.konferensi-kasus-modal />
 
 </div>
