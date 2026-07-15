@@ -150,7 +150,7 @@ class SiswaRepository implements SiswaRepositoryInterface
 
     public function getPeriode(): Collection
     {
-        return TahunAjaran::selectRaw("CONCAT(tahun, '/', tahun + 1) as periode")
+        return TahunAjaran::selectRaw("(tahun || '/' || (tahun + 1)) as periode")
             ->orderByDesc('tahun')
             ->pluck('periode')
             ->unique()
