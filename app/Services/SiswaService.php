@@ -122,6 +122,7 @@ class SiswaService
         $siswaData = [
             'nis' => (int) $data['nis'],
             'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? $existing->kelas_id),
+            'alamat' => $data['alamat'] ?? $existing->alamat ?? '',
         ];
 
         return $this->siswaRepository->update($id, $siswaData);

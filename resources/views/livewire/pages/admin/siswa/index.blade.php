@@ -36,6 +36,9 @@ new #[Layout('layouts.app')] class extends Component {
     #[Validate('required|in:L,P')]
     public string $jenis_kelamin = 'L';
 
+    #[Validate('required|string|max:500')]
+    public string $alamat         = '';
+
     // ── Import ──────────────────────────────
     public bool   $showImportModal  = false;
     public        $importFile       = null;
@@ -106,6 +109,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->nama            = $siswa->nama;
         $this->kelas           = (string) $siswa->kelas_id;
         $this->jenis_kelamin   = $siswa->jenis_kelamin;
+        $this->alamat          = $siswa->alamat ?? '';
 
         $this->showForm = true;
     }
@@ -119,6 +123,7 @@ new #[Layout('layouts.app')] class extends Component {
             'nama'           => $this->nama,
             'kelas'          => (int) $this->kelas,
             'jenis_kelamin'  => $this->jenis_kelamin,
+            'alamat'         => $this->alamat,
         ];
 
         try {
@@ -651,6 +656,21 @@ new #[Layout('layouts.app')] class extends Component {
                             size="md"
                         />
                         @error('nama')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Alamat --}}
+                    <div>
+                        <x-atoms.input-label for="alamat" size="sm">Alamat *</x-atoms.input-label>
+                        <x-atoms.text-input
+                            id="alamat"
+                            type="text"
+                            wire:model="alamat"
+                            placeholder="Alamat siswa"
+                            size="md"
+                        />
+                        @error('alamat')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
