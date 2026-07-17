@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'no_hp',
         'jenis_kelamin',
+        'alamat',
         'foto',
         'status',
         'password',
