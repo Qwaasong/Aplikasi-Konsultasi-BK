@@ -20,25 +20,22 @@ new class extends Component {
     public $siswa_id = '';
 
     #[Validate('required|date')]
-    public $tanggal_kunjungan = '';
+    public $tanggal_konsultasi = '';
 
     #[Validate('required|string|max:255')]
-    public $orang_tua = '';
+    public $judul = '';
 
     #[Validate('required|string')]
-    public $alamat = '';
-
-    #[Validate('required|string')]
-    public $hasil_observasi = '';
-
-    #[Validate('required|string')]
-    public $permasalahan = '';
-
-    #[Validate('required|string')]
-    public $solusi = '';
+    public $isi_konsultasi = '';
 
     #[Validate('nullable|string')]
-    public $catatan = '';
+    public $hasil_tindak_lanjut = '';
+
+    #[Validate('required|in:Open,Diproses,Selesai')]
+    public $status = 'Open';
+
+    #[Validate('required|in:Rendah,Sedang,Tinggi')]
+    public $prioritas = 'Sedang';
 
     #[Validate([
         'files' => 'array|max:5',
@@ -47,24 +44,22 @@ new class extends Component {
     public $files = [];
     public $newFiles = [];
 
+    public $konsultasi_id = '';
     public $searchSiswa = '';
     public $showStudentModal = false;
 
     public function mount()
     {
-        $this->tanggal_kunjungan = date('Y-m-d');
+        $this->tanggal_konsultasi = date('Y-m-d');
     }
 
     public function nextStep()
     {
         $this->validate([
             'siswa_id' => 'required|integer',
-            'tanggal_kunjungan' => 'required|date',
-            'orang_tua' => 'required|string|max:255',
-            'alamat' => 'required|string',
-            'hasil_observasi' => 'required|string',
-            'permasalahan' => 'required|string',
-            'solusi' => 'required|string',
+            'judul' => 'required|string|max:255',
+            'tanggal_konsultasi' => 'required|date',
+            'isi_konsultasi' => 'required|string',
         ]);
         $this->step = 2;
     }
@@ -145,98 +140,104 @@ new class extends Component {
     public function createHomeVisit()
     {
         $this->resetValidation();
-        $this->reset([
-            'editingId',
-            'siswa_id',
-            'tanggal_kunjungan',
-            'orang_tua',
-            'alamat',
-            'hasil_observasi',
-            'permasalahan',
-            'solusi',
-            'catatan',
-            'files',
-            'newFiles',
-            'existingFiles',
-            'searchSiswa',
-        ]);
-        $this->editingId = null;
-        $this->tanggal_kunjungan = date('Y-m-d');
-        $this->step = 1;
-
-        $this->dispatch('open-modal', 'form-home-visit');
-    }
-
-    // ── EVENT UNTUK MODE EDIT ───────────────────────────────────
-    #[On('edit-home-visit')]
-    public function loadHomeVisit($id)
-    {
-        $service = app(HomeVisitService::class);
-        $this->resetValidation();
-        $this->reset(['files', 'newFiles']);
-
-        $record = $service->findByIdForCurrentUser($id);
-        
-        $this->editingId             = $id;
-        $this->siswa_id              = $record->siswa_id;
-
-        $this->tanggal_kunjungan = $record->tanggal_kunjungan
-            ? \Carbon\Carbon::parse($record->tanggal_kunjungan)->format('Y-m-d')
-            : date('Y-m-d');
-
-        $this->orang_tua = $record->orang_tua;
-        $this->alamat = $record->alamat;
-        $this->hasil_observasi = $record->hasil_observasi;
-        $this->permasalahan = $record->permasalahan;
-        $this->solusi = $record->solusi;
-        $this->catatan = $record->catatan;
-                
-        $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
-        $this->step = 1;
-
-        $this->dispatch('open-modal', 'form-home-visit');
-    }
-
-    // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
-    public function save(HomeVisitService $service)
-    {
-        $this->validate();
-
-        $data = [
-            'siswa_id'            => $this->siswa_id,
-            'tanggal_kunjungan'   => $this->tanggal_kunjungan,
-            'orang_tua'           => $this->orang_tua,
-            'alamat'              => $this->alamat,
-            'hasil_observasi'     => $this->hasil_observasi,
-            'permasalahan'        => $this->permasalahan,
-            'solusi'              => $this->solusi,
-            'catatan'             => $this->catatan,
-        ];
-        if ($this->editingId) {
-            $service->update($this->editingId, $data, $this->existingFiles, $this->files);
-            session()->flash('success', 'Kunjungan Rumah berhasil diperbarui!');
-        } else {
-            $service->create($data, $this->files);
-            session()->flash('success', 'Kunjungan Rumah berhasil ditambahkan!');
-        }
 
         $this->reset([
             'editingId',
             'siswa_id',
-            'tanggal_kunjungan',
-            'orang_tua',
-            'alamat',
-            'hasil_observasi',
-            'permasalahan',
-            'solusi',
-            'catatan',
+            'judul',
+            'isi_konsultasi',
+            'hasil_tindak_lanjut',
+            'status',
+            'prioritas',
             'files',
             'newFiles',
             'existingFiles',
             'searchSiswa',
             'showStudentModal',
         ]);
-        $this->tanggal_kunjungan = date('Y-m-d');
+
+        $this->tanggal_konsultasi = date('Y-m-d');
+        $this->status = 'Open';
+        $this->prioritas = 'Sedang';
+        $this->step = 1;
+
+        $this->dispatch('open-modal', 'form-home-visit');
+        $this->dispatch('refreshTable');
+    }
+
+    // ── EVENT UNTUK MODE EDIT ───────────────────────────────────
+    #[On('edit-home-visit')]
+    public function loadHomeVisit(int $id)
+    {
+        $service = app(HomeVisitService::class);
+
+        $record = $service->findById($id);
+
+        $this->editingId = $record->id;
+        $this->siswa_id = $record->siswa_id;
+
+        $this->tanggal_konsultasi =
+            optional($record->tanggal_konsultasi)->format('Y-m-d');
+
+        $this->judul = $record->judul;
+        $this->isi_konsultasi = $record->isi_konsultasi;
+        $this->hasil_tindak_lanjut = $record->hasil_tindak_lanjut;
+
+        $this->status = $record->status;
+        $this->prioritas = $record->prioritas;
+
+        $this->dispatch('open-modal', 'form-home-visit');
+    }
+
+    // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
+    public function save()
+    {
+        $this->validate();
+
+        $service = app(HomeVisitService::class);
+
+        $data = [
+            'siswa_id' => $this->siswa_id,
+            'judul' => $this->judul,
+            'isi_konsultasi' => $this->isi_konsultasi,
+            'hasil_tindak_lanjut' => $this->hasil_tindak_lanjut,
+            'tanggal_konsultasi' => $this->tanggal_konsultasi,
+            'status' => $this->status,
+            'prioritas' => $this->prioritas,
+        ];
+
+        if ($this->editingId) {
+
+            $service->update($this->editingId, $data);
+
+            session()->flash('success', 'Kunjungan Rumah berhasil diperbarui.');
+
+        } else {
+
+            $service->create($data);
+
+            session()->flash('success', 'Kunjungan Rumah berhasil ditambahkan.');
+        }
+
+        // Reset form
+        $this->resetValidation();
+
+        $this->reset([
+            'editingId',
+            'siswa_id',
+            'judul',
+            'isi_konsultasi',
+            'hasil_tindak_lanjut',
+            'files',
+            'newFiles',
+            'existingFiles',
+            'searchSiswa',
+            'showStudentModal',
+        ]);
+
+        $this->tanggal_konsultasi = date('Y-m-d');
+        $this->status = 'Open';
+        $this->prioritas = 'Sedang';
         $this->step = 1;
 
         $this->dispatch('close-modal', 'form-home-visit');
@@ -306,142 +307,133 @@ new class extends Component {
 
                 {{-- Tanggal Kunjungan --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="tanggal_kunjungan" size="sm">
+                    <x-atoms.input-label for="tanggal_konsultasi" size="sm">
                         Tanggal Kunjungan
                     </x-atoms.input-label>
 
                     <x-atoms.text-input
-                        id="tanggal_kunjungan"
+                        id="tanggal_konsultasi"
                         type="date"
-                        wire:model="tanggal_kunjungan"
+                        wire:model="tanggal_konsultasi"
                         size="md" />
 
-                    @error('tanggal_kunjungan')
+                    @error('tanggal_konsultasi')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Nama Orang Tua --}}
+                {{-- Judul --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="orang_tua" size="sm">
-                        Nama Orang Tua / Wali
+                    <x-atoms.input-label for="judul" size="sm">
+                        Judul
                     </x-atoms.input-label>
 
                     <x-atoms.text-input
-                        id="orang_tua"
-                        wire:model="orang_tua"
+                        id="judul"
+                        wire:model="judul"
                         size="md"
-                        placeholder="Masukkan nama orang tua / wali..." />
+                        placeholder="Masukkan judul..." />
 
-                    @error('orang_tua')
+                    @error('judul')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Alamat --}}
+                {{-- Isi Konsultasi --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="alamat" size="sm">
-                        Alamat Rumah
+                    <x-atoms.input-label for="isi_konsultasi" size="sm">
+                        Hasil Kunjungan
                     </x-atoms.input-label>
 
                     <textarea
-                        id="alamat"
-                        wire:model="alamat"
+                        id="isi_konsultasi"
+                        wire:model="isi_konsultasi"
                         rows="3"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Masukkan alamat rumah siswa..."></textarea>
+                        placeholder="Tuliskan hasil kunjungan rumah..."></textarea>
 
-                    @error('alamat')
+                    @error('isi_konsultasi')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Hasil Observasi --}}
+                {{-- Hasil Tindak Lanjut --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="hasil_observasi" size="sm">
-                        Hasil Observasi
+                    <x-atoms.input-label for="hasil_tindak_lanjut" size="sm">
+                        Hasil Tindak Lanjut
                     </x-atoms.input-label>
 
                     <textarea
-                        id="hasil_observasi"
-                        wire:model="hasil_observasi"
+                        id="hasil_tindak_lanjut"
+                        wire:model="hasil_tindak_lanjut"
                         rows="4"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan hasil observasi selama kunjungan rumah..."></textarea>
+                        placeholder="Tuliskan tindak lanjut setelah kunjungan rumah...">
+                    </textarea>
 
-                    @error('hasil_observasi')
+                    @error('hasil_tindak_lanjut')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
-
-                {{-- Permasalahan --}}
+                
+                {{-- Status --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="permasalahan" size="sm">
-                        Permasalahan
+                    <x-atoms.input-label for="status" size="sm">
+                        Status
                     </x-atoms.input-label>
 
-                    <textarea
-                        id="permasalahan"
-                        wire:model="permasalahan"
-                        rows="4"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan permasalahan yang ditemukan..."></textarea>
+                    <select
+                        id="status"
+                        wire:model="status"
+                        class="w-full border border-gray-200 rounded-md p-3">
 
-                    @error('uraian_masalah')
+                        <option value="Open">Open</option>
+                        <option value="Diproses">Diproses</option>
+                        <option value="Selesai">Selesai</option>
+
+                    </select>
+
+                    @error('status')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Solusi / Tindak Lanjut --}}
+                {{-- Prioritas --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="solusi" size="sm">
-                        Solusi / Tindak Lanjut
+                    <x-atoms.input-label for="prioritas" size="sm">
+                        Prioritas
                     </x-atoms.input-label>
 
-                    <textarea
-                        id="solusi"
-                        wire:model="solusi"
-                        rows="4"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan solusi atau tindak lanjut..."></textarea>
+                    <select
+                        id="prioritas"
+                        wire:model="prioritas"
+                        class="w-full border border-gray-200 rounded-md p-3">
 
-                    @error('solusi')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
+                        <option value="Rendah">Rendah</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Tinggi">Tinggi</option>
 
-                {{-- Catatan --}}
-                <div class="mb-2">
-                    <x-atoms.input-label for="catatan" size="sm">
-                        Catatan Tambahan
-                    </x-atoms.input-label>
+                    </select>
 
-                    <textarea
-                        id="catatan"
-                        wire:model="catatan"
-                        rows="3"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Catatan tambahan (opsional)..."></textarea>
-
-                    @error('catatan')
+                    @error('prioritas')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
             </div>
+
+
 
             <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
                 <div class="mb-6">

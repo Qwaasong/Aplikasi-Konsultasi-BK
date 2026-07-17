@@ -6,7 +6,9 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
+use App\Models\Konsultasi;
 use App\Services\KonferensiKasusService;
+use App\Models\KonferensiKasus;
 // use App\Models\KategoriKonferensi;
 
 new class extends Component {
@@ -19,23 +21,16 @@ new class extends Component {
     #[Validate('required|integer')]
     public $siswa_id = '';
 
+    public $konsultasi_id = '';
+
     #[Validate('required|date')]
-    public $tanggal_alih = '';
+    public $tanggal_konferensi = '';
 
     #[Validate('required|string|max:255')]
-    public $orang_tua = '';
+    public $topik = '';
 
     #[Validate('required|string')]
-    public $alamat = '';
-
-    #[Validate('required|date')]
-    public $tanggal_penanganan = '';
-
-    #[Validate('required|string')]
-    public $uraian_masalah = '';
-
-    #[Validate('required|string')]
-    public $hasil_tindak_lanjut = '';
+    public $tindak_lanjut = '';
 
     #[Validate([
         'files' => 'array|max:5',
@@ -44,28 +39,21 @@ new class extends Component {
     public $files = [];
     public $newFiles = [];
 
-    public $ttd_siswa = '';
-    public $ttd_guru = '';
-    public $pekerjaan_ortu = '';
-
     public $searchSiswa = '';
     public $showStudentModal = false;
 
     public function mount()
     {
-        $this->tanggal_alih = date('Y-m-d');
+        $this->tanggal_konferensi = date('Y-m-d');
     }
 
     public function nextStep()
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
-            'tanggal_penanganan' => 'required|date',
-            'orang_tua' => 'required|string|max:255',
-            'pekerjaan_ortu' => 'nullable|string|max:255',
-            'alamat' => 'required|string',
-            'uraian_masalah' => 'required|string',
-            'hasil_tindak_lanjut' => 'required|string',
+            'konsultasi_id' => 'required|exists:konsultasi,id',
+            'tanggal_konferensi' => 'required|date',
+            'topik' => 'required|string|max:255',
+            'tindak_lanjut' => 'required|string',
         ]);
         $this->step = 2;
     }
@@ -78,6 +66,14 @@ new class extends Component {
     public function selectStudent(int $id)
     {
         $this->siswa_id = $id;
+
+        $this->selectedStudent = app(SiswaService::class)
+        ->findById($id);
+
+        $this->konsultasi_id = Konsultasi::where('siswa_id', $id)
+            ->latest()
+            ->value('id');
+
         $this->showStudentModal = false;
         $this->searchSiswa = '';
     }
@@ -146,93 +142,85 @@ new class extends Component {
     public function createKonferensiKasus()
     {
         $this->resetValidation();
+
         $this->reset([
             'editingId',
             'siswa_id',
-            'orang_tua',
-            'pekerjaan_ortu',
-            'alamat',
-            'uraian_masalah',
-            'hasil_tindak_lanjut',
-            'files',
-            'newFiles',
-            'existingFiles',
+            'konsultasi_id',
+            'topik',
+            'tindak_lanjut',
             'searchSiswa',
         ]);
+
         $this->editingId = null;
-        $this->tanggal_alih = date('Y-m-d');
+        $this->tanggal_konferensi = date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-konferensi-kasus');
     }
 
-    // ── EVENT UNTUK MODE EDIT ───────────────────────────────────
-    // #[On('edit-konferensi-kasus')]
-    // public function loadKonferensiKasus(int $id)
-    // {
-    //     //$service = app(KonferensiKasusService::class);
-    //     $this->resetValidation();
-    //     $this->reset(['files', 'newFiles']);
+    //── EVENT UNTUK MODE EDIT ───────────────────────────────────
+    #[On('edit-konferensi-kasus')]
+    public function loadKonferensiKasus(int $id)
+    {
+        $this->resetValidation();
 
-    //     $record = $service->findByIdForCurrentUser($id);
+        $record = KonferensiKasus::findOrFail($id);
 
-    //     $this->editingId             = $id;
-    //     $this->siswa_id              = $record->siswa_id;
+        $this->editingId = $id;
 
-    //     $this->tanggal_alih = $record->tanggal_alih
-    //         ? \Carbon\Carbon::parse($record->tanggal_alih)->format('Y-m-d')
-    //         : date('Y-m-d');
+        $this->konsultasi_id = $record->konsultasi_id;
+        $this->siswa_id = $record->konsultasi?->siswa_id;
 
-    //     $this->orang_tua = $record->orang_tua;
-    //     $this->alamat = $record->alamat;
-    //     $this->pekerjaan_ortu = $record->pekerjaan_ortu;
-    //     $this->alamat = $record->alamat;
-    //     $this->uraian_masalah = $record->uraian_masalah;
-    //     $this->hasil_tindak_lanjut = $record->hasil_tindak_lanjut;
+        $this->tanggal_konferensi = $record->tanggal_konferensi
+            ? \Carbon\Carbon::parse($record->tanggal_konferensi)->format('Y-m-d')
+            : date('Y-m-d');
 
-    //     $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
-    //     $this->step = 1;
+        $this->topik = $record->topik;
+        $this->tindak_lanjut = $record->tindak_lanjut;
 
-    //     $this->dispatch('open-modal', 'form-konferensi-kasus');
-    // }
+        $this->step = 1;
+
+        $this->dispatch('open-modal', 'form-konferensi-kasus');
+    }
 
     // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
     public function save()
     {
         $this->validate();
 
-        // $data = [
-        //     'siswa_id'             => $this->siswa_id,
-        //     'tanggal_alih'         => $this->tanggal_alih,
-        //     'orang_tua'            => $this->orang_tua,
-        //     'pekerjaan_ortu'       => $this->pekerjaan_ortu,
-        //     'alamat'               => $this->alamat,
-        //     'uraian_masalah'       => $this->uraian_masalah,
-        //     'hasil_tindak_lanjut'  => $this->hasil_tindak_lanjut,
-        // ];
-        // if ($this->editingId) {
-        //     $service->update($this->editingId, $data, $this->existingFiles, $this->files);
-        //     session()->flash('success', 'Konferensi Kasus berhasil diperbarui!');
-        // } else {
-        //     $service->create($data, $this->files);
-        //     session()->flash('success', 'Konferensi Kasus berhasil ditambahkan!');
-        // }
+        $data = [
+            'konsultasi_id' => $this->konsultasi_id,
+            'tanggal_konferensi' => $this->tanggal_konferensi,
+            'topik' => $this->topik,
+            'tindak_lanjut' => $this->tindak_lanjut,
+        ];
+
+        if ($this->editingId) {
+
+            KonferensiKasus::findOrFail($this->editingId)
+                ->update($data);
+
+            session()->flash('success', 'Konferensi Kasus berhasil diperbarui!');
+
+        } else {
+
+            KonferensiKasus::create($data);
+
+            session()->flash('success', 'Konferensi Kasus berhasil ditambahkan!');
+        }
 
         $this->reset([
             'editingId',
             'siswa_id',
-            'orang_tua',
-            'pekerjaan_ortu',
-            'alamat',
-            'uraian_masalah',
-            'hasil_tindak_lanjut',
-            'files',
-            'newFiles',
-            'existingFiles',
+            'konsultasi_id',
+            'topik',
+            'tindak_lanjut',
             'searchSiswa',
             'showStudentModal',
         ]);
-        $this->tanggal_alih = date('Y-m-d');
+
+        $this->tanggal_konferensi = date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('close-modal', 'form-konferensi-kasus');
@@ -302,109 +290,58 @@ new class extends Component {
                         @endif
                     </div>
 
-                    {{-- Tanggal Penanganan --}}
+                    {{-- Tanggal Konferensi --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="tanggal_alih" size="sm">
-                            Tanggal Penanganan
+                        <x-atoms.input-label for="tanggal_konferensi">
+                            Tanggal Konferensi Kasus
                         </x-atoms.input-label>
 
                         <x-atoms.text-input
-                            id="tanggal_alih"
                             type="date"
-                            wire:model="tanggal_alih"
-                            size="md" />
+                            id="tanggal_konferensi"
+                            wire:model="tanggal_konferensi" />
 
-                        @error('tanggal_alih')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                        @error('tanggal_konferensi')
+                            <span class="text-red-500 text-sm">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
-                    {{-- Nama Orang Tua --}}
+                    {{-- Topik --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="orang_tua" size="sm">
-                            Nama Orang Tua / Wali
+                        <x-atoms.input-label for="topik">
+                            Topik
                         </x-atoms.input-label>
 
                         <x-atoms.text-input
-                            id="orang_tua"
-                            wire:model="orang_tua"
-                            size="md"
-                            placeholder="Masukkan nama orang tua / wali..." />
+                            id="topik"
+                            wire:model="topik"
+                            placeholder="Masukkan topik konferensi" />
 
-                        @error('orang_tua')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                        @error('topik')
+                            <span class="text-red-500 text-sm">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
-                    {{-- Pekerjaan Orang Tua --}}
+                    {{-- Tindak Lanjut --}}
                     <div class="mb-6">
-                        <x-atoms.text-input
-                            id="pekerjaan_ortu"
-                            wire:model="pekerjaan_ortu"
-                            placeholder="Masukkan pekerjaan orang tua..." />
-                    </div>
-
-                    {{-- Alamat --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="alamat" size="sm">
-                            Alamat Rumah
+                        <x-atoms.input-label for="tindak_lanjut">
+                            Tindak Lanjut
                         </x-atoms.input-label>
 
                         <textarea
-                            id="alamat"
-                            wire:model="alamat"
-                            rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Masukkan alamat rumah siswa..."></textarea>
-
-                        @error('alamat')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                        @enderror
-                    </div>
-
-                    {{-- Uraian Masalah --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="uraian masalah" size="sm">
-                            Uraian Masalah
-                        </x-atoms.input-label>
-
-                        <textarea
-                            id="uraian_masalah"
-                            wire:model="uraian_masalah"
+                            wire:model="tindak_lanjut"
                             rows="4"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan uraian masalah yang ditemukan..."></textarea>
+                            class="w-full border rounded-md p-3">
+                        </textarea>
 
-                        @error('uraian_masalah')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                        @enderror
-                    </div>
-
-                    {{-- Hasil yang Dicapai dan Tindak Lanjut --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="solusi" size="sm">
-                            Hasil yang Dicapai dan Tindak Lanjut
-                        </x-atoms.input-label>
-
-                        <textarea
-                            id="hasil"
-                            wire:model="hasil_tindak_lanjut"
-                            rows="4"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan hasil yang dicapai dan tindak lanjut..."></textarea>
-
-                        @error('hasil_tindak_lanjut')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                        @error('tindak_lanjut')
+                            <span class="text-red-500 text-sm">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 

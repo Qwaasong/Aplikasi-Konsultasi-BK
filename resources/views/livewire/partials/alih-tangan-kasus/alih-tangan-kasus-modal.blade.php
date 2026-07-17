@@ -5,9 +5,10 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Services\SiswaService;
-use App\Services\AlihTanganKasusService;
+use App\Models\Konsultasi;
 use App\Models\KategoriKonsultasi;
+use App\Services\AlihTanganKasusService;
+use App\Services\SiswaService;
 
 new class extends Component {
     use WithFileUploads;
@@ -19,23 +20,20 @@ new class extends Component {
     #[Validate('required|integer')]
     public $siswa_id = '';
 
+    #[Validate('required|integer')]
+    public $konsultasi_id = '';
+
     #[Validate('required|date')]
     public $tanggal_alih = '';
 
     #[Validate('required|string|max:255')]
-    public $orang_tua = '';
+    public $pihak_penerima = '';
 
-    #[Validate('required|string')]
-    public $alamat = '';
+    #[Validate('nullable|string')]
+    public $alasan_alih = '';
 
-    #[Validate('required|date')]
-    public $tanggal_penanganan = '';
-
-    #[Validate('required|string')]
-    public $uraian_masalah = '';
-
-    #[Validate('required|string')]
-    public $hasil_tindak_lanjut = '';
+    #[Validate('nullable|string')]
+    public $tindak_lanjut = '';
 
     #[Validate([
         'files' => 'array|max:5',
@@ -43,10 +41,6 @@ new class extends Component {
     ])]
     public $files = [];
     public $newFiles = [];
-
-    public $ttd_siswa = '';
-    public $ttd_guru = '';
-    public $pekerjaan_ortu = '';
 
     public $searchSiswa = '';
     public $showStudentModal = false;
@@ -59,13 +53,11 @@ new class extends Component {
     public function nextStep()
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
-            'tanggal_penanganan' => 'required|date',
-            'orang_tua' => 'required|string|max:255',
-            'pekerjaan_ortu' => 'nullable|string|max:255',
-            'alamat' => 'required|string',
-            'uraian_masalah' => 'required|string',
-            'hasil_tindak_lanjut' => 'required|string',
+            'konsultasi_id' => 'required|integer',
+            'tanggal_alih' => 'required|date',
+            'pihak_penerima' => 'required|string|max:255',
+            'alasan_alih' => 'nullable|string',
+            'tindak_lanjut' => 'nullable|string',
         ]);
         $this->step = 2;
     }
@@ -78,6 +70,14 @@ new class extends Component {
     public function selectStudent($id)
     {
         $this->siswa_id = $id;
+
+        $this->selectedStudent = app(SiswaService::class)
+        ->findById($id);
+
+        $this->konsultasi_id = Konsultasi::where('siswa_id', $id)
+            ->latest()
+            ->value('id');
+
         $this->showStudentModal = false;
         $this->searchSiswa = '';
     }
@@ -115,8 +115,18 @@ new class extends Component {
     #[Computed]
     public function selectedStudent()
     {
-        if (!$this->siswa_id) return null;
+        if (!$this->siswa_id) {
+            return null;
+        }
+
         return app(SiswaService::class)->findById($this->siswa_id);
+    }
+
+    #[Computed]
+    public function filteredStudents()
+    {
+        return app(SiswaService::class)
+            ->search($this->searchSiswa, 50);
     }
 
     #[Computed]
@@ -129,12 +139,6 @@ new class extends Component {
 
         array_unshift($options, ['value' => '', 'label' => 'Pilih Kategori (Opsional)']);
         return $options;
-    }
-
-    #[Computed]
-    public function filteredStudents()
-    {
-        return app(SiswaService::class)->search($this->searchSiswa, 50);
     }
 
     public function getInitials($name)
@@ -160,16 +164,14 @@ new class extends Component {
         $this->resetValidation();
         $this->reset([
             'editingId',
-            'siswa_id',
-            'orang_tua',
-            'pekerjaan_ortu',
-            'alamat',
-            'uraian_masalah',
-            'hasil_tindak_lanjut',
+            'konsultasi_id',
+            'tanggal_alih',
+            'pihak_penerima',
+            'alasan_alih',
+            'tindak_lanjut',
             'files',
             'newFiles',
             'existingFiles',
-            'searchSiswa',
         ]);
         $this->editingId = null;
         $this->tanggal_alih = date('Y-m-d');
@@ -182,26 +184,29 @@ new class extends Component {
     #[On('edit-alih-tangan-kasus')]
     public function loadAlihTanganKasus($id)
     {
+        $this->siswa_id = $record->konsultasi->siswa_id;
+
+        $this->selectedStudent = app(SiswaService::class)
+            ->findById($this->siswa_id);
+
         $service = app(AlihTanganKasusService::class);
         $this->resetValidation();
         $this->reset(['files', 'newFiles']);
 
         $record = $service->findByIdForCurrentUser($id);
         
-        $this->editingId             = $id;
-        $this->siswa_id              = $record->siswa_id;
+        $this->editingId = $id;
+
+        $this->konsultasi_id = $record->konsultasi_id;
 
         $this->tanggal_alih = $record->tanggal_alih
             ? \Carbon\Carbon::parse($record->tanggal_alih)->format('Y-m-d')
             : date('Y-m-d');
 
-        $this->orang_tua = $record->orang_tua;
-        $this->alamat = $record->alamat;
-        $this->pekerjaan_ortu = $record->pekerjaan_ortu;
-        $this->alamat = $record->alamat;
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->hasil_tindak_lanjut = $record->hasil_tindak_lanjut;
-                
+        $this->pihak_penerima = $record->pihak_penerima;
+        $this->alasan_alih = $record->alasan_alih;
+        $this->tindak_lanjut = $record->tindak_lanjut;
+                        
         $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
         $this->step = 1;
 
@@ -214,13 +219,11 @@ new class extends Component {
         $this->validate();
 
         $data = [
-            'siswa_id'             => $this->siswa_id,
-            'tanggal_alih'         => $this->tanggal_alih,
-            'orang_tua'            => $this->orang_tua,
-            'pekerjaan_ortu'       => $this->pekerjaan_ortu,
-            'alamat'               => $this->alamat,
-            'uraian_masalah'       => $this->uraian_masalah,
-            'hasil_tindak_lanjut'  => $this->hasil_tindak_lanjut,
+            'konsultasi_id' => $this->konsultasi_id,
+            'tanggal_alih' => $this->tanggal_alih,
+            'pihak_penerima' => $this->pihak_penerima,
+            'alasan_alih' => $this->alasan_alih,
+            'tindak_lanjut' => $this->tindak_lanjut,
         ];
         if ($this->editingId) {
             $service->update($this->editingId, $data, $this->existingFiles, $this->files);
@@ -232,17 +235,14 @@ new class extends Component {
 
         $this->reset([
             'editingId',
-            'siswa_id',
-            'orang_tua',
-            'pekerjaan_ortu',
-            'alamat',
-            'uraian_masalah',
-            'hasil_tindak_lanjut',
+            'konsultasi_id',
+            'tanggal_alih',
+            'pihak_penerima',
+            'alasan_alih',
+            'tindak_lanjut',
             'files',
             'newFiles',
             'existingFiles',
-            'searchSiswa',
-            'showStudentModal',
         ]);
         $this->tanggal_alih = date('Y-m-d');
         $this->step = 1;
@@ -312,10 +312,10 @@ new class extends Component {
                     @endif
                 </div>
 
-                {{-- Tanggal Penanganan --}}
+                {{-- Tanggal Alih Tangan --}}
                 <div class="mb-6">
                     <x-atoms.input-label for="tanggal_alih" size="sm">
-                        Tanggal Penanganan
+                        Tanggal Alih Tangan
                     </x-atoms.input-label>
 
                     <x-atoms.text-input
@@ -331,87 +331,69 @@ new class extends Component {
                     @enderror
                 </div>
 
-                {{-- Nama Orang Tua --}}
+                {{-- Pihak Penerima --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="orang_tua" size="sm">
-                        Nama Orang Tua / Wali
+                    <x-atoms.input-label for="pihak_penerima" size="sm">
+                        Pihak Penerima
                     </x-atoms.input-label>
 
-                    <x-atoms.text-input
-                        id="orang_tua"
-                        wire:model="orang_tua"
-                        size="md"
-                        placeholder="Masukkan nama orang tua / wali..." />
+                    <select
+                        id="pihak_penerima"
+                        wire:model="pihak_penerima"
+                        class="w-full border border-gray-200 rounded-md px-4 py-3 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm">
 
-                    @error('orang_tua')
+                        <option value="">Pilih Pihak Penerima</option>
+                        <option value="Orang Tua / Wali">Orang Tua / Wali</option>
+                        <option value="Wali Kelas">Wali Kelas</option>
+                        <option value="Psikolog">Psikolog</option>
+                        <option value="Psikiater">Psikiater</option>
+                        <option value="Puskesmas">Puskesmas</option>
+                        <option value="Rumah Sakit">Rumah Sakit</option>
+                        <option value="Lembaga Perlindungan Anak">Lembaga Perlindungan Anak</option>
+                        <option value="Instansi Lain">Instansi Lain</option>
+                    </select>
+
+                    @error('pihak_penerima')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Pekerjaan Orang Tua --}}
+                {{-- Alasan Alih Tangan --}}
                 <div class="mb-6">
-                    <x-atoms.text-input
-                    id="pekerjaan_ortu"
-                    wire:model="pekerjaan_ortu"
-                    placeholder="Masukkan pekerjaan orang tua..." />
-                </div>
-
-                {{-- Alamat --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="alamat" size="sm">
-                        Alamat Rumah
+                    <x-atoms.input-label for="alasan_alih" size="sm">
+                        Alasan Alih Tangan
                     </x-atoms.input-label>
 
                     <textarea
-                        id="alamat"
-                        wire:model="alamat"
-                        rows="3"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Masukkan alamat rumah siswa..."></textarea>
-
-                    @error('alamat')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                {{-- Uraian Masalah --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="uraian masalah" size="sm">
-                        Uraian Masalah
-                    </x-atoms.input-label>
-
-                    <textarea
-                        id="uraian_masalah"
-                        wire:model="uraian_masalah"
+                        id="alasan_alih"
+                        wire:model="alasan_alih"
                         rows="4"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan uraian masalah yang ditemukan..."></textarea>
+                        placeholder="Contoh: Membutuhkan penanganan psikolog karena memerlukan asesmen lanjutan"></textarea>
 
-                    @error('uraian_masalah')
+                    @error('alasan_alih')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
 
-                {{-- Hasil yang Dicapai dan Tindak Lanjut --}}
+                {{-- Tindak Lanjut --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="solusi" size="sm">
-                        Hasil yang Dicapai dan Tindak Lanjut
+                    <x-atoms.input-label for="tindak_lanjut" size="sm">
+                        Tindak Lanjut
                     </x-atoms.input-label>
 
                     <textarea
-                        id="hasil"
-                        wire:model="hasil_tindak_lanjut"
+                        id="tindak_lanjut"
+                        wire:model="tindak_lanjut"
                         rows="4"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan hasil yang dicapai dan tindak lanjut..."></textarea>
+                        placeholder="Contoh: Guru BK melakukan monitoring perkembangan setelah proses alih tangan."></textarea>
 
-                    @error('hasil_tindak_lanjut')
+                    @error('tindak_lanjut')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>

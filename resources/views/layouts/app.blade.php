@@ -29,7 +29,7 @@
         @endif
 
         <!-- Page Content -->
-        <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white">
+        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-white">
             {{ $slot }}
         </main>
     </div>
