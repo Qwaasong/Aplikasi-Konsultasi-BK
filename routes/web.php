@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\WordExportController;
 
+// Landing Page
+Route::view('/', 'landing.index')->name('landing');
+
 Volt::route('test', 'pages.test');
 
 // ── Export Word ──────────────────────────────────────────────
