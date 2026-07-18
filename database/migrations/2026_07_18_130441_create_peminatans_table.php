@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pelanggaran_siswa', function (Blueprint $table) {
+        Schema::create('peminatans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->foreignId('kasus_id')->constrained('kasus_bk')->nullOnDelete()->nullable();
-            $table->date('tanggal_pernyataan');
-            $table->text('deskripsi');
-            $table->text('sanksi');
-            $table->text('tindak_lanjut');
-            $table->string('bukti_foto')->nullable();
+            $table->date('tanggal');
+            $table->string('pilihan1', 100);
+            $table->string('pilihan2', 100);
+            $table->string('pilihan3', 100);
+            $table->text('hasil');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pelanggaran_siswa');
+        Schema::dropIfExists('peminatans');
     }
 };

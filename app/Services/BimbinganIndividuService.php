@@ -2,26 +2,28 @@
 
 namespace App\Services;
 
-use App\Models\BimbinganKelompok;
-use App\Models\TahunAjaran;
+use App\Models\BimbinganIndividu;
 use App\Models\Pegawai;
+use App\Models\TahunAjaran;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 class BimbinganIndividuService
 {
     public function getAll(): Collection
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran'])->latest()->get();
+        return BimbinganIndividu::with(['guruBk.user', 'tahunAjaran'])
+            ->latest('tanggal_layanan')
+            ->get();
     }
 
-    public function findById(int $id): BimbinganKelompok
+    public function findById(int $id): ?BimbinganIndividu
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran'])->findOrFail($id);
+        return BimbinganIndividu::with(['guruBk.user', 'tahunAjaran'])
+            ->findOrFail($id);
     }
 
-    public function create(array $data, array $files = []): BimbinganKelompok
+    public function create(array $data): BimbinganIndividu
     {
         $pegawai = Pegawai::where('user_id', auth()->id())->first();
         if (!$pegawai) {
@@ -32,21 +34,18 @@ class BimbinganIndividuService
         $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');
 
-        $record = BimbinganKelompok::create($data);
-
-        return $record->fresh(['guruBk.user', 'tahunAjaran']);
+        return BimbinganIndividu::create($data);
     }
 
-    public function update(int $id, array $data, array $keptFiles = [], array $newFiles = []): BimbinganKelompok
+    public function update(int $id, array $data): BimbinganIndividu
     {
-        $record = BimbinganKelompok::findOrFail($id);
+        $record = BimbinganIndividu::findOrFail($id);
         $record->update($data);
-
         return $record->fresh(['guruBk.user', 'tahunAjaran']);
     }
 
     public function delete(int $id): void
     {
-        BimbinganKelompok::findOrFail($id)->delete();
+        BimbinganIndividu::findOrFail($id)->delete();
     }
 }

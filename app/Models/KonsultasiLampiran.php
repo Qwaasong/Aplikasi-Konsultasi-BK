@@ -3,19 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class KonsultasiLampiran extends Model
 {
     protected $table = 'konsultasi_lampiran';
+
     protected $fillable = [
-        'konsultasi_id',
+        'kasus_id',
         'nama_file',
         'path_file',
         'tipe_file',
         'ukuran',
     ];
-    public function konsultasi()
+
+    protected $casts = [
+        'ukuran' => 'integer',
+    ];
+
+    public function kasus(): BelongsTo
     {
-        return $this->belongsTo(Konsultasi::class, 'konsultasi_id');
+        return $this->belongsTo(KasusBk::class, 'kasus_id');
     }
 }

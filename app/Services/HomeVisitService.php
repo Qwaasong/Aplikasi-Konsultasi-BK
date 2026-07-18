@@ -2,50 +2,58 @@
 
 namespace App\Services;
 
-use App\Models\Konsultasi;
+use App\Models\HomeVisit;
 use App\Models\Pegawai;
-use App\Models\TahunAjaran;
 use Illuminate\Support\Collection;
 
 class HomeVisitService
 {
     public function getAll(): Collection
     {
-        return Konsultasi::where('jenis_layanan', 'Kunjungan Rumah')
-            ->with(['siswa.user', 'gurubk.user'])
-            ->latest()
+        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
+            ->latest('tanggal_kunjungan')
             ->get();
     }
 
-    public function findById(int $id): Konsultasi
+    public function getByGurubk(?int $pegawaiId = null): Collection
     {
-        return Konsultasi::with(['siswa.user', 'gurubk.user'])->findOrFail($id);
+        $id = $pegawaiId ?? $this->resolveGurubkId();
+        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
+            ->where('guru_bk_id', $id)
+            ->latest('tanggal_kunjungan')
+            ->get();
     }
 
-    public function create(array $data, array $files = []): Konsultasi
+    public function findById(int $id): ?HomeVisit
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
-
-        $data['guru_bk_id'] = $pegawai?->id;
-        $data['jenis_layanan'] = 'Kunjungan Rumah';
-        $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
-            ?? TahunAjaran::latest()->value('id');
-        $data['status'] = 'Open';
-        $data['prioritas'] = 'Sedang';
-
-        return Konsultasi::create($data);
+        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'guruBk.user'])
+            ->find($id);
     }
 
-    public function update(int $id, array $data, array $keptFiles = [], array $newFiles = []): Konsultasi
+    public function create(array $data): HomeVisit
     {
-        $record = Konsultasi::findOrFail($id);
+        $data['guru_bk_id'] = $data['guru_bk_id'] ?? $this->resolveGurubkId();
+        return HomeVisit::create($data);
+    }
+
+    public function update(int $id, array $data): HomeVisit
+    {
+        $record = HomeVisit::findOrFail($id);
         $record->update($data);
-
-        return $record->fresh(['siswa.user', 'gurubk.user']);
+        return $record->fresh(['kasus.siswa.user', 'guruBk.user']);
     }
 
     public function delete(int $id): void
     {
-        Konsultasi::findOrFail($id)->delete();
+        HomeVisit::findOrFail($id)->delete();
+    }
+
+    private function resolveGurubkId(): int
+    {
+        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        if (!$pegawai) {
+            abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');
+        }
+        return $pegawai->id;
     }
 }

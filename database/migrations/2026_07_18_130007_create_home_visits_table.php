@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alihtangan_kasus', function (Blueprint $table) {
+        Schema::create('home_visits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
-            $table->foreignId('nama_asal')->constrained('pegawai')->cascadeOnDelete();
-            $table->foreignId('nama_penerima')->constrained('pegawai')->cascadeOnDelete();
-            $table->date('tanggal_alih');
-            $table->text('alasan_alih')->nullable();
+            $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->date('tanggal_kunjungan');
+            $table->text('uraian_masalah');
+            $table->text('penanganan');
             $table->text('tindak_lanjut')->nullable();
+            $table->enum('status', ['diproses', 'ditunda', 'dibatalkan'])->default('diproses');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('alihtangan_kasus');
+        Schema::dropIfExists('home_visits');
     }
 };

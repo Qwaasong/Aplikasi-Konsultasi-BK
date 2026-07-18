@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('konsultasi_lampiran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('konsultasi_id')->constrained('konsultasi')->cascadeOnDelete();
+            $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
             $table->string('nama_file');
             $table->string('path_file');
             $table->string('tipe_file');

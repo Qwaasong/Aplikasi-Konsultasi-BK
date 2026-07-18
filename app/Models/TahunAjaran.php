@@ -14,8 +14,8 @@ class TahunAjaran extends Model
         'status_aktif',
     ];
 
-    public function konsultasis()
+    public function kasus()
     {
-        return $this->hasMany(Konsultasi::class, 'tahun_ajaran_id');
+        return $this->hasMany(KasusBk::class, 'tahun_ajaran_id');
     }
 }
