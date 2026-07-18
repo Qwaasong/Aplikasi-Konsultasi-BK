@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KeluargaSiswa extends Model
 {
+    use HasFactory;
     protected $table = 'komulatif_record';
 
     protected $fillable = [

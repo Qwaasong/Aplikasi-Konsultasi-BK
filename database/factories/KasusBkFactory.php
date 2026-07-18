@@ -4,9 +4,9 @@ namespace Database\Factories;
 
 use App\Models\KasusBk;
 use App\Models\DataSiswa;
+use App\Models\KategoriKasus;
 use App\Models\Pegawai;
 use App\Models\TahunAjaran;
-use App\Models\KategoriKasus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class KasusBkFactory extends Factory
@@ -21,12 +21,10 @@ class KasusBkFactory extends Factory
         $hasilAkhir = $status === 'Closed' ? $this->faker->sentence() : null;
 
         return [
-            'siswa_id' => DataSiswa::inRandomOrder()->value('id') ?? DataSiswa::factory(),
-            'guru_bk_id' => Pegawai::inRandomOrder()->value('id') ?? 1,
-            'tahun_ajaran_id' => TahunAjaran::where('status_aktif', true)->value('id') 
-                ?? TahunAjaran::inRandomOrder()->value('id') 
-                ?? 1,
-            'kategori_id' => KategoriKasus::inRandomOrder()->value('id') ?? KategoriKasus::factory(),
+            'siswa_id' => DataSiswa::factory(),
+            'guru_bk_id' => Pegawai::factory()->guruBk(),
+            'tahun_ajaran_id' => TahunAjaran::factory()->aktif(),
+            'kategori_id' => KategoriKasus::factory(),
             'penanganan' => $this->faker->randomElement(['Konseling Individu', 'Bimbingan Belajar', 'Konsultasi Karir', 'Mediasi Konflik']),
             'uraian_masalah' => $this->faker->paragraph(),
             'status' => $status,

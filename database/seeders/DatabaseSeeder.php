@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
             FirstDatabaseSeeder::class,
             DataSiswaSeeder::class,
             KonsultasiSeeder::class,
+            FactorySeeder::class,
         ]);
     }
 }

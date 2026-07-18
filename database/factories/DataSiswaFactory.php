@@ -14,9 +14,9 @@ class DataSiswaFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory()->state(['role' => 'siswa']),
+            'user_id' => User::factory()->siswa(),
             'nis' => $this->faker->unique()->numerify('#####'),
-            'kelas_id' => Kelas::inRandomOrder()->value('id') ?? 1,
+            'kelas_id' => Kelas::factory(),
             'alamat' => $this->faker->address(),
             'tempat_lahir' => $this->faker->city(),
             'tgl_lahir' => $this->faker->date(),

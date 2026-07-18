@@ -14,6 +14,12 @@ class KonsultasiSeeder extends Seeder
 {
     public function run()
     {
+        // Lewati jika data kasus_bk sudah ada (idempoten)
+        if (KasusBk::count() > 0) {
+            $this->command->info('KasusBk sudah ada, seeder konsultasi dilewati.');
+            return;
+        }
+
         $konselorUser = User::where('role', 'guru_bk')->first();
         $pegawai = \App\Models\Pegawai::where('user_id', $konselorUser->id)->first();
         $tahunAjaran = TahunAjaran::first();
