@@ -8,7 +8,7 @@ use App\Models\Sekolah;
 use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
-use App\Models\KategoriKonsultasi;
+use App\Models\KategoriKasus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -117,13 +117,9 @@ class FirstDatabaseSeeder extends Seeder
             'status_aktif' => true,
         ]);
 
-        // ─────────────────────────────────────────
-        // 7. BUAT KATEGORI KONSULTASI
-        // ─────────────────────────────────────────
-
         $kategoris = ['Pribadi', 'Belajar', 'Karir', 'Sosial'];
         foreach ($kategoris as $nama) {
-            KategoriKonsultasi::create([
+            KategoriKasus::create([
                 'nama_kategori' => $nama,
             ]);
         }

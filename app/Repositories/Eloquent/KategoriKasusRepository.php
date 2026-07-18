@@ -2,18 +2,18 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\KategoriKonsultasi;
-use App\Repositories\Contracts\KategoriKonsultasiRepositoryInterface;
+use App\Models\KategoriKasus;
+use App\Repositories\Contracts\KategoriKasusRepositoryInterface;
 use Illuminate\Support\Collection;
 
-class KategoriKonsultasiRepository implements KategoriKonsultasiRepositoryInterface
+class KategoriKasusRepository implements KategoriKasusRepositoryInterface
 {
     /**
      * Ambil semua kategori.
      */
     public function getAll(): Collection
     {
-        return KategoriKonsultasi::orderBy('nama_kategori')->get();
+        return KategoriKasus::orderBy('nama_kategori')->get();
     }
 
     /**
@@ -21,31 +21,31 @@ class KategoriKonsultasiRepository implements KategoriKonsultasiRepositoryInterf
      */
     public function countKategori(): int
     {
-        return KategoriKonsultasi::count();
+        return KategoriKasus::count();
     }
 
     /**
      * Cari kategori berdasarkan ID.
      */
-    public function findById(int $id): KategoriKonsultasi
+    public function findById(int $id): KategoriKasus
     {
-        return KategoriKonsultasi::findOrFail($id);
+        return KategoriKasus::findOrFail($id);
     }
 
     /**
      * Tambah kategori.
      */
-    public function create(array $data): KategoriKonsultasi
+    public function create(array $data): KategoriKasus
     {
-        return KategoriKonsultasi::create($data);
+        return KategoriKasus::create($data);
     }
 
     /**
      * Update kategori.
      */
-    public function update(int $id, array $data): KategoriKonsultasi
+    public function update(int $id, array $data): KategoriKasus
     {
-        $kategori = KategoriKonsultasi::findOrFail($id);
+        $kategori = KategoriKasus::findOrFail($id);
 
         $kategori->update($data);
 
@@ -57,6 +57,6 @@ class KategoriKonsultasiRepository implements KategoriKonsultasiRepositoryInterf
      */
     public function delete(int $id): bool
     {
-        return KategoriKonsultasi::findOrFail($id)->delete();
+        return KategoriKasus::findOrFail($id)->delete();
     }
 }

@@ -6,7 +6,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Models\Konsultasi;
-use App\Models\KategoriKonsultasi;
+use App\Models\KategoriKasus;
 use App\Services\AlihTanganKasusService;
 use App\Services\SiswaService;
 
@@ -132,7 +132,7 @@ new class extends Component {
     #[Computed]
     public function kategoriOptions()
     {
-        $options = KategoriKonsultasi::all()->map(fn($item) => [
+        $options = KategoriKasus::all()->map(fn($item) => [
             'value' => $item->id,
             'label' => $item->nama_kategori,
         ])->toArray();

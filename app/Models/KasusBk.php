@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class KasusBk extends Model
 {
+    use HasFactory;
     protected $table = 'kasus_bk';
 
     protected $fillable = [
@@ -52,7 +54,7 @@ class KasusBk extends Model
 
     public function kategori()
     {
-        return $this->belongsTo(KategoriKonsultasi::class, 'kategori_id');
+        return $this->belongsTo(KategoriKasus::class, 'kategori_id');
     }
 
     public function lampirans()
@@ -83,5 +85,69 @@ class KasusBk extends Model
     public function pelanggaranSiswa()
     {
         return $this->hasMany(PelanggaranSiswa::class, 'kasus_id');
+    }
+
+    // ─────────────────────────────────────────
+    // BACKWARD COMPATIBILITY ACCESSORS/MUTATORS
+    // ─────────────────────────────────────────
+
+    public function getJudulAttribute()
+    {
+        return $this->penanganan;
+    }
+
+    public function setJudulAttribute($value)
+    {
+        $this->attributes['penanganan'] = $value;
+    }
+
+    public function getDeksripsiAttribute()
+    {
+        return $this->uraian_masalah;
+    }
+
+    public function setDeksripsiAttribute($value)
+    {
+        $this->attributes['uraian_masalah'] = $value;
+    }
+
+    public function getDeskripsiAttribute()
+    {
+        return $this->uraian_masalah;
+    }
+
+    public function setDeskripsiAttribute($value)
+    {
+        $this->attributes['uraian_masalah'] = $value;
+    }
+
+    public function getIsiKonsultasiAttribute()
+    {
+        return $this->uraian_masalah;
+    }
+
+    public function setIsiKonsultasiAttribute($value)
+    {
+        $this->attributes['uraian_masalah'] = $value;
+    }
+
+    public function getTanggalKonsultasiAttribute()
+    {
+        return $this->tanggal_mulai;
+    }
+
+    public function setTanggalKonsultasiAttribute($value)
+    {
+        $this->attributes['tanggal_mulai'] = $value;
+    }
+
+    public function getHasilTindakLanjutAttribute()
+    {
+        return $this->hasil_akhir;
+    }
+
+    public function setHasilTindakLanjutAttribute($value)
+    {
+        $this->attributes['hasil_akhir'] = $value;
     }
 }

@@ -23,7 +23,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $query->whereHas('siswa.user', function ($q) {
                     $q->where('nama', 'like', '%' . $this->search . '%');
                 })
-                    ->orWhere('judul', 'like', '%' . $this->search . '%');
+                    ->orWhere('penanganan', 'like', '%' . $this->search . '%');
             })
             ->take(5)
             ->get();

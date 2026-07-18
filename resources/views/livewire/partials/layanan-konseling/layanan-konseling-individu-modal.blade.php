@@ -8,7 +8,7 @@ use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
 use App\Services\KonsultasiService;
 use App\Services\BimbinganIndividuService;
-use App\Models\KategoriKonsultasi;
+use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
 
 new class extends Component {
@@ -117,7 +117,7 @@ new class extends Component {
     #[Computed]
     public function kategoriOptions()
     {
-        $options = KategoriKonsultasi::all()->map(fn($item) => [
+        $options = KategoriKasus::all()->map(fn($item) => [
             'value' => $item->id,
             'label' => $item->nama_kategori,
         ])->toArray();

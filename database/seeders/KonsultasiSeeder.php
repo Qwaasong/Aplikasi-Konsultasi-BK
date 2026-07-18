@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
-use App\Models\Konsultasi;
+use App\Models\KasusBk;
 use App\Models\DataSiswa;
 use App\Models\User;
-use App\Models\KategoriKonsultasi;
+use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
 
 class KonsultasiSeeder extends Seeder
@@ -17,7 +17,7 @@ class KonsultasiSeeder extends Seeder
         $konselorUser = User::where('role', 'guru_bk')->first();
         $pegawai = \App\Models\Pegawai::where('user_id', $konselorUser->id)->first();
         $tahunAjaran = TahunAjaran::first();
-        $kategoris = KategoriKonsultasi::pluck('id', 'nama_kategori');
+        $kategoris = KategoriKasus::pluck('id', 'nama_kategori');
         $siswaIds = DataSiswa::pluck('id');
 
         if ($siswaIds->count() < 10) {
@@ -39,16 +39,23 @@ class KonsultasiSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            Konsultasi::create([
+            $status = $item['status'];
+            $tanggalMulai = Carbon::now()->subDays($item['hari']);
+            $tanggalSelesai = $status === 'Closed' ? Carbon::now() : null;
+            $hasilAkhir = $status === 'Closed' ? 'Selesai ditangani' : null;
+
+            KasusBk::create([
                 'siswa_id'           => $siswaIds[$item['siswa_no']],
                 'guru_bk_id'         => $pegawai->id,
                 'tahun_ajaran_id'    => $tahunAjaran->id,
                 'kategori_id'        => $kategoris[$item['kategori']],
-                'judul'              => $item['judul'],
-                'isi_konsultasi'     => $item['isi'],
-                'status'             => $item['status'],
+                'penanganan'         => $item['judul'],
+                'uraian_masalah'     => $item['isi'],
+                'status'             => $status,
                 'prioritas'          => 'Sedang',
-                'tanggal_konsultasi' => Carbon::now()->subDays($item['hari']),
+                'tanggal_mulai'      => $tanggalMulai->format('Y-m-d'),
+                'tanggal_selesai'    => $tanggalSelesai ? $tanggalSelesai->format('Y-m-d') : null,
+                'hasil_akhir'        => $hasilAkhir,
             ]);
         }
     }
