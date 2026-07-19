@@ -29,7 +29,6 @@ $sizes = [
     </svg>
     @break
 
-
     {{-- Consultation --}}
     @case('consultation')
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="{{ $color }}">
@@ -154,6 +153,123 @@ $sizes = [
     @case('target')
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="{{ $color }}">
         <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q69 0 131 22.5T720-792l-58 58q-38-30-84.5-48T480-800q-134 0-227 93t-93 227q0 134 93 227t227 93q134 0 227-93t93-227v-16l80-80v96q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-240q-66 0-113-47t-47-113q0-66 47-113t113-47q28 0 53 9.5t45 26.5l-56 56q-17-12-42-12-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400q33 0 56.5-23.5T560-480v-8l80-80v88q0 66-47 113t-113 47Z" />
+    </svg>
+    @break
+
+    {{-- Home Visit --}}
+    @case('home-visit')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M80-400v-320l400-200 400 200v320H800v240H560v-160H400v160H160v-240H80Zm80-80h640v-192L480-832 160-672v192Z" />
+    </svg>
+    @break
+
+    {{-- Conference --}}
+    @case('conference')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M480-520q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm-240 320v-80q0-50 35-85t85-35h240q50 0 85 35t35 85v80H240Z" />
+    </svg>
+    @break
+
+    {{-- Referral --}}
+    @case('referral')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M280-280 120-440l160-160 56 56-64 64h448v80H272l64 64-56 56Zm400-80-56-56 64-64H240v-80h448l-64-64 56-56 160 160-160 160Z" />
+    </svg>
+    @break
+
+    {{-- Personal --}}
+    @case('personal')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0 80q113 0 193 53t80 127H207q0-74 80-127t193-53Z" />
+    </svg>
+    @break
+
+    {{-- Social --}}
+    @case('social')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M40-160v-112q0-34 17-62t47-43q51-26 104-39.5T320-430q59 0 112 13.5T536-377q30 15 47 43t17 62v112H40Zm640 0v-112q0-45-17.5-85T612-426q37 6 72 18.5t67 29.5q30 15 49.5 43.5T820-272v112H680Z" />
+    </svg>
+    @break
+
+    {{-- Learning --}}
+    @case('learning')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M480-120 120-320l360-200 360 200-360 200Zm0-320L120-640l360-200 360 200-360 200Z" />
+    </svg>
+    @break
+
+    {{-- Career --}}
+    @case('career')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M280-120q-33 0-56.5-23.5T200-200v-360h-40v-120h200v-80h240v80h200v120h-40v360q0 33-23.5 56.5T680-120H280Z" />
+    </svg>
+    @break
+
+    {{-- Lock --}}
+    @case('lock')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M240-400h480v-320q0-33-23.5-56.5T640-800H320q-33 0-56.5 23.5T240-720v320Zm80-80v-240h320v240H320Zm160 360q-83 0-141.5-58.5T280-320v-80h400v80q0 83-58.5 141.5T480-120Z" />
+    </svg>
+    @break
+
+    {{-- Handshake --}}
+    @case('handshake')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M320-320 160-480l56-56 104 104 264-264q17-17 40-17t40 17l136 136-56 56-120-120-264 264q-17 17-40 17t-40-17Z" />
+    </svg>
+    @break
+
+    {{-- Visibility --}}
+    @case('visibility')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M480-320q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-80q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0 280q-146 0-273-82T0-480q80-196 207-278t273-82q146 0 273 82t207 278q-80 196-207 278t-273 82Z" />
+    </svg>
+    @break
+
+    {{-- Balance --}}
+    @case('balance')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M480-120q-17 0-28.5-11.5T440-160v-480H280v-80h160v-80h80v80h160v80H520v480q0 17-11.5 28.5T480-120ZM240-240q-50 0-85-35t-35-85h240q0 50-35 85t-85 35Zm480 0q-50 0-85-35t-35-85h240q0 50-35 85t-85 35Z" />
+    </svg>
+    @break
+
+    {{-- Heart --}}
+    @case('heart')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="m480-280-56-50q-99-89-163.5-153.5T196-604q0-74 50-125t124-51q44 0 82 19.5T480-708q17-33 55-52.5T617-780q74 0 124 51t50 125q0 56-64.5 120.5T536-330l-56 50Z" />
+    </svg>
+    @break
+
+    {{-- Independence --}}
+    @case('independence')
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="{{ $color }}">
+        <path d="M440-120v-326L336-342l-56-58 200-200 200 200-56 58-104-104v326h-80Zm40-560q-83 0-141.5-58.5T280-880h80q0 50 35 85t85 35q50 0 85-35t35-85h80q0 83-58.5 141.5T480-680Z" />
     </svg>
     @break
 

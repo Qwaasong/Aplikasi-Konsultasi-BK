@@ -6,14 +6,8 @@ use App\Livewire\Actions\Logout;
 
 // 1. Logic halaman depan
 Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->role == 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
-        return redirect()->route('konselor.dashboard');
-    }
-    return redirect()->route('login');
-});
+    return view('landing.index');
+})->name('landing');
 
 // 2. Route untuk yang BELUM login (Ini yang tadi hilang)
 Route::middleware('guest')->group(function () {
