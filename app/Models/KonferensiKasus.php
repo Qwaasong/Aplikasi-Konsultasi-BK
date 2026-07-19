@@ -18,6 +18,7 @@ class KonferensiKasus extends Model
         'uraian_masalah',
         'penanganan',
         'tindak_lanjut',
+        'tempat_pertemuan',
     ];
 
     protected $casts = [

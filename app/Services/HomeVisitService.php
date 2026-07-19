@@ -5,13 +5,14 @@ namespace App\Services;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\Pegawai;
+use App\Models\KategoriKasus;
 use Illuminate\Support\Collection;
 
 class HomeVisitService
 {
     public function getAll(): Collection
     {
-        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
+        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'kasus.lampirans', 'guruBk.user'])
             ->latest('tanggal_kunjungan')
             ->get();
     }
@@ -19,7 +20,7 @@ class HomeVisitService
     public function getByGurubk(?int $pegawaiId = null): Collection
     {
         $id = $pegawaiId ?? $this->resolveGurubkId();
-        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
+        return HomeVisit::with(['kasus.siswa.user', 'kasus.lampirans', 'guruBk.user'])
             ->where('guru_bk_id', $id)
             ->latest('tanggal_kunjungan')
             ->get();
@@ -27,94 +28,58 @@ class HomeVisitService
 
     public function findById(int $id): ?HomeVisit
     {
-        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'guruBk.user'])
+        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'kasus.lampirans', 'guruBk.user'])
             ->find($id);
     }
 
     public function create(array $data): HomeVisit
     {
-        $mapped = $this->mapFields($data);
-        $mapped['guru_bk_id'] = $mapped['guru_bk_id'] ?? $this->resolveGurubkId();
-        return HomeVisit::create($mapped);
-    }
+        $gurubkId = $this->resolveGurubkId();
 
-    public function update(int $id, array $data): HomeVisit
-    {
-        $record = HomeVisit::findOrFail($id);
-        $mapped = $this->mapFields($data);
-        $record->update($mapped);
-        return $record->fresh(['kasus.siswa.user', 'guruBk.user']);
-    }
+        // Resolve kasus_id dari siswa_id
+        $siswaId = $data['siswa_id'] ?? null;
+        unset($data['siswa_id']);
 
-    public function delete(int $id): void
-    {
-        HomeVisit::findOrFail($id)->delete();
-    }
-
-    /**
-     * Map legacy/modal field names to actual DB columns.
-     * Also resolves kasus_id from siswa_id if needed.
-     */
-    private function mapFields(array $data): array
-    {
-        $mapped = [];
-
-        // Resolve kasus_id from siswa_id
-        if (isset($data['siswa_id']) && !isset($data['kasus_id'])) {
-            $gurubkId = $data['guru_bk_id'] ?? $this->resolveGurubkId();
-            $kasus = KasusBk::where('siswa_id', $data['siswa_id'])
+        if ($siswaId) {
+            $kasus = KasusBk::where('siswa_id', $siswaId)
                 ->where('status', 'Open')
                 ->latest()
                 ->first();
 
             if (!$kasus) {
                 $kasus = KasusBk::create([
-                    'siswa_id'    => $data['siswa_id'],
-                    'guru_bk_id'  => $gurubkId,
-                    'penanganan'  => $data['judul'] ?? ($data['isi_konsultasi'] ?? 'Kunjungan Rumah'),
-                    'uraian_masalah' => $data['isi_konsultasi'] ?? ($data['judul'] ?? '-'),
-                    'tanggal_mulai' => $data['tanggal_konsultasi'] ?? now()->toDateString(),
-                    'status'      => 'Open',
-                    'prioritas'   => $data['prioritas'] ?? 'Sedang',
+                    'siswa_id'      => $siswaId,
+                    'guru_bk_id'    => $gurubkId,
+                    'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
+                    'penanganan'    => $data['penanganan'] ?? 'Kunjungan Rumah',
+                    'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
+                    'tanggal_mulai' => $data['tanggal_kunjungan'] ?? now()->toDateString(),
+                    'status'        => 'Open',
+                    'prioritas'     => 'Sedang',
                 ]);
             }
 
-            $mapped['kasus_id'] = $kasus->id;
-        } elseif (isset($data['kasus_id'])) {
-            $mapped['kasus_id'] = $data['kasus_id'];
+            $data['kasus_id'] = $kasus->id;
         }
 
-        // Map field names
-        $mapped['tanggal_kunjungan'] = $data['tanggal_kunjungan']
-            ?? $data['tanggal_konsultasi']
-            ?? now()->toDateString();
+        $data['guru_bk_id'] = $gurubkId;
 
-        $mapped['uraian_masalah'] = $data['uraian_masalah']
-            ?? $data['isi_konsultasi']
-            ?? '';
+        return HomeVisit::create($data);
+    }
 
-        $mapped['penanganan'] = $data['penanganan']
-            ?? $data['judul']
-            ?? '';
+    public function update(int $id, array $data): HomeVisit
+    {
+        $record = HomeVisit::findOrFail($id);
 
-        $mapped['tindak_lanjut'] = $data['tindak_lanjut']
-            ?? $data['hasil_tindak_lanjut']
-            ?? null;
+        unset($data['siswa_id']);
 
-        // Map status: modal uses Open/Diproses/Selesai → DB uses diproses/ditunda/dibatalkan
-        $statusMap = [
-            'Open'     => 'diproses',
-            'Diproses' => 'diproses',
-            'Selesai'  => 'diproses',
-        ];
-        $rawStatus = $data['status'] ?? 'Open';
-        $mapped['status'] = $statusMap[$rawStatus] ?? 'diproses';
+        $record->update($data);
+        return $record->fresh(['kasus.siswa.user', 'kasus.lampirans', 'guruBk.user']);
+    }
 
-        if (isset($data['guru_bk_id'])) {
-            $mapped['guru_bk_id'] = $data['guru_bk_id'];
-        }
-
-        return $mapped;
+    public function delete(int $id): void
+    {
+        HomeVisit::findOrFail($id)->delete();
     }
 
     private function resolveGurubkId(): int

@@ -41,6 +41,7 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/kunjungan-rumah/{id}/detail','pages.konselor.kunjungan-rumah.detail')->name('konselor.home-visit.detail');
     Volt::route('konselor/alih-tangan-kasus', 'pages.konselor.alih-tangan-kasus.index')->name('konselor.alih-tangan-kasus.index');
     Volt::route('konselor/konferensi-kasus', 'pages.konselor.konferensi-kasus.index')->name('konselor.konferensi-kasus.index');
+    Volt::route('konselor/konferensi-kasus/{id}/detail', 'pages.konselor.konferensi-kasus.konferensi-kasus-detail')->name('konselor.konferensi-kasus.detail');
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
 });
 

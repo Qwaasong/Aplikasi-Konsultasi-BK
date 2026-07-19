@@ -212,20 +212,16 @@ new #[Layout('layouts.app')] class extends Component {
                     {{ $record->guruBk?->user?->nama ?? '-' }}
                 </td>
 
-                <td class="px-4 py-2 text-right align-middle relative rounded-r-md">
-                    <span class="group-hover:opacity-0 font-medium text-gray-900 pr-2 transition-opacity text-xs">
-                        {{ \Carbon\Carbon::parse($record->tanggal_layanan)->format('d M y') }}
-                    </span>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                            <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
-                                <x-atoms.icon variant="edit" size="sm" />
-                            </x-atoms.action-button>
-                            <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
-                                wire:confirm="Yakin ingin menghapus layanan konseling individu ini?">
-                                <x-atoms.icon variant="delete" size="sm" />
-                            </x-atoms.action-button>
-                        </div>
+                <td class="px-4 py-2 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2" onclick="event.stopPropagation()">
+                        <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
+                            <x-atoms.icon variant="edit" size="sm" />
+                        </x-atoms.action-button>
+
+                        <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
+                            wire:confirm="Yakin ingin menghapus layanan konseling individu ini?">
+                            <x-atoms.icon variant="delete" size="sm" />
+                        </x-atoms.action-button>
                     </div>
                 </td>
 

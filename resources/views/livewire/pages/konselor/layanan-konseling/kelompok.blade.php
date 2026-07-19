@@ -251,21 +251,19 @@ new #[Layout('layouts.app')] class extends Component {
                     {{ $record->guruBk?->user?->nama ?? '-' }}
                 </td>
 
-                <td class="px-4 py-2 text-right align-middle relative rounded-r-md">
+                <td class="px-4 py-2 w-40 text-right align-middle relative rounded-r-md">
                     <span class="group-hover:opacity-0 font-medium text-gray-900 pr-2 transition-opacity text-xs">
                         {{ \Carbon\Carbon::parse($record->tanggal_layanan)->format('d M y') }}
                     </span>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                            <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
-                                <x-atoms.icon variant="edit" size="sm" />
-                            </x-atoms.action-button>
-                            <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
-                                wire:confirm="Yakin ingin menghapus layanan konseling kelompok ini?">
-                                <x-atoms.icon variant="delete" size="sm" />
-                            </x-atoms.action-button>
-                        </div>
-                    </div>
+
+                    <x-molecules.table-action :id="$record->id">
+                        <x-slot:edit>
+                            <span class="sr-only">Edit</span>
+                        </x-slot>
+                        <x-slot:delete>
+                            <span class="sr-only">Delete</span>
+                        </x-slot>
+                    </x-molecules.table-action>
                 </td>
 
             </tr>
