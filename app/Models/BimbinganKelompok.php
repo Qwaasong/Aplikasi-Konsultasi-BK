@@ -16,6 +16,7 @@ class BimbinganKelompok extends Model
     protected $fillable = [
         'guru_bk_id',
         'tahun_ajaran_id',
+        'kasus_id',
         'tanggal_layanan',
         'uraian_masalah',
         'penanganan',
@@ -34,6 +35,11 @@ class BimbinganKelompok extends Model
     public function tahunAjaran(): BelongsTo
     {
         return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
+    }
+
+    public function kasus(): BelongsTo
+    {
+        return $this->belongsTo(KasusBk::class, 'kasus_id');
     }
 
     public function siswa(): HasMany

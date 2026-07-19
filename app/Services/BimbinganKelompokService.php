@@ -37,6 +37,7 @@ class BimbinganKelompokService
         $data['guru_bk_id'] = $pegawai?->id;
         $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');
+        $data['kasus_id'] = $data['kasus_id'] ?? null;
 
         $record = BimbinganKelompok::create($data);
 
