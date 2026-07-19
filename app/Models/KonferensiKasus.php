@@ -14,6 +14,7 @@ class KonferensiKasus extends Model
 
     protected $fillable = [
         'kasus_id',
+        'guru_bk_id',
         'tanggal_konferensi',
         'uraian_masalah',
         'penanganan',
@@ -28,6 +29,11 @@ class KonferensiKasus extends Model
     public function kasus(): BelongsTo
     {
         return $this->belongsTo(KasusBk::class, 'kasus_id');
+    }
+
+    public function guruBk(): BelongsTo
+    {
+        return $this->belongsTo(Pegawai::class, 'guru_bk_id');
     }
 
     public function peserta(): HasMany

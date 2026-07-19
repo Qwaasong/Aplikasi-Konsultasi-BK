@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\AlihtanganKasus;
 use App\Models\BimbinganIndividu;
+use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
+use App\Models\KonferensiKasus;
 use App\Models\Pegawai;
 use Illuminate\Support\Collection;
 
@@ -72,7 +74,9 @@ class AlihTanganKasusService
     {
         KasusBk::where('id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
         BimbinganIndividu::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
+        BimbinganKelompok::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
         HomeVisit::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
+        KonferensiKasus::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
     }
 
     /**
