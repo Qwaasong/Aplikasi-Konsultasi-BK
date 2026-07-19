@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('pelanggaran_siswa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->foreignId('jenis_pelanggaran_id')->nullable()->constrained('jenis_pelanggaran')->nullOnDelete();
-            $table->integer('jumlah_poin')->default(0);
+            $table->foreignId('kasus_id')->constrained('kasus_bk')->nullOnDelete()->nullable();
             $table->date('tanggal_pernyataan');
-            $table->text('deskripsi_pelanggaran');
+            $table->text('deskripsi');
             $table->text('sanksi');
+            $table->text('tindak_lanjut');
             $table->string('bukti_foto')->nullable();
             $table->timestamps();
         });

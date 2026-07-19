@@ -4,12 +4,12 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use App\Services\UserService;
 use App\Services\SiswaService;
-use App\Services\KonsultasiService;
+use App\Services\KasusBkService;
 
 new #[Layout('layouts.app')] class extends Component {
     public int $totalUsers = 0;
     public int $totalSiswa = 0;
-    public int $totalKonsultasi = 0;
+    public int $totalKasus = 0;
     public int $totalKonselor = 0;
 
     public function mount(): void
@@ -20,7 +20,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->totalUsers = $stats['total'] ?? 0;
         $this->totalKonselor = $stats['konselor'] ?? 0;
         $this->totalSiswa = app(SiswaService::class)->getTotalSiswa();
-        $this->totalKonsultasi = app(KonsultasiService::class)->getTotalKonsultasi();
+        $this->totalKasus = app(KasusBkService::class)->countKasus();
     }
 }; ?>
 
@@ -46,10 +46,10 @@ new #[Layout('layouts.app')] class extends Component {
                 </x-slot>
             </x-molecules.stat-card>
 
-            {{-- Total Konsultasi --}}
-            <x-molecules.stat-card label="Total Konsultasi" textColor='text-white' textContainerClass="bg-[#086375]"
-                bgClassIcon="bg-[#086375]" :value="$totalKonsultasi" color="ruby"
-                url="{{ route('admin.konsultasi.index') }}">
+            {{-- Total Kasus BK --}}
+            <x-molecules.stat-card label="Total Kasus BK" textColor='text-white' textContainerClass="bg-[#086375]"
+                bgClassIcon="bg-[#086375]" :value="$totalKasus" color="ruby"
+                url="{{ route('admin.kasus-bk.index') }}">
                 <x-slot name="icon">
                     <x-atoms.icon variant="consultation" size="lg" color="white" />
                 </x-slot>

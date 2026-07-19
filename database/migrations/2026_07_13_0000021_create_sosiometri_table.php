@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::create('sosiometri', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pemilih_siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->foreignId('pilihan1_siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->text('alasan_1')->nullable();
-            $table->foreignId('pilihan2_siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->text('alasan_2')->nullable();
-            $table->foreignId('pilihan3_siswa_id')->constrained('data_siswa')->cascadeOnDelete();
-            $table->text('alasan_3')->nullable();
+            $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
+            $table->string('judul');
+            $table->string('instruksi');
+            $table->integer('jumlah_pilihan');
             $table->timestamps();
         });
     }

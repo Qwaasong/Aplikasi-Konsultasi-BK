@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('alihtangan_kasus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('konsultasi_id')->constrained('konsultasi')->cascadeOnDelete();
-            $table->foreignId('guru_bk_asal_id')->constrained('pegawai')->cascadeOnDelete();
-            $table->string('pihak_penerima');
+            $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
+            $table->foreignId('nama_asal')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignId('nama_penerima')->constrained('pegawai')->cascadeOnDelete();
             $table->date('tanggal_alih');
             $table->text('alasan_alih')->nullable();
             $table->text('tindak_lanjut')->nullable();

@@ -6,8 +6,8 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Services\SiswaService;
-use App\Services\KonsultasiService;
-use App\Models\KategoriKonsultasi;
+use App\Services\KasusBkService;
+use App\Models\KategoriKasus;
 
 new class extends Component {
     use WithFileUploads;
@@ -122,7 +122,7 @@ new class extends Component {
     #[Computed]
     public function kategoriOptions()
     {
-        $options = KategoriKonsultasi::all()->map(fn($item) => [
+        $options = KategoriKasus::all()->map(fn($item) => [
             'value' => $item->id,
             'label' => $item->nama_kategori,
         ])->toArray();
@@ -172,7 +172,7 @@ new class extends Component {
     #[On('edit-konsultasi')]
     public function loadKonsultasi($id)
     {
-        $service = app(KonsultasiService::class);
+        $service = app(KasusBkService::class);
         $this->resetValidation();
         $this->reset(['files', 'newFiles']);
 
@@ -196,7 +196,7 @@ new class extends Component {
     }
 
     // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
-    public function save(KonsultasiService $service)
+    public function save(KasusBkService $service)
     {
         $this->validate();
 

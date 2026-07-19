@@ -24,10 +24,15 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'nama' => fake()->name(),
+            'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make('password123'),
+            'role' => 'siswa',
+            'jenis_kelamin' => fake()->randomElement(['L', 'P']),
+            'no_hp' => fake()->phoneNumber(),
+            'foto' => null,
+            'status' => 'aktif',
             'remember_token' => Str::random(10),
         ];
     }
@@ -39,6 +44,27 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    public function guruBk(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'guru_bk',
+        ]);
+    }
+
+    public function siswa(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'siswa',
         ]);
     }
 }

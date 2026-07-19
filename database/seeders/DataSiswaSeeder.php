@@ -31,24 +31,28 @@ class DataSiswaSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            $user = User::create([
-                'role' => 'siswa',
-                'nama' => $item['nama'],
-                'username' => 'siswa' . $item['nis'],
-                'email' => 'siswa' . $item['nis'] . '@sekolah.sch.id',
-                'password' => Hash::make('password123'),
-                'jenis_kelamin' => $item['jk'],
-                'no_hp' => '08' . $item['nis'],
-                'foto' => '',
-                'status' => 'aktif',
-            ]);
+            $user = User::firstOrCreate(
+                ['email' => 'siswa' . $item['nis'] . '@sekolah.sch.id'],
+                [
+                    'role' => 'siswa',
+                    'nama' => $item['nama'],
+                    'username' => 'siswa' . $item['nis'],
+                    'password' => Hash::make('password123'),
+                    'jenis_kelamin' => $item['jk'],
+                    'no_hp' => '08' . $item['nis'],
+                    'foto' => '',
+                    'status' => 'aktif',
+                ]
+            );
 
-            DataSiswa::create([
-                'user_id'  => $user->id,
-                'nis'      => $item['nis'],
-                'kelas_id' => $item['kelas']->id,
-                'alamat'   => $item['alamat'],
-            ]);
+            DataSiswa::firstOrCreate(
+                ['nis' => $item['nis']],
+                [
+                    'user_id'  => $user->id,
+                    'kelas_id' => $item['kelas']->id,
+                    'alamat'   => $item['alamat'],
+                ]
+            );
         }
     }
 }

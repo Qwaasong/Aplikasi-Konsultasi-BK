@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DataSiswa extends Model
 {
+    use HasFactory;
+
     protected $table = 'data_siswa';
 
     protected $fillable = [
@@ -27,7 +30,9 @@ class DataSiswa extends Model
     ];
 
     protected $casts = [
-        'nis' => 'integer',
+        'tgl_lahir' => 'date',
+        'anak_ke' => 'integer',
+        'jml_saudara' => 'integer',
     ];
 
     // ─────────────────────────────────────────
@@ -44,14 +49,39 @@ class DataSiswa extends Model
         return $this->belongsTo(Kelas::class);
     }
 
-    public function konsultasis()
+    public function kasus()
     {
-        return $this->hasMany(Konsultasi::class, 'siswa_id');
+        return $this->hasMany(KasusBk::class, 'siswa_id');
     }
 
     public function keluarga()
     {
         return $this->hasOne(KeluargaSiswa::class, 'siswa_id');
+    }
+
+    public function pelanggarans()
+    {
+        return $this->hasMany(PelanggaranSiswa::class, 'siswa_id');
+    }
+
+    public function kehadiran()
+    {
+        return $this->hasMany(Kehadiran::class, 'siswa_id');
+    }
+
+    public function peminatan()
+    {
+        return $this->hasMany(Peminatan::class, 'siswa_id');
+    }
+
+    public function pengunduranDiri()
+    {
+        return $this->hasMany(PengunduranDiri::class, 'siswa_id');
+    }
+
+    public function sosiometri()
+    {
+        return $this->hasMany(Sosiometri::class, 'siswa_id');
     }
 
     // ─────────────────────────────────────────
@@ -74,24 +104,6 @@ class DataSiswa extends Model
     public function scopeByJurusan(Builder $query, string $jurusan): Builder
     {
         return $query->whereHas('kelas.jurusan', fn($q) => $q->where('nama_jurusan', $jurusan));
-    }
-
-    public function scopeByJenisKelamin(Builder $query, string $jenisKelamin): Builder
-    {
-        return $query->whereHas('user', fn($q) => $q->where('jenis_kelamin', $jenisKelamin));
-    }
-
-    public function scopeByPeriode(Builder $query, string $periode): Builder
-    {
-        // Filter siswa yang punya konsultasi di periode tertentu
-        // Format periode: "2025/2026" → tahun = 2025
-        $tahun = (int) explode('/', $periode)[0];
-
-        return $query->whereHas('konsultasis', function ($q) use ($tahun) {
-            $q->whereHas('tahunAjaran', function ($q2) use ($tahun) {
-                $q2->where('tahun', $tahun);
-            });
-        });
     }
 
     // ─────────────────────────────────────────
@@ -135,8 +147,8 @@ class DataSiswa extends Model
         return $this->user?->nama ?? '-';
     }
 
-    public function getTotalKonsultasiAttribute(): int
+    public function getTotalKasusAttribute(): int
     {
-        return $this->konsultasis()->count();
+        return $this->kasus()->count();
     }
 }
