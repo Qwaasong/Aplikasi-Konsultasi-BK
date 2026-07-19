@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KeluargaSiswa extends Model
 {
-    protected $table = 'keluarga_siswa';
+    use HasFactory;
+    protected $table = 'komulatif_record';
 
     protected $fillable = [
         'siswa_id',

@@ -3,13 +3,15 @@
 namespace App\Services;
 
 use App\Models\Kehadiran;
-use App\Repositories\Contracts\KehadiranRepositoryInterface;
+use Illuminate\Support\Collection;
 
 class KehadiranService
 {
-    public function getAll()
+    public function getAll(): Collection
     {
-        return Kehadiran::with(['siswa.user', 'tahunAjaran'])->latest()->get();
+        return Kehadiran::with(['siswa.user', 'tahunAjaran'])
+            ->latest('tanggal_kehadiran')
+            ->get();
     }
 
     public function findById(int $id): ?Kehadiran

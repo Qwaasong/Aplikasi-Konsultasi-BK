@@ -2,240 +2,189 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
-use App\Models\KonferensiKasus;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
+use App\Services\KonferensiKasusService;
 
 new #[Layout('layouts.app')] class extends Component {
 
     public string $search = '';
-
     public string $filterKelas = '';
-    public string $filterTopik = '';
-    public string $filterTanggal = '';
-
+    public string $filterJurusan = '';
     public bool $showFilters = false;
 
-    public array $records = [];
+    public array $selected = [];
+    public bool $selectAll = false;
 
-    public function create()
+    public function with(): array
     {
-        $this->dispatch('create-konferensi-kasus');
+        $service = app(KonferensiKasusService::class);
+        $all = $service->getAll();
+
+        $kelasOptions = $all->pluck('kasus.siswa.kelas_label')
+            ->filter()->unique()->sort()->values()->toArray();
+        $jurusanOptions = $all->pluck('kasus.siswa.jurusan_label')
+            ->filter()->unique()->sort()->values()->toArray();
+
+        $data = $all;
+
+        if ($this->search) {
+            $needle = (string) $this->search;
+            $data = $data->filter(function ($item) use ($needle) {
+                return mb_stripos($item->kasus?->siswa?->nama ?? '', $needle) !== false
+                    || mb_stripos($item->uraian_masalah ?? '', $needle) !== false;
+            });
+        }
+
+        if ($this->filterKelas !== '') {
+            $data = $data->filter(fn($item) => (string) ($item->kasus?->siswa?->kelas_label ?? '') === (string) $this->filterKelas);
+        }
+
+        if ($this->filterJurusan !== '') {
+            $data = $data->filter(fn($item) => strcasecmp(($item->kasus?->siswa?->jurusan_label ?? ''), $this->filterJurusan) === 0);
+        }
+
+        return [
+            'records' => $data->values(),
+            'kelasOptions' => $kelasOptions,
+            'jurusanOptions' => $jurusanOptions,
+        ];
     }
 
-    public function mount()
+    public function updatedSelectAll($value)
     {
-        $this->loadData();
+        if ($value) {
+            $records = $this->with()['records'];
+            $this->selected = $records->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else { $this->selected = []; }
     }
+
+    public function updatedSelected()
+    {
+        $recordsCount = $this->with()['records']->count();
+        $this->selectAll = (count($this->selected) === $recordsCount && $recordsCount > 0);
+    }
+
+    public function filterAction() { $this->showFilters = !$this->showFilters; }
+
+    public function resetFilters(): void
+    {
+        $this->search = ''; $this->filterKelas = ''; $this->filterJurusan = '';
+        $this->selected = []; $this->selectAll = false;
+    }
+
+    public function create() { $this->dispatch('create-konferensi-kasus'); }
 
     #[On('refreshTable')]
-    public function loadData()
+    public function refreshTable($id = null) {}
+
+    public function goToDetail($id)
     {
-        $records = KonferensiKasus::with([
-            'konsultasi.siswa.kelas.jurusan'
-        ])->latest()->get();
-
-        // Search nama siswa
-        if ($this->search !== '') {
-            $records = $records->filter(function ($item) {
-                return str_contains(
-                    strtolower($item->konsultasi?->siswa?->nama_lengkap ?? ''),
-                    strtolower($this->search)
-                );
-            });
-        }
-
-        // Filter kelas
-        if ($this->filterKelas !== '') {
-            $records = $records->filter(function ($item) {
-                return ($item->konsultasi?->siswa?->kelas_label ?? '') === $this->filterKelas;
-            });
-        }
-
-        // Filter topik
-        if ($this->filterTopik !== '') {
-            $records = $records->filter(function ($item) {
-                return $item->topik === $this->filterTopik;
-            });
-        }
-
-        // Filter tanggal
-        if ($this->filterTanggal !== '') {
-            $records = $records->filter(function ($item) {
-                return $item->tanggal_konferensi == $this->filterTanggal;
-            });
-        }
-
-        $this->records = $records
-            ->map(function ($item) {
-
-                $siswa = $item->konsultasi?->siswa;
-
-                return [
-                    'id' => $item->id,
-                    'nama' => $siswa?->nama_lengkap ?? '-',
-                    'kelas' => $siswa?->kelas_label ?? '-',
-                    'topik' => $item->topik,
-                    'tanggal' => \Carbon\Carbon::parse($item->tanggal_konferensi)
-                        ->format('d-m-Y'),
-                ];
-            })
-            ->toArray();
+        $this->redirectRoute('konselor.konferensi-kasus.detail', ['id' => $id], navigate: true);
     }
 
-    public function updated()
+    public function edit($id) { $this->dispatch('edit-konferensi-kasus', id: (int) $id); }
+
+    public function delete($id)
     {
-        $this->loadData();
+        app(KonferensiKasusService::class)->delete($id);
+        $this->selected = array_diff($this->selected, [(string) $id]);
+        session()->flash('success', 'Konferensi kasus berhasil dihapus!');
     }
+}; ?>
 
-    public function resetFilter()
-    {
-        $this->search = '';
-        $this->filterKelas = '';
-        $this->filterTopik = '';
-        $this->filterTanggal = '';
+<div class="flex-1 flex flex-col min-w-0 bg-white h-full" x-data="{ loading: false }"
+    x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"
+    x-on:open-modal.window="loading = false" x-on:close-modal.window="loading = false">
 
-        $this->loadData();
-    }
-
-    public function refreshData()
-    {
-        $this->resetFilter();
-    }
-
-    public function filterAction()
-    {
-        $this->showFilters = ! $this->showFilters;
-    }
-};
-
-?>
-
-<div class="flex-1 flex flex-col min-w-0 bg-white h-full">
-
-    {{-- Header --}}
-    <x-organisms.header  action="create">
+    <x-organisms.header action="create">
         <x-slot:search>
             <x-molecules.search-input model="search" />
         </x-slot:search>
-
         Konferensi Kasus
     </x-organisms.header>
 
-    {{-- Toolbar --}}
-    <x-organisms.table-toolbar onFilter="filterAction" onRefresh="refreshData">
-
+    <x-organisms.table-toolbar onFilter="filterAction" onRefresh="$refresh">
         <x-slot:pagination>
             {{ count($records) }} data
         </x-slot:pagination>
-
-        <x-slot:actions>
-            <x-atoms.button
-                wire:click="create">
-                Tambah Konferensi Kasus
-            </x-atoms.button>
-        </x-slot:actions>
-
     </x-organisms.table-toolbar>
 
     @if($showFilters)
-
-    <div class="px-6 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm">
-
-        <span class="text-xs text-gray-500 font-medium">
-            Filter Data:
-        </span>
-
-        <select
-            wire:model.live="filterKelas"
-            class="text-xs border rounded px-2 py-1 pr-6">
-
-            <option value="">Semua Kelas</option>
-
-            @foreach(collect($records)->pluck('kelas')->unique()->sort() as $kelas)
-                <option value="{{ $kelas }}">
-                    {{ $kelas }}
-                </option>
-            @endforeach
-
-        </select>
-
-        <select
-            wire:model.live="filterTopik"
-            class="text-xs border rounded px-2 py-1 pr-6">
-
-            <option value="">Semua Topik</option>
-
-            @foreach(collect($records)->pluck('topik')->unique()->sort() as $topik)
-                <option value="{{ $topik }}">
-                    {{ $topik }}
-                </option>
-            @endforeach
-
-        </select>
-
-        <input
-            type="date"
-            wire:model.live="filterTanggal"
-            class="text-xs border rounded px-2 py-1">
-
-        <button
-            wire:click="resetFilter"
-            class="ml-auto text-xs text-brand-teal hover:underline">
-            Reset Semua
-        </button>
-
-    </div>
-
+        <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
+            <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
+            <select wire:model.live="filterKelas" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                <option value="">Semua Kelas</option>
+                @foreach($kelasOptions ?? [] as $k)
+                    <option value="{{ $k }}">Kelas {{ $k }}</option>
+                @endforeach
+            </select>
+            <select wire:model.live="filterJurusan" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                <option value="">Semua Jurusan</option>
+                @foreach($jurusanOptions ?? [] as $j)
+                    <option value="{{ $j }}">{{ $j }}</option>
+                @endforeach
+            </select>
+            @if($search !== '' || $filterKelas !== '' || $filterJurusan !== '')
+                <button wire:click="resetFilters" class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">Reset Semua</button>
+            @endif
+        </div>
     @endif
 
-    {{-- Flash Message --}}
+    @if(count($selected) > 0)
+        <div class="px-6 py-2 bg-teal-50 border-b border-teal-100 flex justify-between items-center text-sm">
+            <span class="text-xs font-medium text-brand-teal">{{ count($selected) }} data dipilih</span>
+            <button wire:click="$set('selected', [])" class="text-xs text-gray-500 hover:text-gray-700">Batal Pilih</button>
+        </div>
+    @endif
+
     <div class="px-4 py-2">
         <x-shared.flash-message />
     </div>
 
-    {{-- Data Table --}}
-    <x-organisms.data-table 
-        :headers="[
-            '',
-            'Nama Siswa',
-            'Kelas',
-            'Topik',
-            'Tanggal Konferensi',
-        ]"
-        empty="Belum ada data konferensi kasus."
-    >
-
+    <x-organisms.data-table
+        :headers="['', 'Tanggal', 'Siswa', 'Uraian Masalah', 'Peserta', 'Aksi']"
+        empty="Belum ada data konferensi kasus.">
         @forelse($records as $record)
+            <tr wire:key="kk-{{ $record->id }}" wire:click="goToDetail({{ $record->id }})"
+                class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md {{ in_array($record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}">
 
-            <tr
-                class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md bg-white">
-
-                <td class="w-16 text-center align-middle py-2">
-                    <input
-                        type="checkbox"
-                        class="w-4 h-4 rounded border-gray-300 accent-brand-teal">
+                <td class="w-16 text-center align-middle rounded-l-md py-2" onclick="event.stopPropagation()">
+                    <input type="checkbox" value="{{ $record->id }}" wire:model.live="selected"
+                        class="w-4 h-4 rounded border-gray-300 text-brand-teal focus:ring-brand-teal accent-brand-teal cursor-pointer">
                 </td>
 
-                <td class="px-4 py-2 font-semibold">
-                    {{ $record['nama'] }}
+                <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap align-middle">
+                    {{ \Carbon\Carbon::parse($record->tanggal_konferensi)->isoFormat('D MMM Y') }}
                 </td>
 
-                <td class="px-4 py-2 text-sm text-gray-600">
-                    {{ $record['kelas'] }}
+                <td class="px-4 py-2 font-semibold align-middle">
+                    <span class="text-gray-900">{{ $record->kasus?->siswa?->nama ?? '-' }}</span>
                 </td>
 
-                <td class="px-4 py-2 text-sm text-gray-600">
-                    {{ $record['topik'] }}
+                <td class="px-4 py-2 text-sm text-gray-600 max-w-xs truncate align-middle">
+                    {{ $record->uraian_masalah }}
                 </td>
 
-                <td class="px-4 py-2 text-sm text-gray-600">
-                    {{ $record['tanggal'] }}
+                <td class="px-4 py-2 text-sm text-gray-600 align-middle">
+                    {{ $record->peserta->count() }} peserta
+                </td>
+
+                <td class="px-4 py-2 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2" onclick="event.stopPropagation()">
+                        <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
+                            <x-atoms.icon variant="edit" size="sm" />
+                        </x-atoms.action-button>
+
+                        <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
+                            wire:confirm="Yakin ingin menghapus konferensi kasus ini?">
+                            <x-atoms.icon variant="delete" size="sm" />
+                        </x-atoms.action-button>
+                    </div>
                 </td>
             </tr>
-
         @empty
-
         @endforelse
-
     </x-organisms.data-table>
 
     <livewire:partials.konferensi-kasus.konferensi-kasus-modal />

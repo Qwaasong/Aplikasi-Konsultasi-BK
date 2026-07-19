@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('konferensi_kasus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('konsultasi_id')->constrained('konsultasi')->cascadeOnDelete();
+            $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
             $table->date('tanggal_konferensi');
-            $table->string('topik');
+            $table->string('uraian_masalah');
+            $table->string('penanganan');
             $table->text('tindak_lanjut')->nullable();
             $table->timestamps();
         });

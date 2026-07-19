@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('keluarga_siswa', function (Blueprint $table) {
+        Schema::create('komulatif_record', function (Blueprint $table) {
             $table->id();
             $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
             $table->string('nama_ayah')->nullable();
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('keluarga_siswa');
+        Schema::dropIfExists('komulatif_record');
     }
 };

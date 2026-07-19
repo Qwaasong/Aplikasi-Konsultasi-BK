@@ -2,10 +2,10 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\KategoriKonsultasi;
+use App\Models\KategoriKasus;
 use Illuminate\Support\Collection;
 
-interface KategoriKonsultasiRepositoryInterface
+interface KategoriKasusRepositoryInterface
 {
     /**
      * Ambil semua kategori.
@@ -20,17 +20,17 @@ interface KategoriKonsultasiRepositoryInterface
     /**
      * Cari kategori berdasarkan ID.
      */
-    public function findById(int $id): KategoriKonsultasi;
+    public function findById(int $id): KategoriKasus;
 
     /**
      * Tambah kategori.
      */
-    public function create(array $data): KategoriKonsultasi;
+    public function create(array $data): KategoriKasus;
 
     /**
      * Update kategori.
      */
-    public function update(int $id, array $data): KategoriKonsultasi;
+    public function update(int $id, array $data): KategoriKasus;
 
     /**
      * Hapus kategori.

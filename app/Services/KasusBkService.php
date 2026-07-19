@@ -2,84 +2,84 @@
 
 namespace App\Services;
 
-use App\Models\Konsultasi;
+use App\Models\KasusBk;
 use App\Models\KonsultasiLampiran;
 use App\Models\Pegawai;
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\KonsultasiRepositoryInterface;
+use App\Repositories\Contracts\KasusBkRepositoryInterface;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 
-class KonsultasiService
+class KasusBkService
 {
     public function __construct(
-        protected KonsultasiRepositoryInterface $konsultasiRepository
+        protected KasusBkRepositoryInterface $kasusBkRepository
     ) {}
 
-    public function getAll()
+    public function all(): Collection
     {
-        return $this->konsultasiRepository->getAll();
+        return $this->kasusBkRepository->all();
     }
 
     /**
-     * Mengambil konsultasi milik guru BK yang sedang login.
+     * Mengambil kasus BK milik guru BK yang sedang login.
      * Otomatis resolve pegawai dari auth user.
      */
-    public function getByGurubk(?int $pegawaiId = null)
+    public function getByGurubk(?int $pegawaiId = null): Collection
     {
         $id = $pegawaiId ?? $this->resolveGurubkId();
-
-        return $this->konsultasiRepository->getByGurubk($id);
+        return $this->kasusBkRepository->getByGuruBk($id);
     }
 
-    public function getTotalKonsultasi(): int
+    public function countKasus(): int
     {
-        return $this->konsultasiRepository->countKonsultasi();
+        return $this->kasusBkRepository->countKasus();
     }
 
-    public function findById(int $id)
+    public function findById(int $id): ?KasusBk
     {
-        return $this->konsultasiRepository->findById($id);
+        return $this->kasusBkRepository->findById($id);
     }
 
     /**
-     * Cari konsultasi by ID dan pastikan kepemilikan.
+     * Cari kasus BK by ID dan pastikan kepemilikan.
      * Admin bisa mengakses semua, konselor hanya data miliknya.
      */
-    public function findByIdForCurrentUser(int $id): Konsultasi
+    public function findByIdForCurrentUser(int $id): KasusBk
     {
-        $konsultasi = $this->konsultasiRepository->findById($id);
+        $kasus = $this->kasusBkRepository->findById($id);
 
         if (!$this->isAdmin()) {
-            $this->ensureOwnership($konsultasi);
+            $this->ensureOwnership($kasus);
         }
 
-        return $konsultasi;
+        return $kasus;
     }
 
     /**
-     * Hapus konsultasi dengan pengecekan kepemilikan terlebih dahulu.
+     * Hapus kasus BK dengan pengecekan kepemilikan terlebih dahulu.
      * Admin bisa menghapus semua, konselor hanya data miliknya.
      */
     public function deleteForCurrentUser(int $id): void
     {
-        $konsultasi = $this->konsultasiRepository->findById($id);
+        $kasus = $this->kasusBkRepository->findById($id);
 
         if (!$this->isAdmin()) {
-            $this->ensureOwnership($konsultasi);
+            $this->ensureOwnership($kasus);
         }
 
         // Hapus semua file lampiran terlebih dahulu
-        foreach ($konsultasi->lampirans as $lampiran) {
+        foreach ($kasus->lampirans as $lampiran) {
             \Storage::disk('public')->delete($lampiran->path_file);
         }
 
-        $this->konsultasiRepository->delete($id);
+        $this->kasusBkRepository->delete($id);
     }
 
     /**
-     * Buat konsultasi baru + simpan lampiran (jika ada).
+     * Buat kasus BK baru + simpan lampiran (jika ada).
      *
-     * @param  array  $data         Field konsultasi
+     * @param  array  $data         Field kasus BK
      * @param  array  $uploadedFiles  Array UploadedFile dari Livewire
      */
     public function create(array $data, array $uploadedFiles = []): void
@@ -92,16 +92,20 @@ class KonsultasiService
             ?? TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');
 
-        $konsultasi = $this->konsultasiRepository->create($data);
+        // Default status dan prioritas
+        $data['status'] = $data['status'] ?? KasusBk::STATUS_OPEN;
+        $data['prioritas'] = $data['prioritas'] ?? KasusBk::PRIORITAS_RENDAH;
+
+        $kasus = $this->kasusBkRepository->create($data);
 
         // Simpan lampiran ke tabel konsultasi_lampiran
         if (!empty($uploadedFiles)) {
-            $this->saveLampirans($konsultasi->id, $uploadedFiles);
+            $this->saveLampirans($kasus->id, $uploadedFiles);
         }
     }
 
     /**
-     * Update konsultasi + kelola lampiran.
+     * Update kasus BK + kelola lampiran.
      *
      * @param  array  $keptPaths     Path lama yang dipertahankan (array string)
      * @param  array  $newFiles      File baru dari Livewire
@@ -109,16 +113,16 @@ class KonsultasiService
     public function update(int $id, array $data, array $keptPaths = [], array $newFiles = []): void
     {
         // Verifikasi kepemilikan sebelum update (skip untuk admin)
-        $konsultasi = $this->konsultasiRepository->findById($id);
+        $kasus = $this->kasusBkRepository->findById($id);
 
         if (!$this->isAdmin()) {
-            $this->ensureOwnership($konsultasi);
+            $this->ensureOwnership($kasus);
         }
 
-        $this->konsultasiRepository->update($id, $data);
+        $this->kasusBkRepository->update($id, $data);
 
         // Hapus lampiran lama yang tidak dipertahankan
-        foreach ($konsultasi->lampirans as $lampiran) {
+        foreach ($kasus->lampirans as $lampiran) {
             if (!in_array($lampiran->path_file, $keptPaths)) {
                 \Storage::disk('public')->delete($lampiran->path_file);
                 $lampiran->delete();
@@ -134,12 +138,12 @@ class KonsultasiService
     public function delete(int $id): void
     {
         // Hapus semua file lampiran terlebih dahulu
-        $konsultasi = $this->konsultasiRepository->findById($id);
-        foreach ($konsultasi->lampirans as $lampiran) {
+        $kasus = $this->kasusBkRepository->findById($id);
+        foreach ($kasus->lampirans as $lampiran) {
             \Storage::disk('public')->delete($lampiran->path_file);
         }
 
-        $this->konsultasiRepository->delete($id);
+        $this->kasusBkRepository->delete($id);
     }
 
     // ─────────────────────────────────────────
@@ -169,23 +173,23 @@ class KonsultasiService
     }
 
     /**
-     * Pastikan konsultasi milik guru BK yang sedang login.
+     * Pastikan kasus milik guru BK yang sedang login.
      */
-    private function ensureOwnership(Konsultasi $konsultasi): void
+    private function ensureOwnership(KasusBk $kasus): void
     {
         $pegawaiId = $this->resolveGurubkId();
-        if ($konsultasi->guru_bk_id !== $pegawaiId) {
-            abort(403, 'Anda tidak memiliki akses ke data konsultasi ini.');
+        if ($kasus->guru_bk_id !== $pegawaiId) {
+            abort(403, 'Anda tidak memiliki akses ke data kasus ini.');
         }
     }
 
     /**
      * Simpan array UploadedFile ke storage dan insert ke konsultasi_lampiran.
      *
-     * @param  int    $konsultasiId
+     * @param  int    $kasusId
      * @param  array  $files  Array of Livewire UploadedFile
      */
-    private function saveLampirans(int $konsultasiId, array $files): void
+    private function saveLampirans(int $kasusId, array $files): void
     {
         foreach ($files as $file) {
             /** @var UploadedFile $file */
@@ -195,11 +199,11 @@ class KonsultasiService
             $path     = $file->store($folder, 'public');
 
             KonsultasiLampiran::create([
-                'konsultasi_id' => $konsultasiId,
-                'nama_file'     => $file->getClientOriginalName(),
-                'path_file'     => $path,
-                'tipe_file'     => $file->getClientMimeType(),
-                'ukuran'        => $file->getSize(),
+                'kasus_id'  => $kasusId,
+                'nama_file' => $file->getClientOriginalName(),
+                'path_file' => $path,
+                'tipe_file' => $file->getClientMimeType(),
+                'ukuran'    => $file->getSize(),
             ]);
         }
     }

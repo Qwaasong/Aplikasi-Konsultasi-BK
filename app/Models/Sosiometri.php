@@ -2,39 +2,40 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sosiometri extends Model
 {
+    use HasFactory;
     protected $table = 'sosiometri';
 
     protected $fillable = [
-        'pemilih_siswa_id',
-        'pilihan1_siswa_id',
-        'alasan_1',
-        'pilihan2_siswa_id',
-        'alasan_2',
-        'pilihan3_siswa_id',
-        'alasan_3',
+        'siswa_id',
+        'judul',
+        'instruksi',
+        'jumlah_pilihan',
     ];
 
-    public function siswa()
+    protected $casts = [
+        'jumlah_pilihan' => 'integer',
+    ];
+
+    /**
+     * Siswa yang mengisi sosiometri ini.
+     */
+    public function siswa(): BelongsTo
     {
-        return $this->belongsTo(DataSiswa::class, 'pemilih_siswa_id');
+        return $this->belongsTo(DataSiswa::class, 'siswa_id');
     }
 
-    public function pilihan1()
+    /**
+     * Respons (pilihan) untuk sosiometri ini.
+     */
+    public function respons(): HasMany
     {
-        return $this->belongsTo(DataSiswa::class, 'pilihan1_siswa_id');
-    }
-
-    public function pilihan2()
-    {
-        return $this->belongsTo(DataSiswa::class, 'pilihan2_siswa_id');
-    }
-
-    public function pilihan3()
-    {
-        return $this->belongsTo(DataSiswa::class, 'pilihan3_siswa_id');
+        return $this->hasMany(SosiometriRespon::class, 'sosiometri_id');
     }
 }

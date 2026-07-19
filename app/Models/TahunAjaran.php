@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TahunAjaran extends Model
 {
+    use HasFactory;
     protected $table = 'tahun_ajaran';
 
     protected $fillable = [
@@ -14,8 +16,8 @@ class TahunAjaran extends Model
         'status_aktif',
     ];
 
-    public function konsultasis()
+    public function kasus()
     {
-        return $this->hasMany(Konsultasi::class, 'tahun_ajaran_id');
+        return $this->hasMany(KasusBk::class, 'tahun_ajaran_id');
     }
 }

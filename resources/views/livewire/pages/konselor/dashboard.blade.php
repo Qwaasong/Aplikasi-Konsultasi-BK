@@ -2,7 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
-use App\Models\Konsultasi;
+use App\Models\KasusBk;
 
 new #[Layout('layouts.app')] class extends Component {
     public int $countKelas10 = 0;
@@ -13,17 +13,17 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $pegawaiId = \App\Models\Pegawai::where('user_id', auth()->id())->value('id');
 
-        $this->countKelas10 = Konsultasi::where('guru_bk_id', $pegawaiId)
+        $this->countKelas10 = KasusBk::where('guru_bk_id', $pegawaiId)
             ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 10)))
             ->distinct()
             ->count('siswa_id');
 
-        $this->countKelas11 = Konsultasi::where('guru_bk_id', $pegawaiId)
+        $this->countKelas11 = KasusBk::where('guru_bk_id', $pegawaiId)
             ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 11)))
             ->distinct()
             ->count('siswa_id');
 
-        $this->countKelas12 = Konsultasi::where('guru_bk_id', $pegawaiId)
+        $this->countKelas12 = KasusBk::where('guru_bk_id', $pegawaiId)
             ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 12)))
             ->distinct()
             ->count('siswa_id');

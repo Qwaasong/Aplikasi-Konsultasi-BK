@@ -2,29 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PelanggaranSiswa extends Model
 {
+    use HasFactory;
     protected $table = 'pelanggaran_siswa';
 
     protected $fillable = [
         'siswa_id',
-        'jenis_pelanggaran_id',
-        'jumlah_poin',
+        'kasus_id',
         'tanggal_pernyataan',
-        'deskripsi_pelanggaran',
+        'deskripsi',
         'sanksi',
+        'tindak_lanjut',
         'bukti_foto',
     ];
 
-    public function siswa()
+    protected $casts = [
+        'tanggal_pernyataan' => 'date',
+    ];
+
+    public function siswa(): BelongsTo
     {
         return $this->belongsTo(DataSiswa::class, 'siswa_id');
     }
 
-    public function jenisPelanggaran()
+    public function kasus(): BelongsTo
     {
-        return $this->belongsTo(JenisPelanggaran::class, 'jenis_pelanggaran_id');
+        return $this->belongsTo(KasusBk::class, 'kasus_id');
     }
 }
