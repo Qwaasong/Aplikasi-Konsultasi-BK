@@ -23,6 +23,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('admin/user', 'pages.admin.user.index')->name('admin.user.index');
     Volt::route('/admin/konsultasi/{id}/detail', 'pages.admin.konsultasi.detail')
         ->name('admin.konsultasi.detail');
+    Volt::route('admin/kasus-bk', 'pages.admin.kasus-bk.index')->name('admin.kasus-bk.index');
+    Volt::route('admin/kasus-bk/{id}/detail', 'pages.admin.kasus-bk.detail')->name('admin.kasus-bk.detail');
 });
 
 // Guru / Konselor
