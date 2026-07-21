@@ -63,14 +63,14 @@ state([
                                 'label' => 'Individu',
                                 'url' => route('konselor.layanan-konseling.individu'),
                                 'active' => request()->routeIs('konselor.layanan-konseling.individu'),
-                                'variants' => 'consultation',
+                                'variants' => 'triangle',
                             ],
 
                             [
                                 'label' => 'Kelompok',
                                 'url' => route('konselor.layanan-konseling.kelompok'),
                                 'active' => request()->routeIs('konselor.layanan-konseling.kelompok'),
-                                'variants' => 'consultation',
+                                'variants' => 'triangle',
                             ],
 
                         ],
@@ -98,10 +98,64 @@ state([
                     ],
 
                     [
+                        'label' => 'Pengunduran Diri',
+                        'url' => route('konselor.pengunduran-diri.index'),
+                        'active' => request()->routeIs('konselor.pengunduran-diri.*'),
+                        'variants' => 'logout',
+                    ],
+
+                    [
                         'label' => 'Peminatan',
                         'url' => route('konselor.peminatan.index'),
                         'active' => request()->routeIs('konselor.peminatan.*'),
                         'variants' => 'target',
+                    ],
+
+                ],
+
+            ];
+
+            $menus[] = [
+                'label' => 'Asesmen',
+                'url' => '#',
+                'active' => request()->routeIs('konselor.asesmen.*'),
+                'variants' => 'assessment',
+
+                'children' => [
+
+                    [
+                        'label' => 'AKPD',
+                        'url' => route('konselor.asesmen.akpd.index'),
+                        'active' => request()->routeIs('konselor.asesmen.akpd.*'),
+                        'variants' => 'assignment',
+                    ],
+
+                    [
+                        'label' => 'Gaya Belajar',
+                        'url' => route('konselor.asesmen.gaya-belajar.index'),
+                        'active' => request()->routeIs('konselor.asesmen.gaya-belajar.*'),
+                        'variants' => 'book',
+                    ],
+
+                    [
+                        'label' => 'DCM',
+                        'url' => route('konselor.asesmen.dcm.index'),
+                        'active' => request()->routeIs('konselor.asesmen.dcm.*'),
+                        'variants' => 'fact_check',
+                    ],
+
+                    [
+                        'label' => 'Sosiometri',
+                        'url' => route('konselor.asesmen.sosiometri.index'),
+                        'active' => request()->routeIs('konselor.asesmen.sosiometri.*'),
+                        'variants' => 'group',
+                    ],
+
+                    [
+                        'label' => 'Tes Bakat Minat',
+                        'url' => route('konselor.asesmen.tes-bakat-minat.index'),
+                        'active' => request()->routeIs('konselor.asesmen.tes-bakat-minat.*'),
+                        'variants' => 'analytics',
                     ],
 
                 ],

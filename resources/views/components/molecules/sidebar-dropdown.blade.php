@@ -1,6 +1,6 @@
 @props([
-'menu',
-'nested' => false,
+    'menu',
+    'depth' => 1,
 ])
 
 <div
@@ -11,7 +11,7 @@
     <x-molecules.sidebar-button
         :variants="$menu['variants']"
         :active="$menu['active']"
-        :iconSize="$nested ? 'md' : 'lg'"
+        :iconSize="$depth == 1 ? 'lg' : 'md'"
         @click="openDropdown = !openDropdown">
 
         {{ $menu['label'] }}
@@ -24,31 +24,35 @@
         x-transition
         class="overflow-hidden">
 
-        <div class="mt-1 ml-6 space-y-1">
+        <div class="mt-1 space-y-1">
 
             @foreach($menu['children'] as $child)
 
-            @if(!empty($child['children']))
+                @if(!empty($child['children']))
 
-            <x-molecules.sidebar-dropdown
-                :menu="$child"
-                nested />
+                    <div class="{{ $depth == 1 ? 'pl-6' : 'pl-10' }}">
 
-            @else
+                        <x-molecules.sidebar-dropdown
+                            :menu="$child"
+                            :depth="$depth" />
 
-            <x-molecules.sidebar-item
-                :linkHref="$child['url']"
-                :active="$child['active']"
-                :variants="$child['variants']"
-                :iconSize="$nested ? 'sm' : 'md'"
-                :showIcon="!$nested"
-                :indent="$nested ? 'pl-8' : ''">
+                    </div>
 
-                {{ $child['label'] }}
+                @else
 
-            </x-molecules.sidebar-item>
+                    <x-molecules.sidebar-item
+                        :linkHref="$child['url']"
+                        :active="$child['active']"
+                        :variants="$child['variants']"
+                        :iconSize="$depth == 1 ? 'md' : 'sm'"
+                        :showIcon="$depth == 1"
+                        :indent="$depth == 1 ? 'pl-6' : 'pl-10'">
 
-            @endif
+                        {{ $child['label'] }}
+
+                    </x-molecules.sidebar-item>
+
+                @endif
 
             @endforeach
 

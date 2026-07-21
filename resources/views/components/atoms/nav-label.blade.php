@@ -14,5 +14,6 @@
     .hide-text {
         opacity: 1;
         width: auto;
+        display: flex;
     }
 </style>

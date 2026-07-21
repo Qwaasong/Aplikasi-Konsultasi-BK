@@ -10,13 +10,15 @@
     :class="[open ? 'w-64' : 'w-20', ready ? 'transition-all duration-200 ease-out' : '']"
     class="group bg-white border-r border-gray-200 flex flex-col justify-between z-20 shadow-lg absolute h-full md:relative flex-shrink-0">
 
-    <div class="flex flex-col w-full">
+    <div class="flex flex-col flex-1 min-h-0 w-full">
 
-        <div class="h-20 flex items-center overflow-hidden whitespace-nowrap">
+        {{-- Logo --}}
+        <div class="h-20 flex items-center overflow-hidden whitespace-nowrap flex-shrink-0">
             <x-atoms.application-logo class="w-10 h-10 object-contain" />
         </div>
 
-        <nav class="flex flex-col mt-4 w-full space-y-2">
+        {{-- Menu --}}
+        <nav class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden mt-4 w-full space-y-2">
 
             @foreach ($menus as $menu)
 
