@@ -4,12 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Livewire\Actions\Logout;
 
-// 1. Logic halaman depan
-Route::get('/', function () {
-    return view('landing.index');
-})->name('landing');
-
-// 2. Route untuk yang BELUM login (Ini yang tadi hilang)
+// 1. Route untuk yang BELUM login (Ini yang tadi hilang)
 Route::middleware('guest')->group(function () {
     Volt::route('register', 'pages.auth.register')
         ->name('register');
@@ -18,7 +13,7 @@ Route::middleware('guest')->group(function () {
         ->name('login'); // Nama ini yang dicari oleh sistem
 });
 
-// 3. Route untuk yang SUDAH login
+// 2. Route untuk yang SUDAH login
 Route::middleware('auth')->group(function () {
     Route::get('logout', function (Logout $logout) {
         $logout();
