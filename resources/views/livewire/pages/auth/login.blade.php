@@ -1,12 +1,29 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
     public LoginForm $form;
+
+    /**
+     * Jika user sudah login, redirect ke dashboard sesuai role.
+     */
+    public function mount(): void
+    {
+        if (Auth::check()) {
+            $role = Auth::user()->role;
+
+            if ($role === 'admin') {
+                $this->redirect(route('admin.dashboard', absolute: false), navigate: true);
+            } elseif ($role === 'guru_bk') {
+                $this->redirect(route('konselor.dashboard', absolute: false), navigate: true);
+            }
+        }
+    }
 
     /**
      * Handle an incoming authentication request.
