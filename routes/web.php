@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
 
 //Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
+    // route lama
     Volt::route('admin/dashboard', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
     Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');
@@ -38,6 +39,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('admin.konsultasi.detail');
     Volt::route('admin/kasus-bk', 'pages.admin.kasus-bk.index')->name('admin.kasus-bk.index');
     Volt::route('admin/kasus-bk/{id}/detail', 'pages.admin.kasus-bk.detail')->name('admin.kasus-bk.detail');
+
+    // route baru
+    Volt::route('/admin/kelola-user/siswa', 'pages.admin.kelola-user.siswa.index')->name('admin.kelola-user.siswa.index');
+    Volt::route('/admin/kelola-user/pegawai', 'pages.admin.kelola-user.pegawai.index')->name('admin.kelola-user.pegawai.index');
+    Volt::route('/admin/kelola-data/daftar-sekolah', 'pages.admin.kelola-data.daftar-sekolah.index')->name('admin.kelola-data.daftar-sekolah.index');
+    Volt::route('/admin/kelola-data/daftar-jurusan', 'pages.admin.kelola-data.daftar-jurusan.index')->name('admin.kelola-data.daftar-jurusan.index');
+    Volt::route('/admin/kelola-data/daftar-kelas', 'pages.admin.kelola-data.daftar-kelas.index')->name('admin.kelola-data.daftar-kelas.index');
+    Volt::route('/admin/kelola-data/daftar-tahun-ajaran', 'pages.admin.kelola-data.daftar-tahun-ajaran.index')->name('admin.kelola-data.daftar-tahun-ajaran.index');
+    Volt::route('/admin/log-kasus', 'pages.admin.log-kasus.index')->name('admin.log-kasus.index');
+    Volt::route('/admin/rekap-absensi', 'pages.admin.rekap-absensi.index')->name('admin.rekap-absensi.index');
 });
 
 // Guru / Konselor
@@ -65,10 +76,13 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
 
     // Asesmen
+    Volt::route('konselor/asesmen', 'pages.konselor.asesmen.index')->name('konselor.asesmen.index');
     Volt::route('konselor/asesmen/akpd', 'pages.konselor.asesmen.akpd.index')->name('konselor.asesmen.akpd.index');
     Volt::route('konselor/asesmen/gaya-belajar', 'pages.konselor.asesmen.gaya-belajar.index')->name('konselor.asesmen.gaya-belajar.index');
     Volt::route('konselor/asesmen/dcm', 'pages.konselor.asesmen.dcm.index')->name('konselor.asesmen.dcm.index');
     Volt::route('konselor/asesmen/sosiometri', 'pages.konselor.asesmen.sosiometri.index')->name('konselor.asesmen.sosiometri.index');
+    Volt::route('konselor/asesmen/sosiometri/form', 'pages.konselor.asesmen.sosiometri.form')->name('konselor.asesmen.sosiometri.form');
+    Volt::route('konselor/asesmen/sosiometri/form','pages.konselor.asesmen.sosiometri.form')->name('konselor.asesmen.sosiometri.form');
     Volt::route('konselor/asesmen/tes-bakat-minat', 'pages.konselor.asesmen.tes-bakat-minat.index')->name('konselor.asesmen.tes-bakat-minat.index');
 });
 

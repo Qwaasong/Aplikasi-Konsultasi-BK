@@ -9,16 +9,33 @@ new #[Layout('layouts.app')] class extends Component {
 
 ?>
 
-<div class="py-8">
-    <div class="mx-auto sm:px-6 lg:px-8">
+<div class="flex-1 flex flex-col bg-gray-50">
 
-        <h1 class="text-3xl font-bold text-brand-teal">
-            Sosiometri
-        </h1>
+    <x-organisms.header>
+        <x-slot:search>
+        <x-molecules.search-input model="search" />
+    </x-slot:search>
+        Sosiometri
+    </x-organisms.header>
 
-        <p class="mt-2 text-gray-500">
-            Halaman ini masih dalam tahap pengembangan.
-        </p>
+    <div class="p-8">
+
+
+        <x-organisms.assessment-card
+            title="Sosiometri"
+            subtitle="Hubungan Sosial Peserta Didik"
+            description="Halaman ini digunakan untuk mengetahui hubungan sosial antar peserta didik."
+            :details="[
+                'Jawablah dengan jujur.',
+                'Hasil digunakan untuk layanan BK.',
+                'Data bersifat rahasia.'
+            ]"
+            :route="route('konselor.asesmen.sosiometri.form')"
+            button="Mulai Sosiometri"
+            variants="group"
+            color="teal"
+        />
 
     </div>
+
 </div>
