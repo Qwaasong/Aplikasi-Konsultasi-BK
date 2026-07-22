@@ -64,10 +64,13 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
 
     // Asesmen
+    Volt::route('konselor/asesmen', 'pages.konselor.asesmen.index')->name('konselor.asesmen.index');
     Volt::route('konselor/asesmen/akpd', 'pages.konselor.asesmen.akpd.index')->name('konselor.asesmen.akpd.index');
     Volt::route('konselor/asesmen/gaya-belajar', 'pages.konselor.asesmen.gaya-belajar.index')->name('konselor.asesmen.gaya-belajar.index');
     Volt::route('konselor/asesmen/dcm', 'pages.konselor.asesmen.dcm.index')->name('konselor.asesmen.dcm.index');
     Volt::route('konselor/asesmen/sosiometri', 'pages.konselor.asesmen.sosiometri.index')->name('konselor.asesmen.sosiometri.index');
+    Volt::route('konselor/asesmen/sosiometri/form', 'pages.konselor.asesmen.sosiometri.form')->name('konselor.asesmen.sosiometri.form');
+    Volt::route('konselor/asesmen/sosiometri/form','pages.konselor.asesmen.sosiometri.form')->name('konselor.asesmen.sosiometri.form');
     Volt::route('konselor/asesmen/tes-bakat-minat', 'pages.konselor.asesmen.tes-bakat-minat.index')->name('konselor.asesmen.tes-bakat-minat.index');
 });
 
