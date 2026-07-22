@@ -215,7 +215,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- Data Table --}}
     <x-organisms.data-table
-        :headers="['', 'Tanggal', 'Uraian Masalah', 'Peserta', 'Guru BK', 'Aksi']"
+        :headers="['', 'Tanggal', ['text' => 'Daftar Siswa', 'align' => 'text-center'], 'Kelas', 'Uraian Masalah', 'Aksi']"
         empty="Belum ada data layanan konseling kelompok.">
         @forelse($records as $record)
             <tr wire:key="bk-{{ $record->id }}" wire:click="goToDetail({{ $record->id }})"
@@ -230,42 +230,45 @@ new #[Layout('layouts.app')] class extends Component {
                     {{ \Carbon\Carbon::parse($record->tanggal_layanan)->isoFormat('D MMM Y') }}
                 </td>
 
-                <td class="px-4 py-2 font-semibold max-w-xs truncate align-middle">
-                    <a href="{{ route('konselor.layanan-konseling.kelompok.detail', $record->id) }}" wire:navigate
-                        class="text-gray-900 transition-colors duration-200 hover:text-blue-600">
-                        {{ $record->uraian_masalah }}
-                    </a>
+                <td class="px-4 py-2 text-center align-middle" onclick="event.stopPropagation()">
+                    <div x-data="{ open: false }" class="relative inline-block">
+                        <button @click="open = !open" class="flex items-center gap-1.5 text-xs font-semibold text-gray-900 hover:text-brand-teal transition-colors cursor-pointer justify-center mx-auto">
+                            {{ $record->siswa->count() }} Siswa
+                            <svg class="w-3 h-3 text-gray-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-30 min-w-[200px] py-1">
+                            @foreach($record->siswa as $peserta)
+                                <div class="px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                                    <p class="text-[12px] font-semibold text-gray-900">{{ $peserta->siswa?->nama ?? '-' }}</p>
+                                    <p class="text-[10px] text-gray-400">NIS {{ $peserta->siswa?->nis ?? '-' }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </td>
 
                 <td class="px-4 py-2 text-sm text-gray-600 align-middle">
-                    @php $pesertaCount = $record->siswa->count(); @endphp
-                    <span class="inline-flex items-center gap-1">
-                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                        </svg>
-                        {{ $pesertaCount }} peserta
-                    </span>
+                    {{ $record->siswa->first()?->siswa?->kelas_label ?? '-' }}
                 </td>
 
-                <td class="px-4 py-2 text-sm text-gray-600 align-middle">
-                    {{ $record->guruBk?->user?->nama ?? '-' }}
+                <td class="px-4 py-2 text-sm text-gray-600 max-w-xs truncate align-middle">
+                    {{ $record->uraian_masalah }}
                 </td>
 
-                <td class="px-4 py-2 w-40 text-right align-middle relative rounded-r-md">
-                    <span class="group-hover:opacity-0 font-medium text-gray-900 pr-2 transition-opacity text-xs">
-                        {{ \Carbon\Carbon::parse($record->tanggal_layanan)->format('d M y') }}
-                    </span>
-
-                    <x-molecules.table-action :id="$record->id">
-                        <x-slot:edit>
-                            <span class="sr-only">Edit</span>
-                        </x-slot>
-                        <x-slot:delete>
-                            <span class="sr-only">Delete</span>
-                        </x-slot>
-                    </x-molecules.table-action>
+                <td class="px-4 py-2 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2" onclick="event.stopPropagation()">
+                        <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
+                            <x-atoms.icon variant="edit" size="sm" />
+                        </x-atoms.action-button>
+                        <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
+                            wire:confirm="Yakin ingin menghapus layanan konseling kelompok ini?">
+                            <x-atoms.icon variant="delete" size="sm" />
+                        </x-atoms.action-button>
+                    </div>
                 </td>
-
             </tr>
         @empty
         @endforelse
