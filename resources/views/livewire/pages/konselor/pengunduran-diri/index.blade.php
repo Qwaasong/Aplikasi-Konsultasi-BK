@@ -3,6 +3,7 @@
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use App\Services\PengunduranDiriService;
 
 new #[Layout('layouts.app')] class extends Component {
@@ -21,229 +22,12 @@ new #[Layout('layouts.app')] class extends Component {
         $all = $service->getAll();
 
         $kelasOptions = $all->pluck('siswa.kelas_label')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values()
-            ->toArray();
-
-        $jurusanOptions = $all->pluck('siswa.jurusan_label')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values()
-            ->toArray();
-
-        $data = $all;
-
-        if ($this->search) {
-            $needle = (string) $this->search;
-
-            $data = $data->filter(function ($item) use ($needle) {
-                return
-                    mb_stripos($item->siswa?->nama ?? '', $needle) !== false
-                    || mb_stripos($item->nama_ortu_wali ?? '', $needle) !== false
-                    || mb_stripos($item->alasan_pengunduran ?? '', $needle) !== false;
-            });
-        }
-
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(fn ($item)
-                => (string) ($item->siswa?->kelas_label ?? '') === (string) $this->filterKelas);
-        }
-
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn ($item)
-                => strcasecmp($item->siswa?->jurusan_label ?? '', $this->filterJurusan) === 0);
-        }
-
-        return [
-            'records' => $data->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-        ];
-    }
-
-    public function updatedSelectAll($value)
-    {
-        if ($value) {
-            $records = $this->with()['records'];
-
-            $this->selected = $records
-                ->pluck('id')
-                ->map(fn($id) => (string) $id)
-                ->toArray();
-        } else {
-            $this->selected = [];
-        }
-    }
-
-    public function updatedSelected()
-    {
-        $recordsCount = $this->with()['records']->count();
-
-        $this->selectAll =
-            count($this->selected) === $recordsCount &&
-            $recordsCount > 0;
-    }
-
-    public function filterAction()
-    {
-        $this->showFilters = !$this->showFilters;
-    }
-
-    public function resetFilters()
-    {
-        $this->search = '';
-        $this->filterKelas = '';
-        $this->filterJurusan = '';
-
-        $this->selected = [];
-        $this->selectAll = false;
-    }
-
-    public function create()
-    {
-        $this->dispatch('create-pengunduran-diri');
-    }
-
-    #[On('refreshTable')]
-    public function refreshTable($id = null) {}
-
-    public function goToDetail($id)
-    {
-        $this->redirectRoute(
-            'konselor.pengunduran-diri.detail',
-            ['id' => $id],
-            navigate: true
-        );
-    }
-
-    public function edit($id)
-    {
-        $this->dispatch(
-            'edit-pengunduran-diri',
-            id: (int) $id
-        );
-    }
-
-    public function delete($id)
-    {
-        app(PengunduranDiriService::class)->delete($id);
-
-        $this->selected = array_diff(
-            $this->selected,
-            [(string) $id]
-        );
-
-        session()->flash(
-            'success',
-            'Data pengunduran diri berhasil dihapus!'
-        );
-    }
-};
-
-    public array $selected = [];
-    public bool $selectAll = false;
-
-    public function with(): array
-    {
-        $service = app(PengunduranDiriService::class);
-        $all = $service->getAll();
-
-        $kelasOptions = $all->pluck('siswa.kelas_label')
             ->filter()->unique()->sort()->values()->toArray();
+
         $jurusanOptions = $all->pluck('siswa.jurusan_label')
             ->filter()->unique()->sort()->values()->toArray();
 
         $data = $all;
-<div class="flex-1 flex flex-col min-w-0 bg-white h-full"
-    x-data="{ loading:false }"
-    x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'],button[wire\\:click=\'create\']')) loading=true"
-    x-on:open-modal.window="loading=false"
-    x-on:close-modal.window="loading=false">
-
-    <x-organisms.header action="create">
-
-        <x-slot:search>
-            <x-molecules.search-input model="search"/>
-        </x-slot:search>
-
-        Pengunduran Diri
-
-    </x-organisms.header>
-
-    <x-organisms.table-toolbar
-        onFilter="filterAction"
-        onRefresh="$refresh">
-
-        <x-slot:pagination>
-            {{ count($records) }} data
-        </x-slot:pagination>
-
-    </x-organisms.table-toolbar>
-
-    @if($showFilters)
-
-        <div class="px-6 py-3 border-b bg-gray-50 flex gap-4">
-
-            <span class="text-xs text-gray-500">
-                Filter Data:
-            </span>
-
-            <select wire:model.live="filterKelas"
-                class="text-xs border rounded px-2 py-1">
-
-                <option value="">
-                    Semua Kelas
-                </option>
-
-                @foreach($kelasOptions as $k)
-
-                    <option value="{{ $k }}">
-                        Kelas {{ $k }}
-                    </option>
-
-                @endforeach
-
-            </select>
-
-            <select wire:model.live="filterJurusan"
-                class="text-xs border rounded px-2 py-1">
-
-                <option value="">
-                    Semua Jurusan
-                </option>
-
-                @foreach($jurusanOptions as $j)
-
-                    <option value="{{ $j }}">
-                        {{ $j }}
-                    </option>
-
-                @endforeach
-
-            </select>
-
-            @if($search || $filterKelas || $filterJurusan)
-
-                <button
-                    wire:click="resetFilters"
-                    class="ml-auto text-xs text-brand-teal">
-
-                    Reset Semua
-
-                </button>
-
-            @endif
-
-        </div>
-
-    @endif
-
-    <div class="px-4 py-2">
-
-        <x-shared.flash-message/>
 
         if ($this->search) {
             $needle = (string) $this->search;
@@ -259,7 +43,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa?->jurusan_label ?? ''), $this->filterJurusan) === 0);
+            $data = $data->filter(fn($item) => strcasecmp($item->siswa?->jurusan_label ?? '', $this->filterJurusan) === 0);
         }
 
         return [
@@ -274,7 +58,9 @@ new #[Layout('layouts.app')] class extends Component {
         if ($value) {
             $records = $this->with()['records'];
             $this->selected = $records->pluck('id')->map(fn($id) => (string) $id)->toArray();
-        } else { $this->selected = []; }
+        } else {
+            $this->selected = [];
+        }
     }
 
     public function updatedSelected()
@@ -283,15 +69,24 @@ new #[Layout('layouts.app')] class extends Component {
         $this->selectAll = (count($this->selected) === $recordsCount && $recordsCount > 0);
     }
 
-    public function filterAction() { $this->showFilters = !$this->showFilters; }
-
-    public function resetFilters(): void
+    public function filterAction()
     {
-        $this->search = ''; $this->filterKelas = ''; $this->filterJurusan = '';
-        $this->selected = []; $this->selectAll = false;
+        $this->showFilters = !$this->showFilters;
     }
 
-    public function create() { $this->dispatch('create-pengunduran-diri'); }
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
+    public function create()
+    {
+        $this->dispatch('create-pengunduran-diri');
+    }
 
     #[On('refreshTable')]
     public function refreshTable($id = null) {}
@@ -301,7 +96,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->redirectRoute('konselor.pengunduran-diri.detail', ['id' => $id], navigate: true);
     }
 
-    public function edit($id) { $this->dispatch('edit-pengunduran-diri', id: (int) $id); }
+    public function edit($id)
+    {
+        $this->dispatch('edit-pengunduran-diri', id: (int) $id);
+    }
 
     public function delete($id)
     {
@@ -331,15 +129,17 @@ new #[Layout('layouts.app')] class extends Component {
     @if($showFilters)
         <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
-            <select wire:model.live="filterKelas" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+            <select wire:model.live="filterKelas"
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Kelas</option>
-                @foreach($kelasOptions ?? [] as $k)
+                @foreach($kelasOptions as $k)
                     <option value="{{ $k }}">Kelas {{ $k }}</option>
                 @endforeach
             </select>
-            <select wire:model.live="filterJurusan" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+            <select wire:model.live="filterJurusan"
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Jurusan</option>
-                @foreach($jurusanOptions ?? [] as $j)
+                @foreach($jurusanOptions as $j)
                     <option value="{{ $j }}">{{ $j }}</option>
                 @endforeach
             </select>
@@ -398,7 +198,6 @@ new #[Layout('layouts.app')] class extends Component {
                         <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
                             <x-atoms.icon variant="edit" size="sm" />
                         </x-atoms.action-button>
-
                         <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
                             wire:confirm="Yakin ingin menghapus pengunduran diri ini?">
                             <x-atoms.icon variant="delete" size="sm" />
@@ -408,97 +207,7 @@ new #[Layout('layouts.app')] class extends Component {
             </tr>
         @empty
         @endforelse
-        :headers="[
-            '',
-            'Tanggal',
-            'Siswa',
-            'Nama Orang Tua/Wali',
-            'Alasan Pengunduran',
-            'Aksi'
-        ]"
-        empty="Belum ada data pengunduran diri.">
-
-        @forelse($records as $record)
-
-        <tr
-            wire:key="pd-{{ $record->id }}"
-            wire:click="goToDetail({{ $record->id }})"
-            class="group border-b hover:bg-gray-50 cursor-pointer">
-
-            <td
-                class="w-16 text-center"
-                onclick="event.stopPropagation()">
-
-                <input
-                    type="checkbox"
-                    value="{{ $record->id }}"
-                    wire:model.live="selected">
-
-            </td>
-
-            <td class="px-4 py-3">
-
-                {{ \Carbon\Carbon::parse($record->tanggal_pengunduran)->isoFormat('D MMM Y') }}
-
-            </td>
-
-            <td class="px-4 py-3 font-semibold">
-
-                {{ $record->siswa?->nama }}
-
-            </td>
-
-            <td class="px-4 py-3">
-
-                {{ $record->nama_ortu_wali }}
-
-            </td>
-
-            <td class="px-4 py-3 max-w-sm truncate">
-
-                {{ $record->alasan_pengunduran }}
-
-            </td>
-
-            <td
-                class="px-4 py-3"
-                onclick="event.stopPropagation()">
-
-                <div class="flex justify-end gap-2">
-
-                    <x-atoms.action-button
-                        color="blue"
-                        wire:click="edit({{ $record->id }})">
-
-                        <x-atoms.icon
-                            variant="edit"
-                            size="sm"/>
-
-                    </x-atoms.action-button>
-
-                    <x-atoms.action-button
-                        color="red"
-                        wire:click="delete({{ $record->id }})"
-                        wire:confirm="Yakin ingin menghapus data ini?">
-
-                        <x-atoms.icon
-                            variant="delete"
-                            size="sm"/>
-
-                    </x-atoms.action-button>
-
-                </div>
-
-            </td>
-
-        </tr>
-
-        @empty
-
-        @endforelse
-
     </x-organisms.data-table>
 
     <livewire:partials.pengunduran-diri.pengunduran-diri-modal />
-
 </div>

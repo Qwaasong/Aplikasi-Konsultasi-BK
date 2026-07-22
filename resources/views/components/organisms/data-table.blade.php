@@ -9,8 +9,12 @@
         <thead class="bg-gray-50">
             <tr>
                 @foreach($headers as $header)
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {{ $header }}
+                    @php
+                        $headerText = is_array($header) ? ($header['text'] ?? '') : $header;
+                        $headerAlign = is_array($header) ? ($header['align'] ?? 'text-left') : 'text-left';
+                    @endphp
+                    <th class="px-6 py-3 {{ $headerAlign }} text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {{ $headerText }}
                     </th>
                 @endforeach
             </tr>

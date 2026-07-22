@@ -2,14 +2,13 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use App\Services\HomeVisitService;
 
 new #[Layout('layouts.app')] class extends Component {
 
     public string $search = '';
-    public string $filterStatus = '';
     public string $filterKelas = '';
     public string $filterJurusan = '';
     public bool $showFilters = false;
@@ -24,6 +23,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         $kelasOptions = $all->pluck('kasus.siswa.kelas_label')
             ->filter()->unique()->sort()->values()->toArray();
+
         $jurusanOptions = $all->pluck('kasus.siswa.jurusan_label')
             ->filter()->unique()->sort()->values()->toArray();
 
@@ -33,12 +33,9 @@ new #[Layout('layouts.app')] class extends Component {
             $needle = (string) $this->search;
             $data = $data->filter(function ($item) use ($needle) {
                 return mb_stripos($item->kasus?->siswa?->nama ?? '', $needle) !== false
+                    || mb_stripos($item->kasus?->siswa?->nis ?? '', $needle) !== false
                     || mb_stripos($item->penanganan ?? '', $needle) !== false;
             });
-        }
-
-        if ($this->filterStatus !== '') {
-            $data = $data->filter(fn($item) => $item->status === $this->filterStatus);
         }
 
         if ($this->filterKelas !== '') {
@@ -46,12 +43,11 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->kasus?->siswa?->jurusan_label ?? ''), $this->filterJurusan) === 0);
+            $data = $data->filter(fn($item) => strcasecmp($item->kasus?->siswa?->jurusan_label ?? '', $this->filterJurusan) === 0);
         }
 
         return [
             'records' => $data->values(),
-            'statusOptions' => ['diproses', 'ditunda', 'dibatalkan'],
             'kelasOptions' => $kelasOptions,
             'jurusanOptions' => $jurusanOptions,
         ];
@@ -78,10 +74,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showFilters = !$this->showFilters;
     }
 
-    public function resetFilters(): void
+    public function resetFilters()
     {
         $this->search = '';
-        $this->filterStatus = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
         $this->selected = [];
@@ -112,15 +107,12 @@ new #[Layout('layouts.app')] class extends Component {
         $this->selected = array_diff($this->selected, [(string) $id]);
         session()->flash('success', 'Kunjungan rumah berhasil dihapus!');
     }
-};
-
-?>
+}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full" x-data="{ loading: false }"
     x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"
     x-on:open-modal.window="loading = false" x-on:close-modal.window="loading = false">
 
-    {{-- Header --}}
     <x-organisms.header action="create">
         <x-slot:search>
             <x-molecules.search-input model="search" />
@@ -128,48 +120,35 @@ new #[Layout('layouts.app')] class extends Component {
         Kunjungan Rumah
     </x-organisms.header>
 
-    {{-- Toolbar --}}
     <x-organisms.table-toolbar onFilter="filterAction" onRefresh="$refresh">
         <x-slot:pagination>
             {{ count($records) }} data
         </x-slot:pagination>
     </x-organisms.table-toolbar>
 
-    {{-- Advanced Filters --}}
     @if($showFilters)
         <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
-            <select wire:model.live="filterStatus"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
-                <option value="">Semua Status</option>
-                @foreach($statusOptions ?? [] as $s)
-                    <option value="{{ $s }}">{{ ucfirst($s) }}</option>
-                @endforeach
-            </select>
             <select wire:model.live="filterKelas"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Kelas</option>
-                @foreach($kelasOptions ?? [] as $k)
+                @foreach($kelasOptions as $k)
                     <option value="{{ $k }}">Kelas {{ $k }}</option>
                 @endforeach
             </select>
             <select wire:model.live="filterJurusan"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Jurusan</option>
-                @foreach($jurusanOptions ?? [] as $j)
+                @foreach($jurusanOptions as $j)
                     <option value="{{ $j }}">{{ $j }}</option>
                 @endforeach
             </select>
-            @if($search !== '' || $filterStatus !== '' || $filterKelas !== '' || $filterJurusan !== '')
-                <button wire:click="resetFilters"
-                    class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">
-                    Reset Semua
-                </button>
+            @if($search !== '' || $filterKelas !== '' || $filterJurusan !== '')
+                <button wire:click="resetFilters" class="text-xs text-brand-teal font-medium hover:text-teal-700 hover:underline transition-colors ml-auto">Reset Semua</button>
             @endif
         </div>
     @endif
 
-    {{-- Selected indicator --}}
     @if(count($selected) > 0)
         <div class="px-6 py-2 bg-teal-50 border-b border-teal-100 flex justify-between items-center text-sm">
             <span class="text-xs font-medium text-brand-teal">{{ count($selected) }} data dipilih</span>
@@ -177,16 +156,13 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     @endif
 
-    {{-- Flash Message --}}
     <div class="px-4 py-2">
         <x-shared.flash-message />
     </div>
 
-    {{-- Data Table --}}
     <x-organisms.data-table
-        :headers="['', 'Tanggal', 'Siswa', 'Penanganan', 'Status', 'Aksi']"
-        empty="Belum ada data kunjungan rumah."
-    >
+        :headers="['', 'Tanggal', 'Siswa', 'Kelas', 'Uraian Masalah', 'Aksi']"
+        empty="Belum ada data kunjungan rumah.">
         @forelse($records as $record)
             <tr wire:key="hv-{{ $record->id }}" wire:click="goToDetail({{ $record->id }})"
                 class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md {{ in_array($record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}">
@@ -202,22 +178,15 @@ new #[Layout('layouts.app')] class extends Component {
 
                 <td class="px-4 py-2 font-semibold align-middle">
                     <span class="text-gray-900">{{ $record->kasus?->siswa?->nama ?? '-' }}</span>
+                    <p class="text-[11px] text-gray-400">NIS {{ $record->kasus?->siswa?->nis ?? '-' }}</p>
+                </td>
+
+                <td class="px-4 py-2 text-sm text-gray-600 align-middle">
+                    {{ $record->kasus?->siswa?->kelas_label ?? '-' }} - {{ $record->kasus?->siswa?->jurusan_label ?? '-' }}
                 </td>
 
                 <td class="px-4 py-2 text-sm text-gray-600 max-w-xs truncate align-middle">
                     {{ $record->penanganan }}
-                </td>
-
-                <td class="px-4 py-2 align-middle">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        {{ match($record->status) {
-                            'diproses' => 'bg-blue-100 text-blue-700',
-                            'ditunda' => 'bg-yellow-100 text-yellow-700',
-                            'dibatalkan' => 'bg-red-100 text-red-700',
-                            default => 'bg-gray-100 text-gray-700',
-                        } }}">
-                        {{ ucfirst($record->status) }}
-                    </span>
                 </td>
 
                 <td class="px-4 py-2 text-right align-middle">
@@ -225,19 +194,16 @@ new #[Layout('layouts.app')] class extends Component {
                         <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
                             <x-atoms.icon variant="edit" size="sm" />
                         </x-atoms.action-button>
-
                         <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
                             wire:confirm="Yakin ingin menghapus kunjungan rumah ini?">
                             <x-atoms.icon variant="delete" size="sm" />
                         </x-atoms.action-button>
                     </div>
                 </td>
-
             </tr>
         @empty
         @endforelse
     </x-organisms.data-table>
 
     <livewire:partials.home-visit.home-visit-modal />
-
 </div>

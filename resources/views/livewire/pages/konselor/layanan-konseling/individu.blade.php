@@ -183,7 +183,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- Data Table --}}
     <x-organisms.data-table
-        :headers="['', 'Tanggal', 'Siswa', 'Uraian Masalah', 'Guru BK', 'Aksi']"
+        :headers="['', 'Tanggal', 'Siswa', 'Kelas', 'Uraian Masalah', 'Aksi']"
         empty="Belum ada data layanan konseling individu.">
         @forelse($records as $record)
             <tr wire:key="bi-{{ $record->id }}" wire:click="goToDetail({{ $record->id }})"
@@ -199,17 +199,16 @@ new #[Layout('layouts.app')] class extends Component {
                 </td>
 
                 <td class="px-4 py-2 font-semibold align-middle">
-                    <span class="text-gray-900">
-                        {{ $record->kasus?->siswa?->nama ?? $record->siswa?->nama ?? '-' }}
-                    </span>
+                    <span class="text-gray-900">{{ $record->kasus?->siswa?->nama ?? $record->siswa?->nama ?? '-' }}</span>
+                    <p class="text-[11px] text-gray-400">NIS {{ $record->kasus?->siswa?->nis ?? $record->siswa?->nis ?? '-' }}</p>
+                </td>
+
+                <td class="px-4 py-2 text-sm text-gray-600 align-middle">
+                    {{ $record->kasus?->siswa?->kelas_label ?? '-' }} - {{ $record->kasus?->siswa?->jurusan_label ?? '-' }}
                 </td>
 
                 <td class="px-4 py-2 text-sm text-gray-600 max-w-xs truncate align-middle">
                     {{ $record->uraian_masalah }}
-                </td>
-
-                <td class="px-4 py-2 text-sm text-gray-600 align-middle">
-                    {{ $record->guruBk?->user?->nama ?? '-' }}
                 </td>
 
                 <td class="px-4 py-2 text-right align-middle">
@@ -217,7 +216,6 @@ new #[Layout('layouts.app')] class extends Component {
                         <x-atoms.action-button color="blue" title="Edit" wire:click="edit({{ $record->id }})">
                             <x-atoms.icon variant="edit" size="sm" />
                         </x-atoms.action-button>
-
                         <x-atoms.action-button color="red" title="Hapus" wire:click="delete({{ $record->id }})"
                             wire:confirm="Yakin ingin menghapus layanan konseling individu ini?">
                             <x-atoms.icon variant="delete" size="sm" />

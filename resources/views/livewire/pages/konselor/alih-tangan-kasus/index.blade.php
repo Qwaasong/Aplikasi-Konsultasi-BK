@@ -174,6 +174,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                 <td class="px-4 py-2 font-semibold align-middle">
                     <span class="text-gray-900">{{ $record->kasus?->siswa?->nama ?? '-' }}</span>
+                    <p class="text-[11px] text-gray-400">NIS {{ $record->kasus?->siswa?->nis ?? '-' }}</p>
                 </td>
 
                 <td class="px-4 py-2 text-sm text-gray-600 align-middle">
