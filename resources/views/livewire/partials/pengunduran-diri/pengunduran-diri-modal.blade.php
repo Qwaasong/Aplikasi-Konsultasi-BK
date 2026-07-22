@@ -4,59 +4,52 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Models\DataSiswa;
 use App\Services\SiswaService;
-use App\Services\HomeVisitService;
-use App\Services\LampiranService;
+use App\Services\PengunduranDiriService;
 
 new class extends Component {
 
     public ?int $editingId = null;
     public int $step = 1;
 
-    // ── DATA KUNJUNGAN RUMAH ─────────────────────────
-    #[Validate('required|integer')]
+    // ── DATA PENGUNDURAN DIRI ─────────────────────
+    #[Validate('required|integer', message: 'Siswa wajib dipilih.')]
     public $siswa_id = '';
 
-    #[Validate('required|date')]
-    public $tanggal_kunjungan = '';
+    #[Validate('required|string|max:255', message: 'Nama orang tua/wali wajib diisi.')]
+    public string $nama_ortu_wali = '';
 
-    #[Validate('required|string')]
-    public $penanganan = '';
+    #[Validate('required|string', message: 'Alamat orang tua/wali wajib diisi.')]
+    public string $alamat_ortu_wali = '';
 
-    #[Validate('required|string')]
-    public $uraian_masalah = '';
+    #[Validate('required|string', message: 'Alasan pengunduran diri wajib diisi.')]
+    public string $alasan_pengunduran = '';
 
-    #[Validate('nullable|string')]
-    public $tindak_lanjut = '';
+    #[Validate('required|date', message: 'Tanggal pengunduran wajib diisi.')]
+    public string $tanggal_pengunduran = '';
 
-    #[Validate('required|in:diproses,ditunda,dibatalkan')]
-    public $status = 'diproses';
+    // ── SISWA ─────────────────────────────────────
+    public string $searchSiswa = '';
+    public bool $showStudentModal = false;
 
-    // ── FILE UPLOAD (STEP 3) ────────────────────────
+    // ── FILE UPLOAD (STEP 3) ──────────────────────
     public $uploadedFiles = [];
-    public array $existingLampiran = [];
-    public array $deletedLampiran = [];
-
-    public $searchSiswa = '';
-    public $showStudentModal = false;
 
     public function mount()
     {
-        $this->tanggal_kunjungan = date('Y-m-d');
+        $this->tanggal_pengunduran = date('Y-m-d');
     }
 
-    // ── STEP NAVIGATION ─────────────────────────────
+    // ── STEP NAVIGATION ───────────────────────────
     public function nextStep()
     {
         if ($this->step === 1) {
             $this->validate([
-                'siswa_id'           => 'required|integer',
-                'tanggal_kunjungan'  => 'required|date',
-                'penanganan'         => 'required|string',
-                'uraian_masalah'     => 'required|string',
-                'tindak_lanjut'      => 'nullable|string',
-                'status'             => 'required|in:diproses,ditunda,dibatalkan',
+                'siswa_id'            => 'required|integer',
+                'nama_ortu_wali'      => 'required|string|max:255',
+                'alamat_ortu_wali'    => 'required|string',
+                'alasan_pengunduran'  => 'required|string',
+                'tanggal_pengunduran' => 'required|date',
             ]);
         }
 
@@ -72,10 +65,10 @@ new class extends Component {
         }
     }
 
-    // ── SISWA SELECTION ─────────────────────────────
-    public function selectStudent($id)
+    // ── SISWA SELECTION ───────────────────────────
+    public function selectStudent(int $id)
     {
-        $this->siswa_id = (int) $id;
+        $this->siswa_id = $id;
         $this->showStudentModal = false;
         $this->searchSiswa = '';
     }
@@ -103,7 +96,7 @@ new class extends Component {
         return app(SiswaService::class)->search($this->searchSiswa, 50);
     }
 
-    public function getInitials($name)
+    public function getInitials(?string $name): string
     {
         if (!$name) return 'S';
         $words = explode(' ', trim($name));
@@ -113,136 +106,95 @@ new class extends Component {
         return strtoupper(substr($name, 0, 2));
     }
 
-    // ── FILE ACTIONS ────────────────────────────────
-    public function removeFile($index)
+    // ── FILE HANDLING ─────────────────────────────
+    public function removeFile(int $index)
     {
         unset($this->uploadedFiles[$index]);
         $this->uploadedFiles = array_values($this->uploadedFiles);
     }
 
-    public function removeExistingLampiran($index)
-    {
-        if (isset($this->existingLampiran[$index])) {
-            $this->deletedLampiran[] = $this->existingLampiran[$index]['id'];
-            unset($this->existingLampiran[$index]);
-            $this->existingLampiran = array_values($this->existingLampiran);
-        }
-    }
-
-    // ── CREATE ──────────────────────────────────────
-    #[On('create-home-visit')]
-    public function createHomeVisit()
+    // ── CREATE ────────────────────────────────────
+    #[On('create-pengunduran-diri')]
+    public function createPengunduranDiri()
     {
         $this->resetValidation();
         $this->reset([
-            'editingId', 'siswa_id', 'penanganan', 'uraian_masalah',
-            'tindak_lanjut', 'status', 'uploadedFiles',
-            'existingLampiran', 'deletedLampiran',
+            'siswa_id', 'nama_ortu_wali', 'alamat_ortu_wali',
+            'alasan_pengunduran', 'uploadedFiles',
         ]);
+        $this->editingId = null;
+        $this->tanggal_pengunduran = date('Y-m-d');
         $this->step = 1;
-        $this->tanggal_kunjungan = date('Y-m-d');
-        $this->status = 'diproses';
-        $this->dispatch('open-modal', 'form-home-visit');
+
+        $this->dispatch('open-modal', 'form-pengunduran-diri');
     }
 
-    // ── EDIT ────────────────────────────────────────
-    #[On('edit-home-visit')]
-    public function loadHomeVisit($id)
+    // ── EDIT ──────────────────────────────────────
+    #[On('edit-pengunduran-diri')]
+    public function loadPengunduranDiri(int $id)
     {
-        $service = app(HomeVisitService::class);
+        $service = app(PengunduranDiriService::class);
         $this->resetValidation();
 
         $record = $service->findById($id);
 
         $this->editingId = $id;
-        $this->tanggal_kunjungan = \Carbon\Carbon::parse($record->tanggal_kunjungan)->format('Y-m-d');
-        $this->penanganan = $record->penanganan;
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->tindak_lanjut = $record->tindak_lanjut;
-        $this->status = $record->status;
-        $this->siswa_id = $record->kasus?->siswa_id ?? '';
+        $this->siswa_id = $record->siswa_id;
+        $this->nama_ortu_wali = $record->nama_ortu_wali;
+        $this->alamat_ortu_wali = $record->alamat_ortu_wali;
+        $this->alasan_pengunduran = $record->alasan_pengunduran;
+        $this->tanggal_pengunduran = \Carbon\Carbon::parse($record->tanggal_pengunduran)->format('Y-m-d');
         $this->uploadedFiles = [];
         $this->step = 1;
 
-        // Load existing lampiran
-        if ($record->kasus && $record->kasus->lampirans) {
-            $this->existingLampiran = $record->kasus->lampirans->map(fn($l) => [
-                'id' => $l->id,
-                'nama_file' => $l->nama_file,
-                'path_file' => $l->path_file,
-                'tipe_file' => $l->tipe_file,
-            ])->toArray();
-        }
-
-        $this->dispatch('open-modal', 'form-home-visit');
+        $this->dispatch('open-modal', 'form-pengunduran-diri');
     }
 
-    // ── SAVE ────────────────────────────────────────
-    public function save()
+    // ── SAVE ──────────────────────────────────────
+    public function save(PengunduranDiriService $service)
     {
         $this->validate();
 
         $data = [
-            'siswa_id'          => $this->siswa_id,
-            'tanggal_kunjungan' => $this->tanggal_kunjungan,
-            'penanganan'        => $this->penanganan,
-            'uraian_masalah'    => $this->uraian_masalah,
-            'tindak_lanjut'     => $this->tindak_lanjut,
-            'status'            => $this->status,
+            'siswa_id'            => $this->siswa_id,
+            'nama_ortu_wali'      => $this->nama_ortu_wali,
+            'alamat_ortu_wali'    => $this->alamat_ortu_wali,
+            'alasan_pengunduran'  => $this->alasan_pengunduran,
+            'tanggal_pengunduran' => $this->tanggal_pengunduran,
         ];
 
-        $service = app(HomeVisitService::class);
-        $lampiranService = app(LampiranService::class);
-
         if ($this->editingId) {
-            $record = $service->update($this->editingId, $data);
-
-            // Hapus lampiran yang ditandai
-            if (!empty($this->deletedLampiran)) {
-                $lampiranService->deleteMultiple($this->deletedLampiran);
-            }
-
-            // Simpan lampiran baru
-            if (!empty($this->uploadedFiles) && $record->kasus_id) {
-                $lampiranService->storeLampirans($record->kasus_id, $this->uploadedFiles, 'kunjungan');
-            }
-
-            session()->flash('success', 'Kunjungan Rumah berhasil diperbarui!');
+            $service->update($this->editingId, $data);
+            session()->flash('success', 'Data pengunduran diri berhasil diperbarui!');
         } else {
-            $record = $service->create($data);
-
-            // Simpan lampiran
-            if (!empty($this->uploadedFiles) && $record->kasus_id) {
-                $lampiranService->storeLampirans($record->kasus_id, $this->uploadedFiles, 'kunjungan');
-            }
-
-            session()->flash('success', 'Kunjungan Rumah berhasil ditambahkan!');
+            $service->create($data);
+            session()->flash('success', 'Data pengunduran diri berhasil ditambahkan!');
         }
 
         $this->reset([
-            'editingId', 'siswa_id', 'penanganan', 'uraian_masalah',
-            'tindak_lanjut', 'uploadedFiles', 'existingLampiran', 'deletedLampiran',
+            'siswa_id', 'nama_ortu_wali', 'alamat_ortu_wali',
+            'alasan_pengunduran', 'uploadedFiles',
         ]);
+        $this->editingId = null;
+        $this->tanggal_pengunduran = date('Y-m-d');
         $this->step = 1;
-        $this->tanggal_kunjungan = date('Y-m-d');
-        $this->status = 'diproses';
 
-        $this->dispatch('close-modal', 'form-home-visit');
+        $this->dispatch('close-modal', 'form-pengunduran-diri');
         $this->dispatch('refreshTable');
     }
 }; ?>
 
 <div>
-    <x-shared.modal name="form-home-visit" maxWidth="lg">
+    <x-shared.modal name="form-pengunduran-diri" maxWidth="lg">
     <div class="flex flex-col h-full max-h-[80vh]">
 
         {{-- HEADER --}}
         <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
             <h2 class="text-base font-bold text-gray-900 leading-tight">
-                {{ $editingId ? 'Edit Kunjungan Rumah' : 'Tambah Kunjungan Rumah' }}
+                {{ $editingId ? 'Edit Pengunduran Diri' : 'Tambah Pengunduran Diri' }}
             </h2>
             <p class="text-xs text-gray-500 mt-0.5">
-                {{ $editingId ? 'Perbarui data kunjungan rumah' : 'Catat hasil kunjungan rumah baru' }}
+                {{ $editingId ? 'Perbarui data pengunduran diri siswa' : 'Catat pengunduran diri siswa baru' }}
             </p>
 
             {{-- PROGRESS BAR --}}
@@ -326,60 +278,44 @@ new class extends Component {
                     @endif
                 </div>
 
-                {{-- TANGGAL KUNJUNGAN --}}
+                {{-- TANGGAL PENGUNDURAN --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="tanggal_kunjungan" size="sm">
-                        Tanggal Kunjungan <span class="text-red-500">*</span>
+                    <x-atoms.input-label for="tanggal_pengunduran" size="sm">
+                        Tanggal Pengunduran <span class="text-red-500">*</span>
                     </x-atoms.input-label>
-                    <x-atoms.text-input id="tanggal_kunjungan" type="date" wire:model="tanggal_kunjungan" size="md" />
-                    @error('tanggal_kunjungan') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                    <x-atoms.text-input id="tanggal_pengunduran" type="date" wire:model="tanggal_pengunduran" size="md" />
+                    @error('tanggal_pengunduran') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- STATUS --}}
+                {{-- NAMA ORANG TUA / WALI --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="status" size="sm">
-                        Status <span class="text-red-500">*</span>
+                    <x-atoms.input-label for="nama_ortu_wali" size="sm">
+                        Nama Orang Tua / Wali <span class="text-red-500">*</span>
                     </x-atoms.input-label>
-                    <select id="status" wire:model="status"
-                        class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                        <option value="diproses">Diproses</option>
-                        <option value="ditunda">Ditunda</option>
-                        <option value="dibatalkan">Dibatalkan</option>
-                    </select>
-                    @error('status') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                    <x-atoms.text-input id="nama_ortu_wali" wire:model="nama_ortu_wali" size="md" placeholder="Masukkan nama orang tua atau wali" />
+                    @error('nama_ortu_wali') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- URAIAN MASALAH --}}
+                {{-- ALAMAT ORANG TUA / WALI --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="uraian_masalah" size="sm">
-                        Uraian Masalah <span class="text-red-500">*</span>
+                    <x-atoms.input-label for="alamat_ortu_wali" size="sm">
+                        Alamat Orang Tua / Wali <span class="text-red-500">*</span>
                     </x-atoms.input-label>
-                    <textarea id="uraian_masalah" wire:model="uraian_masalah" rows="3"
+                    <textarea id="alamat_ortu_wali" wire:model="alamat_ortu_wali" rows="3"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan uraian masalah yang ditemukan..."></textarea>
-                    @error('uraian_masalah') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                        placeholder="Masukkan alamat orang tua atau wali"></textarea>
+                    @error('alamat_ortu_wali') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- PENANGANAN --}}
+                {{-- ALASAN PENGUNDURAN DIRI --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="penanganan" size="sm">
-                        Penanganan <span class="text-red-500">*</span>
+                    <x-atoms.input-label for="alasan_pengunduran" size="sm">
+                        Alasan Pengunduran Diri <span class="text-red-500">*</span>
                     </x-atoms.input-label>
-                    <textarea id="penanganan" wire:model="penanganan" rows="3"
+                    <textarea id="alasan_pengunduran" wire:model="alasan_pengunduran" rows="4"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan penanganan yang dilakukan..."></textarea>
-                    @error('penanganan') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- TINDAK LANJUT --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="tindak_lanjut" size="sm">
-                        Tindak Lanjut
-                    </x-atoms.input-label>
-                    <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>
-                    @error('tindak_lanjut') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                        placeholder="Tuliskan alasan pengunduran diri siswa..."></textarea>
+                    @error('alasan_pengunduran') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
             {{-- ═══════════════════════════════════════════════
@@ -416,41 +352,30 @@ new class extends Component {
                         @endif
                     </div>
 
-                    {{-- TANGGAL KUNJUNGAN --}}
+                    {{-- TANGGAL PENGUNDURAN --}}
                     <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tanggal Kunjungan</p>
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tanggal Pengunduran</p>
                         <p class="text-[14px] text-gray-900 font-medium">
-                            {{ $tanggal_kunjungan ? \Carbon\Carbon::parse($tanggal_kunjungan)->translatedFormat('d M Y') : '-' }}
+                            {{ $tanggal_pengunduran ? \Carbon\Carbon::parse($tanggal_pengunduran)->translatedFormat('d M Y') : '-' }}
                         </p>
                     </div>
 
-                    {{-- STATUS --}}
+                    {{-- NAMA ORANG TUA / WALI --}}
                     <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Status</p>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-bold
-                            {{ $status === 'diproses' ? 'bg-amber-100 text-amber-700' : '' }}
-                            {{ $status === 'ditunda' ? 'bg-blue-100 text-blue-700' : '' }}
-                            {{ $status === 'dibatalkan' ? 'bg-red-100 text-red-700' : '' }}">
-                            {{ ucfirst($status) }}
-                        </span>
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nama Orang Tua / Wali</p>
+                        <p class="text-[14px] text-gray-900 font-medium">{{ $nama_ortu_wali ?: '-' }}</p>
                     </div>
 
-                    {{-- URAIAN MASALAH --}}
+                    {{-- ALAMAT ORANG TUA / WALI --}}
                     <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Uraian Masalah</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $uraian_masalah ?: '-' }}</p>
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Alamat Orang Tua / Wali</p>
+                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $alamat_ortu_wali ?: '-' }}</p>
                     </div>
 
-                    {{-- PENANGANAN --}}
-                    <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Penanganan</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $penanganan ?: '-' }}</p>
-                    </div>
-
-                    {{-- TINDAK LANJUT --}}
+                    {{-- ALASAN PENGUNDURAN --}}
                     <div class="px-5 py-4">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tindak Lanjut</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $tindak_lanjut ?: '-' }}</p>
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Alasan Pengunduran Diri</p>
+                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $alasan_pengunduran ?: '-' }}</p>
                     </div>
 
                 </div>
@@ -460,39 +385,11 @@ new class extends Component {
                  ═══════════════════════════════════════════════ --}}
             @elseif($step === 3)
 
-                {{-- EXISTING LAMPIRAN --}}
-                @if(!empty($existingLampiran))
-                    <div class="mb-6">
-                        <x-atoms.input-label size="sm">
-                            Berkas Tersimpan
-                        </x-atoms.input-label>
-                        <div class="mt-2 space-y-2">
-                            @foreach($existingLampiran as $idx => $l)
-                                <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-                                        </svg>
-                                        <span class="text-[13px] text-gray-700 truncate">{{ $l['nama_file'] }}</span>
-                                    </div>
-                                    <button type="button" wire:click="removeExistingLampiran({{ $idx }})"
-                                            class="text-gray-400 hover:text-red-500 transition-colors ml-3 flex-shrink-0">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                {{-- UNGGAH BERKAS BARU --}}
                 <div class="mb-6">
                     <x-atoms.input-label size="sm">
                         Unggah Berkas Pendukung
                     </x-atoms.input-label>
-                    <p class="text-[12px] text-gray-400 mb-3">Unggah dokumen pendukung seperti surat, foto, atau berkas lainnya (opsional).</p>
+                    <p class="text-[12px] text-gray-400 mb-3">Unggah dokumen pendukung seperti surat pengunduran diri, foto, atau berkas lainnya (opsional).</p>
 
                     {{-- DROP ZONE --}}
                     <div x-data="{ isDragging: false }"
@@ -500,7 +397,7 @@ new class extends Component {
                          x-on:dragleave.prevent="isDragging = false"
                          x-on:drop.prevent="isDragging = false; $refs.fileInput.click()"
                          class="border-2 border-dashed rounded-xl p-8 text-center transition-colors
-                                {{ $step === 3 ? 'border-primary/30 bg-primary/5' : 'border-gray-200' }}"
+                                border-primary/30 bg-primary/5"
                          :class="{ 'border-primary bg-primary/10': isDragging }">
                         <div class="flex flex-col items-center">
                             <div class="w-12 h-12 bg-icon-bg rounded-full flex items-center justify-center mb-3">
