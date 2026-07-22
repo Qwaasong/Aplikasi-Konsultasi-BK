@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Repositories\Eloquent;
+namespace App\Services;
 
 use App\Models\PengunduranDiri;
-use App\Repositories\Contracts\PengunduranDiriRepositoryInterface;
 use Illuminate\Support\Collection;
 
-class PengunduranDiriRepository implements PengunduranDiriRepositoryInterface
+class PengunduranDiriService
 {
     public function getAll(): Collection
     {
@@ -26,13 +25,16 @@ class PengunduranDiriRepository implements PengunduranDiriRepositoryInterface
         return PengunduranDiri::create($data);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data): PengunduranDiri
     {
-        return PengunduranDiri::findOrFail($id)->update($data);
+        $record = PengunduranDiri::findOrFail($id);
+        $record->update($data);
+
+        return $record->fresh(['siswa.user', 'siswa.kelas.jurusan']);
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id): void
     {
-        return PengunduranDiri::findOrFail($id)->delete();
+        PengunduranDiri::findOrFail($id)->delete();
     }
 }

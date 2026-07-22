@@ -72,6 +72,7 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/konferensi-kasus', 'pages.konselor.konferensi-kasus.index')->name('konselor.konferensi-kasus.index');
     Volt::route('konselor/konferensi-kasus/{id}/detail', 'pages.konselor.konferensi-kasus.konferensi-kasus-detail')->name('konselor.konferensi-kasus.detail');
     Volt::route('konselor/pengunduran-diri', 'pages.konselor.pengunduran-diri.index')->name('konselor.pengunduran-diri.index');
+    Volt::route('konselor/pengunduran-diri/{id}/detail', 'pages.konselor.pengunduran-diri.detail')->name('konselor.pengunduran-diri.detail');
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
 
     // Asesmen

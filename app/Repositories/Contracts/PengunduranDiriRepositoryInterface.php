@@ -2,33 +2,33 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\Sosiometri;
+use App\Models\PengunduranDiri;
 use Illuminate\Support\Collection;
 
-interface SosiometriRepositoryInterface
+interface PengunduranDiriRepositoryInterface
 {
     /**
-     * Ambil semua data sosiometri.
+     * Ambil semua data pengunduran diri.
      */
     public function getAll(): Collection;
 
     /**
-     * Cari data sosiometri berdasarkan ID.
+     * Cari data pengunduran diri berdasarkan ID.
      */
-    public function findById(int $id): ?Sosiometri;
+    public function findById(int $id): ?PengunduranDiri;
 
     /**
-     * Tambah data sosiometri.
+     * Tambah data pengunduran diri.
      */
-    public function create(array $data): Sosiometri;
+    public function create(array $data): PengunduranDiri;
 
     /**
-     * Update data sosiometri.
+     * Update data pengunduran diri.
      */
     public function update(int $id, array $data): bool;
 
     /**
-     * Hapus data sosiometri.
+     * Hapus data pengunduran diri.
      */
     public function delete(int $id): bool;
 }

@@ -34,6 +34,7 @@ state([
                     request()->routeIs('konselor.kunjungan-rumah.*') ||
                     request()->routeIs('konselor.alih-tangan-kasus.*') ||
                     request()->routeIs('konselor.konferensi-kasus.*') ||
+                    request()->routeIs('konselor.pengunduran-diri.*') ||
                     request()->routeIs('konselor.peminatan.*'),
 
                 'variants' => 'consultation',

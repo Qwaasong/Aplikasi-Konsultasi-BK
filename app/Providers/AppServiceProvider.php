@@ -12,6 +12,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\KasusBkRepositoryInterface::class,
             \App\Repositories\Eloquent\KasusBkRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Contracts\PengunduranDiriRepositoryInterface::class,
+            \App\Repositories\Eloquent\PengunduranDiriRepository::class
+        );
     }
 
     public function boot(): void
