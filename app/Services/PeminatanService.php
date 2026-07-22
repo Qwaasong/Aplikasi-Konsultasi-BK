@@ -10,14 +10,14 @@ class PeminatanService
 {
     public function getAll(): Collection
     {
-        return Peminatan::with(['dataSiswa.user', 'dataSiswa.kelas.jurusan'])
+        return Peminatan::with(['siswa.user', 'siswa.kelas.jurusan'])
             ->latest('tanggal')
             ->get();
     }
 
     public function findById(int $id): ?Peminatan
     {
-        return Peminatan::with(['dataSiswa.user', 'dataSiswa.kelas.jurusan'])
+        return Peminatan::with(['siswa.user', 'siswa.kelas.jurusan'])
             ->find($id);
     }
 
@@ -30,7 +30,7 @@ class PeminatanService
     {
         $record = Peminatan::findOrFail($id);
         $record->update($data);
-        return $record->fresh(['dataSiswa.user', 'dataSiswa.kelas.jurusan']);
+        return $record->fresh(['siswa.user', 'siswa.kelas.jurusan']);
     }
 
     public function delete(int $id): void

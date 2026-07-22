@@ -9,16 +9,32 @@ new #[Layout('layouts.app')] class extends Component {
 
 ?>
 
-<div class="py-8">
-    <div class="mx-auto sm:px-6 lg:px-8">
+<div class="flex-1 flex flex-col bg-gray-50">
 
-        <h1 class="text-3xl font-bold text-brand-teal">
-            Gaya Belajar
-        </h1>
+    <x-organisms.header>
+        <x-slot:search>
+            <x-molecules.search-input model="search" />
+        </x-slot:search>
+        Gaya Belajar
+    </x-organisms.header>
 
-        <p class="mt-2 text-gray-500">
-            Halaman ini masih dalam tahap pengembangan.
-        </p>
+    <div class="p-8">
+
+        <x-organisms.assessment-card
+            title="Gaya Belajar"
+            subtitle="Tes Gaya Belajar"
+            description="Halaman ini digunakan untuk mengetahui kecenderungan gaya belajar peserta didik."
+            :details="[
+                'Visual.',
+                'Auditori.',
+                'Kinestetik.'
+            ]"
+            :route="route('konselor.asesmen.gaya-belajar.index')"
+            button="Mulai Tes Gaya Belajar"
+            variants="book"
+            color="teal"
+        />
 
     </div>
+
 </div>

@@ -19,16 +19,19 @@ new class extends Component {
     public $siswa_id = '';
 
     #[Validate('required|date')]
-    public $tanggal_peminatan = '';
+    public $tanggal = '';
 
     #[Validate('required|string|max:255')]
-    public $jurusan_pilihan = '';
+    public $pilihan1 = '';
 
-    #[Validate('required|string|max:255')]
-    public $minat = '';
+    #[Validate('nullable|string|max:255')]
+    public $pilihan2 = '';
 
-    #[Validate('required|string|max:255')]
-    public $bakat = '';
+    #[Validate('nullable|string|max:255')]
+    public $pilihan3 = '';
+
+    #[Validate('nullable|string|max:255')]
+    public $hasil = '';
 
     #[Validate('nullable|string')]
     public $catatan = '';
@@ -45,19 +48,21 @@ new class extends Component {
 
     public function mount()
     {
-        $this->tanggal_peminatan = date('Y-m-d');
+        $this->tanggal= date('Y-m-d');
     }
 
     public function nextStep()
     {
         $this->validate([
             'siswa_id' => 'required|integer',
-            'tanggal_peminatan' => 'required|date',
-            'jurusan_pilihan' => 'required|string|max:255',
-            'minat' => 'required|string|max:255',
-            'bakat' => 'required|string|max:255',
+            'tanggal' => 'required|date',
+            'pilihan1' => 'required|string|max:255',
+            'pilihan2' => 'nullable|string|max:255',
+            'pilihan3' => 'nullable|string|max:255',
+            'hasil' => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
         ]);
+
         $this->step = 2;
     }
 
@@ -138,13 +143,14 @@ new class extends Component {
     {
         $this->resetValidation();
         $this->reset([
-            'jurusan_pilihan',
-            'minat',
-            'bakat',
+            'pilihan1',
+            'pilihan2',
+            'pilihan3',
+            'hasil',
             'catatan',
         ]);
         $this->editingId = null;
-        $this->tanggal_peminatan = date('Y-m-d');
+        $this->tanggal= date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-peminatan');
@@ -157,29 +163,27 @@ new class extends Component {
         $service = app(PeminatanService::class);
 
         $this->resetValidation();
-        $this->reset(['files', 'newFiles']);
-
-        $record = $service->findByIdForCurrentUser($id);
-
+        $record = $service->findById($id);
 
         $this->editingId = $id;
+
         $this->siswa_id = $record->siswa_id;
 
-        $this->tanggal_peminatan = $record->tanggal_peminatan
-            ? \Carbon\Carbon::parse($record->tanggal_peminatan)->format('Y-m-d')
-            : date('Y-m-d');
+        $this->tanggal = optional($record->tanggal)->format('Y-m-d');
 
-        $this->jurusan_pilihan = $record->jurusan_pilihan;
-        $this->minat = $record->minat;
-        $this->bakat = $record->bakat;
+        $this->pilihan1 = $record->pilihan1;
+
+        $this->pilihan2 = $record->pilihan2;
+
+        $this->pilihan3 = $record->pilihan3;
+
+        $this->hasil = $record->hasil;
+
         $this->catatan = $record->catatan;
-
-        $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
-        
 
         $this->step = 1;
 
-        $this->dispatch('open-modal', 'form-peminatan');
+        $this->dispatch('open-modal','form-peminatan');
     }
 
     // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
@@ -189,30 +193,43 @@ new class extends Component {
 
         $data = [
             'siswa_id' => $this->siswa_id,
-            'tanggal_peminatan' => $this->tanggal_peminatan,
-            'jurusan_pilihan' => $this->jurusan_pilihan,
-            'minat' => $this->minat,
-            'bakat' => $this->bakat,
+            'tanggal' => $this->tanggal,
+            'pilihan1' => $this->pilihan1,
+            'pilihan2' => $this->pilihan2,
+            'pilihan3' => $this->pilihan3,
+            'hasil' => $this->hasil,
             'catatan' => $this->catatan,
         ];
+
         if ($this->editingId) {
-            $service->update($this->editingId, $data, $this->existingFiles, $this->files);
-            session()->flash('success', 'Peminatan berhasil diperbarui!');
+
+            $service->update($this->editingId, $data);
+
+            session()->flash('success','Peminatan berhasil diperbarui!');
+
         } else {
-            $service->create($data, $this->files);
-            session()->flash('success', 'Peminatan berhasil ditambahkan!');
+
+            $service->create($data);
+
+            session()->flash('success','Peminatan berhasil ditambahkan!');
         }
 
         $this->reset([
-            'jurusan_pilihan',
-            'minat',
-            'bakat',
+            'pilihan1',
+            'pilihan2',
+            'pilihan3',
+            'hasil',
             'catatan',
         ]);
-        $this->tanggal_peminatan = date('Y-m-d');
+
+        $this->tanggal = now()->format('Y-m-d');
+
+        $this->editingId = null;
+
         $this->step = 1;
 
-        $this->dispatch('close-modal', 'form-peminatan');
+        $this->dispatch('close-modal','form-peminatan');
+
         $this->dispatch('refreshTable');
     }
 }; ?>
@@ -281,67 +298,96 @@ new class extends Component {
 
                     {{-- Tanggal Peminatan --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="tanggal_peminatan" size="sm">
-                            Tanggal Peminatan
+                        <x-atoms.input-label for="tanggal" size="sm">
+                            Tanggal
                         </x-atoms.input-label>
 
                         <x-atoms.text-input
-                            id="tanggal_peminatan"
+                            id="tanggal"
                             type="date"
-                            wire:model="tanggal_peminatan"
+                            wire:model="tanggal"
                             size="md" />
 
-                        @error('tanggal_peminatan')
+                        @error('tanggal')
                         <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                             {{ $message }}
                         </span>
                         @enderror
                     </div>
 
-                    {{-- Jurusan Pilihan --}}
+                    {{-- Pilihan 1 --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="jurusan_pilihan" size="sm">
-                            Jurusan Pilihan
+                        <x-atoms.input-label for="pilihan1" size="sm">
+                            Pilihan 1
                         </x-atoms.input-label>
 
                         <x-atoms.text-input
-                            id="jurusan_pilihan"
-                            wire:model="jurusan_pilihan"
+                            id="pilihan1"
+                            wire:model="pilihan1"
                             size="md"
-                            placeholder="Contoh : RPL" />
+                            placeholder="Masukkan pilihan pertama" />
 
-                        @error('jurusan_pilihan')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                        @error('pilihan1')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
-                    {{-- Minat --}}
+                    {{-- Pilihan 2 --}}
                     <div class="mb-6">
-                        <x-atoms.text-input
-                            id="minat"
-                            wire:model="minat"
-                            placeholder="Contoh : Pemrograman" />
-                    </div>
-
-                    {{-- Bakat --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="bakat" size="sm">
-                            Bakat
+                        <x-atoms.input-label for="pilihan2" size="sm">
+                            Pilihan 2
                         </x-atoms.input-label>
 
-                        <textarea
-                            id="bakat"
-                            wire:model="bakat"
-                            rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan bakat siswa..."></textarea>
+                        <x-atoms.text-input
+                            id="pilihan2"
+                            wire:model="pilihan2"
+                            size="md"
+                            placeholder="Masukkan pilihan kedua" />
 
-                        @error('alamat')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                        @error('pilihan2')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
+
+                    {{-- Pilihan 3 --}}
+                    <div class="mb-6">
+                        <x-atoms.input-label for="pilihan3" size="sm">
+                            Pilihan 3
+                        </x-atoms.input-label>
+
+                        <x-atoms.text-input
+                            id="pilihan3"
+                            wire:model="pilihan3"
+                            size="md"
+                            placeholder="Masukkan pilihan ketiga" />
+
+                        @error('pilihan3')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
+
+                    {{-- Hasil --}}
+                    <div class="mb-6">
+                        <x-atoms.input-label for="hasil" size="sm">
+                            Hasil Peminatan
+                        </x-atoms.input-label>
+
+                        <x-atoms.text-input
+                            id="hasil"
+                            wire:model="hasil"
+                            size="md"
+                            placeholder="Masukkan hasil peminatan" />
+
+                        @error('hasil')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
@@ -359,9 +405,9 @@ new class extends Component {
                             placeholder="Tuliskan catatan tambahan..."></textarea>
 
                         @error('catatan')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 

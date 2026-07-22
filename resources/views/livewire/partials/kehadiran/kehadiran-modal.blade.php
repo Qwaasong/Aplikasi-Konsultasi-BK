@@ -1,7 +1,6 @@
 <?php
 
 use Livewire\Volt\Component;
-use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
@@ -10,34 +9,29 @@ use App\Services\KehadiranService;
 use App\Models\TahunAjaran;
 
 new class extends Component {
-    use WithFileUploads;
 
+    public ?int $editingId = null;
     public int $step = 1;
-    public ?int $editingId = null; // Menentukan mode: null = Tambah, ada angka = Edit
-    public array $existingFiles = [];
 
-    #[Validate('required|integer')]
-    public $siswa_id = '';
+    // ── DATA KEHADIRAN ─────────────────────────────
+    #[Validate('required|date')]
+    public $tanggal_kehadiran = '';
 
     #[Validate('required|integer')]
     public $tahun_ajaran_id = '';
 
-    #[Validate('required|date')]
-    public $tanggal_kehadiran = '';
-
     #[Validate('required|in:Hadir,Sakit,Izin,Alpha')]
     public $status = '';
 
-    #[Validate([
-        'files' => 'array|max:5',
-        'files.*' => 'file|max:12288|mimes:pdf,jpg,png,docx',
-    ])]
-    public $files = [];
-    public $newFiles = [];
+    // ── SISWA ────────────────────────────────────────
+    #[Validate('required|integer')]
+    public $siswa_id = '';
 
     public $searchSiswa = '';
     public $showStudentModal = false;
 
+    // ── FILE UPLOAD (STEP 3) ────────────────────────
+    public $uploadedFiles = [];
 
     public function mount()
     {
@@ -47,24 +41,34 @@ new class extends Component {
             ?? '';
     }
 
+    // ── STEP NAVIGATION ─────────────────────────────
     public function nextStep()
     {
-        $this->validate([
-            'siswa_id' => 'required|integer',
-            'tanggal_kehadiran' => 'required|date',
-            'status' => 'required|in:Hadir,Sakit,Izin,Alpha',
-        ]);
-        $this->step = 2;
+        if ($this->step === 1) {
+            $this->validate([
+                'siswa_id'            => 'required|integer',
+                'tanggal_kehadiran'   => 'required|date',
+                'tahun_ajaran_id'     => 'required|integer',
+                'status'              => 'required|in:Hadir,Sakit,Izin,Alpha',
+            ]);
+        }
+
+        if ($this->step < 3) {
+            $this->step++;
+        }
     }
 
-    public function previousStep()
+    public function prevStep()
     {
-        $this->step = 1;
+        if ($this->step > 1) {
+            $this->step--;
+        }
     }
 
-    public function selectStudent(int $id)
+    // ── SISWA SELECTION ─────────────────────────────
+    public function selectStudent($id)
     {
-        $this->siswa_id = $id;
+        $this->siswa_id = (int) $id;
         $this->showStudentModal = false;
         $this->searchSiswa = '';
     }
@@ -77,26 +81,6 @@ new class extends Component {
     public function closeStudentModal()
     {
         $this->showStudentModal = false;
-    }
-
-    public function updatedNewFiles()
-    {
-        $this->validateOnly('newFiles.*', [
-            'newFiles.*' => 'file|max:12288|mimes:pdf,jpg,png,docx',
-        ]);
-
-        foreach ($this->newFiles as $file) {
-            if (count($this->files) < 5) {
-                $this->files[] = $file;
-            }
-        }
-        $this->newFiles = [];
-    }
-
-    public function removeFile(int $index)
-    {
-        unset($this->files[$index]);
-        $this->files = array_values($this->files);
     }
 
     #[Computed]
@@ -112,7 +96,16 @@ new class extends Component {
         return app(SiswaService::class)->search($this->searchSiswa, 50);
     }
 
-    public function getInitials(?string $name): string
+    #[Computed]
+    public function tahunAjaranLabel()
+    {
+        if (!$this->tahun_ajaran_id) return '-';
+        $ta = TahunAjaran::find($this->tahun_ajaran_id);
+        if (!$ta) return '-';
+        return $ta->tahun . ' - ' . $ta->semester . ($ta->status_aktif ? ' (Aktif)' : '');
+    }
+
+    public function getInitials($name)
     {
         if (!$name) return 'S';
         $words = explode(' ', trim($name));
@@ -122,90 +115,68 @@ new class extends Component {
         return strtoupper(substr($name, 0, 2));
     }
 
-    public function removeExistingFile(int $index)
-    {
-        unset($this->existingFiles[$index]);
-        $this->existingFiles = array_values($this->existingFiles);
-    }
-
-    // ── EVENT UNTUK MODE TAMBAH ─────────────────────────────────
+    // ── CREATE ───────────────────────────────────────
     #[On('create-kehadiran')]
     public function createKehadiran()
     {
         $this->resetValidation();
-
         $this->reset([
-            'editingId',
-            'siswa_id',
-            'tahun_ajaran_id',
-            'status',
-            'searchSiswa',
+            'editingId', 'siswa_id', 'tahun_ajaran_id',
+            'status', 'uploadedFiles',
         ]);
-
+        $this->step = 1;
         $this->tanggal_kehadiran = date('Y-m-d');
-
         $this->dispatch('open-modal', 'form-kehadiran');
     }
 
-    // ── EVENT UNTUK MODE EDIT ───────────────────────────────────
+    // ── EDIT ─────────────────────────────────────────
     #[On('edit-kehadiran')]
     public function loadKehadiran(int $id)
     {
         $service = app(KehadiranService::class);
-
         $this->resetValidation();
-        $this->reset(['files', 'newFiles']);
 
         $record = $service->findByIdForCurrentUser($id);
 
-
         $this->editingId = $id;
         $this->siswa_id = $record->siswa_id;
-
         $this->tanggal_kehadiran = $record->tanggal_kehadiran
             ? \Carbon\Carbon::parse($record->tanggal_kehadiran)->format('Y-m-d')
             : date('Y-m-d');
-
         $this->tahun_ajaran_id = $record->tahun_ajaran_id;
         $this->status = $record->status;
-
-        $this->existingFiles = $record->lampirans->pluck('path_file')->toArray();
-        
-
+        $this->uploadedFiles = [];
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-kehadiran');
     }
 
-    // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
-    public function save()
+    // ── SAVE ─────────────────────────────────────────
+    public function save(KehadiranService $service)
     {
         $this->validate();
 
         $data = [
-            'siswa_id' => $this->siswa_id,
-            'tahun_ajaran_id' => $this->tahun_ajaran_id,
-            'tanggal_kehadiran' => $this->tanggal_kehadiran,
-            'status' => $this->status,
+            'siswa_id'            => $this->siswa_id,
+            'tahun_ajaran_id'     => $this->tahun_ajaran_id,
+            'tanggal_kehadiran'   => $this->tanggal_kehadiran,
+            'status'              => $this->status,
         ];
 
         if ($this->editingId) {
-            app(KehadiranService::class)->update($this->editingId, $data);
+            $service->update($this->editingId, $data);
             session()->flash('success', 'Kehadiran berhasil diperbarui!');
         } else {
-            app(KehadiranService::class)->create($data);
+            $service->create($data);
             session()->flash('success', 'Kehadiran berhasil ditambahkan!');
         }
 
         $this->reset([
-            'editingId',
-            'siswa_id',
-            'tahun_ajaran_id',
-            'status',
-            'searchSiswa',
+            'editingId', 'siswa_id', 'tahun_ajaran_id',
+            'status', 'uploadedFiles',
         ]);
-        $this->tanggal_kehadiran = date('Y-m-d');
         $this->step = 1;
+        $this->tanggal_kehadiran = date('Y-m-d');
 
         $this->dispatch('close-modal', 'form-kehadiran');
         $this->dispatch('refreshTable');
@@ -214,31 +185,65 @@ new class extends Component {
 
 <div>
     <x-shared.modal name="form-kehadiran" maxWidth="lg">
-        <div class="flex flex-col h-full max-h-[80vh]">
+    <div class="flex flex-col h-full max-h-[80vh]">
 
-            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                <h2 class="text-base font-bold text-gray-900 leading-tight">
-                    {{ $editingId ? 'Edit Kehadiran Siswa' : 'Tambah Kehadiran Siswa' }}
-                </h2>
-                <p class="text-xs text-gray-500 mt-0.5">
-                    {{ $editingId ? 'Perbarui Kehadiran Siswa' : 'Simpan Kehadiran Siswa' }}
-                </p>
-            </div>
+        {{-- HEADER ───────────────────────────────────────--}}
+        <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+            <h2 class="text-base font-bold text-gray-900 leading-tight">
+                {{ $editingId ? 'Edit Kehadiran Siswa' : 'Tambah Kehadiran Siswa' }}
+            </h2>
+            <p class="text-xs text-gray-500 mt-0.5">
+                {{ $editingId ? 'Perbarui data kehadiran siswa' : 'Catat kehadiran siswa baru' }}
+            </p>
 
-            <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
-
-                <div class="{{ $step === 1 ? 'block' : 'hidden' }}">
-                    <div class="mb-6">
-                        <p class="text-[14px] font-bold text-primary mb-2.5">Langkah 1 Dari 2</p>
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-gray-200/80 rounded-full"></div>
+            {{-- PROGRESS BAR --}}
+            <div class="mt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-gray-600">Langkah {{ $step }} Dari 3</span>
+                    <span class="text-xs text-gray-400">
+                        @if($step === 1) Isi Data
+                        @elseif($step === 2) Review
+                        @else Unggah Berkas
+                        @endif
+                    </span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full transition-all duration-500 ease-in-out"
+                         style="width: {{ ($step / 3) * 100 }}%"></div>
+                </div>
+                <div class="flex justify-between mt-1.5">
+                    @foreach([1, 2, 3] as $s)
+                        <div class="flex items-center gap-1">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
+                                {{ $step >= $s ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500' }}">
+                                {{ $s }}
+                            </div>
+                            <span class="text-[10px] {{ $step >= $s ? 'text-primary font-semibold' : 'text-gray-400' }}">
+                                @if($s === 1) Data
+                                @elseif($s === 2) Review
+                                @else Berkas
+                                @endif
+                            </span>
                         </div>
-                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
 
-                    <div class="mb-6">
-                        <x-atoms.input-label for="id_siswa" size="sm">Siswa</x-atoms.input-label>
-                        @if($this->selectedStudent)
+        {{-- SCROLLABLE CONTENT --}}
+        <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
+
+            {{-- ═══════════════════════════════════════════════
+                 STEP 1: FORM DATA
+                 ═══════════════════════════════════════════════ --}}
+            @if($step === 1)
+
+                {{-- SISWA --}}
+                <div class="mb-6">
+                    <x-atoms.input-label for="id_siswa" size="sm">
+                        Siswa <span class="text-red-500">*</span>
+                    </x-atoms.input-label>
+                    @if($this->selectedStudent)
                         <div class="bg-bg-light border border-teal-100/60 rounded-lg p-4 flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-[45px] h-[45px] bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[16px]">
@@ -246,18 +251,16 @@ new class extends Component {
                                 </div>
                                 <div>
                                     <h3 class="text-[14px] font-bold text-gray-900">
-                                        {{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}
-                                    </h3>
+                                        {{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}</h3>
                                     <p class="text-[12px] text-gray-400 mt-0.5">Kelas {{ $this->selectedStudent->kelas_label }}
-                                        {{ $this->selectedStudent->jurusan_label }} - NIS {{ $this->selectedStudent->nis }}
-                                    </p>
+                                        {{ $this->selectedStudent->jurusan_label }} - NIS {{ $this->selectedStudent->nis }}</p>
                                 </div>
                             </div>
                             <button type="button" wire:click="openStudentModal" class="text-[13px] font-bold text-gray-500 hover:text-gray-800 transition-colors">
                                 Ganti
                             </button>
                         </div>
-                        @else
+                    @else
                         <div class="bg-bg-light border border-teal-100/60 rounded-lg p-5 flex flex-col items-center justify-center text-center">
                             <div class="w-[56px] h-[56px] bg-icon-bg rounded-full flex items-center justify-center mb-3 text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
@@ -271,229 +274,274 @@ new class extends Component {
                             </button>
                         </div>
                         @error('siswa_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                    @endif
+                </div>
+
+                {{-- TANGGAL KEHADIRAN --}}
+                <div class="mb-6">
+                    <x-atoms.input-label for="tanggal_kehadiran" size="sm">
+                        Tanggal Kehadiran <span class="text-red-500">*</span>
+                    </x-atoms.input-label>
+                    <x-atoms.text-input id="tanggal_kehadiran" type="date" wire:model="tanggal_kehadiran" size="md" />
+                    @error('tanggal_kehadiran') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- TAHUN AJARAN --}}
+                <div class="mb-6">
+                    <x-atoms.input-label for="tahun_ajaran_id" size="sm">
+                        Tahun Ajaran <span class="text-red-500">*</span>
+                    </x-atoms.input-label>
+                    <select id="tahun_ajaran_id" wire:model="tahun_ajaran_id"
+                        class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="">Pilih Tahun Ajaran</option>
+                        @foreach(TahunAjaran::orderByDesc('tahun')->get() as $ta)
+                            <option value="{{ $ta->id }}">{{ $ta->tahun }} - {{ $ta->semester }} {{ $ta->status_aktif ? '(Aktif)' : '' }}</option>
+                        @endforeach
+                    </select>
+                    @error('tahun_ajaran_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- STATUS KEHADIRAN --}}
+                <div class="mb-6">
+                    <x-atoms.input-label for="status" size="sm">
+                        Status Kehadiran <span class="text-red-500">*</span>
+                    </x-atoms.input-label>
+                    <select id="status" wire:model="status"
+                        class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="">Pilih Status</option>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Sakit">Sakit</option>
+                        <option value="Izin">Izin</option>
+                        <option value="Alpha">Alpha</option>
+                    </select>
+                    @error('status') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+            {{-- ═══════════════════════════════════════════════
+                 STEP 2: REVIEW / CONFIRMATION
+                 ═══════════════════════════════════════════════ --}}
+            @elseif($step === 2)
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-sm text-blue-700">Pastikan semua data yang Anda masukkan sudah benar sebelum melanjutkan.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+
+                    {{-- SISWA --}}
+                    <div class="px-5 py-4 border-b border-gray-100">
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Siswa</p>
+                        @if($this->selectedStudent)
+                            <div class="flex items-center gap-3">
+                                <div class="w-[38px] h-[38px] bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[13px]">
+                                    {{ $this->getInitials($this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama) }}
+                                </div>
+                                <div>
+                                    <p class="text-[14px] font-bold text-gray-900">{{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}</p>
+                                    <p class="text-[12px] text-gray-500">Kelas {{ $this->selectedStudent->kelas_label }} {{ $this->selectedStudent->jurusan_label }} - NIS {{ $this->selectedStudent->nis }}</p>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-[13px] text-red-500 italic">Belum dipilih</p>
                         @endif
                     </div>
 
-                    {{-- Tanggal Kehadiran --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="tanggal_kehadiran" size="sm">
-                            Tanggal Kehadiran
-                        </x-atoms.input-label>
-
-                        <x-atoms.text-input
-                            id="tanggal_kehadiran"
-                            type="date"
-                            wire:model="tanggal_kehadiran"
-                            size="md" />
-
-                        @error('tanggal_kehadiran')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                        @enderror
+                    {{-- TANGGAL KEHADIRAN --}}
+                    <div class="px-5 py-4 border-b border-gray-100">
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tanggal Kehadiran</p>
+                        <p class="text-[14px] text-gray-900 font-medium">
+                            {{ $tanggal_kehadiran ? \Carbon\Carbon::parse($tanggal_kehadiran)->translatedFormat('d M Y') : '-' }}
+                        </p>
                     </div>
 
-                    {{-- Tahun Ajaran --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="tahun_ajaran_id" size="sm">
-                            Tahun Ajaran
-                        </x-atoms.input-label>
-
-                        <select id="tahun_ajaran_id" wire:model="tahun_ajaran_id"
-                            class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm
-                                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                            <option value="">Pilih Tahun Ajaran</option>
-                            @foreach(TahunAjaran::orderByDesc('tahun')->get() as $ta)
-                                <option value="{{ $ta->id }}">
-                                    {{ $ta->tahun }} - {{ $ta->semester }} {{ $ta->status_aktif ? '(Aktif)' : '' }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        @error('tahun_ajaran_id')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                        @enderror
+                    {{-- TAHUN AJARAN --}}
+                    <div class="px-5 py-4 border-b border-gray-100">
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tahun Ajaran</p>
+                        <p class="text-[14px] text-gray-900 font-medium">{{ $this->tahunAjaranLabel }}</p>
                     </div>
 
-                    {{-- Status Kehadiran --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="status" size="sm">
-                            Status Kehadiran
-                        </x-atoms.input-label>
-
-                        <select id="status" wire:model="status"
-                            class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm
-                                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                            <option value="">Pilih Status</option>
-                            <option value="Hadir">Hadir</option>
-                            <option value="Sakit">Sakit</option>
-                            <option value="Izin">Izin</option>
-                            <option value="Alpha">Alpha</option>
-                        </select>
-
-                        @error('status')
-                        <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                            {{ $message }}
-                        </span>
-                        @enderror
+                    {{-- STATUS KEHADIRAN --}}
+                    <div class="px-5 py-4">
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Status Kehadiran</p>
+                        @if($status)
+                            <p class="text-[14px] font-bold text-gray-900">{{ $status }}</p>
+                            @php
+                                $statusColors = [
+                                    'Hadir' => 'bg-green-100 text-green-700',
+                                    'Sakit' => 'bg-yellow-100 text-yellow-700',
+                                    'Izin'  => 'bg-blue-100 text-blue-700',
+                                    'Alpha' => 'bg-red-100 text-red-700',
+                                ];
+                            @endphp
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold mt-1 {{ $statusColors[$status] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $status }}
+                            </span>
+                        @else
+                            <p class="text-[13px] text-red-500 italic">Belum dipilih</p>
+                        @endif
                     </div>
+
                 </div>
-                <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
-                    <div class="mb-6">
-                        <p class="text-[14px] font-bold text-primary mb-2.5">Langkah 2 Dari 2</p>
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                        </div>
-                    </div>
 
-                    <div class="mb-6">
-                        <label class="block text-[14px] font-bold text-gray-700 mb-2">Pilih File Tambahan</label>
-                        <div x-data="{ isDropping: false }" x-on:dragover.prevent="isDropping = true" x-on:dragleave.prevent="isDropping = false" x-on:drop.prevent="isDropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="bg-bg-light border-2 py-16 px-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#e9f3f5] transition-colors border-dashed rounded-xl" :class="isDropping ? 'bg-[#e9f3f5] border-primary' : 'border-icon-bg/40'">
-                            <input type="file" wire:model="newFiles" multiple x-ref="fileInput" class="hidden">
-                            <div class="w-[84px] h-[84px] bg-icon-bg/90 rounded-full flex items-center justify-center mb-5">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#044B5F" class="w-10 h-10">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+            {{-- ═══════════════════════════════════════════════
+                 STEP 3: FILE UPLOAD
+                 ═══════════════════════════════════════════════ --}}
+            @elseif($step === 3)
+
+                <div class="mb-6">
+                    <x-atoms.input-label size="sm">
+                        Unggah Berkas Pendukung
+                    </x-atoms.input-label>
+                    <p class="text-[12px] text-gray-400 mb-3">Unggah dokumen pendukung seperti surat, foto, atau berkas lainnya (opsional).</p>
+
+                    {{-- DROP ZONE --}}
+                    <div x-data="{ isDragging: false }"
+                         x-on:dragover.prevent="isDragging = true"
+                         x-on:dragleave.prevent="isDragging = false"
+                         x-on:drop.prevent="isDragging = false; $refs.fileInput.click()"
+                         class="border-2 border-dashed rounded-xl p-8 text-center transition-colors
+                                {{ $step === 3 ? 'border-primary/30 bg-primary/5' : 'border-gray-200' }}"
+                         :class="{ 'border-primary bg-primary/10': isDragging }">
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-icon-bg rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
                                 </svg>
                             </div>
-                            <h3 class="text-[16px] font-bold text-gray-800 mb-2">Tarik Dan Lepas file disini atau Klik untuk Unggah</h3>
-                            <p class="text-[14px] text-gray-400">Hingga 5 file , Maks 12 MB per file (PDF, JPG, PNG, DOCX)</p>
+                            <p class="text-[13px] font-semibold text-gray-700 mb-1">Seret & lepas file ke sini</p>
+                            <p class="text-[12px] text-gray-400 mb-3">atau klik untuk memilih file</p>
+                            <label class="cursor-pointer bg-white border border-gray-200 hover:border-primary px-4 py-2 rounded-md text-[12px] font-semibold text-gray-600 hover:text-primary transition-colors shadow-sm">
+                                Pilih File
+                                <input type="file" x-ref="fileInput" wire:model="uploadedFiles" multiple
+                                       class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                            </label>
                         </div>
-                        @error('files.*') <span class="text-red-500 text-[13px] font-medium mt-2 block">{{ $message }}</span> @enderror
                     </div>
+                    @error('uploadedFiles') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
 
-                    @if($files && count($files) > 0)
-                    <div class="mb-4">
-                        <h4 class="text-[14.5px] font-bold text-gray-700 mb-3">File Baru Terunggah</h4>
-                        <div class="flex flex-col gap-3">
-                            @foreach($files as $index => $fileObj)
-                            <div class="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-white shadow-sm">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7">
-                                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
-                                            <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
+                    {{-- UPLOADED FILES LIST --}}
+                    @if(!empty($uploadedFiles))
+                        <div class="mt-4 space-y-2">
+                            @foreach($uploadedFiles as $index => $file)
+                                <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <svg class="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
                                         </svg>
+                                        <span class="text-[13px] text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                        <span class="text-[11px] text-gray-400 flex-shrink-0">({{ round($file->getSize() / 1024, 1) }} KB)</span>
                                     </div>
-                                    <div class="flex flex-col overflow-hidden max-w-[320px]">
-                                        <p class="text-[15px] font-bold text-gray-800 truncate">{{ $fileObj->getClientOriginalName() }}</p>
-                                        <p class="text-[13.5px] text-gray-500 font-medium tracking-wide">{{ round($fileObj->getSize() / 1024 / 1024, 2) }} MB</p>
-                                    </div>
+                                    <button type="button" wire:click="removeFile({{ $index }})"
+                                            class="text-gray-400 hover:text-red-500 transition-colors ml-3 flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
                                 </div>
-                                <button type="button" wire:click="removeFile({{ $index }})" class="text-gray-400 hover:text-red-500 transition-colors p-2 shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                    </svg>
-                                </button>
-                            </div>
                             @endforeach
                         </div>
-                    </div>
-                    @endif
-
-                    @if(!empty($existingFiles))
-                    <div class="mb-4">
-                        <h4 class="text-[14.5px] font-bold text-gray-700 mb-3">File Lama Tersimpan</h4>
-                        <div class="flex flex-col gap-3">
-                            @foreach($existingFiles as $index => $path)
-                            @php
-                            $fileName = basename($path);
-                            $isImage = in_array(strtolower(pathinfo($fileName, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png']);
-                            $fileUrl = asset('storage/' . $path);
-                            @endphp
-                            <div class="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-white shadow-sm hover:border-blue-300 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    @if($isImage)
-                                    <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500 shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                        </svg>
-                                    </div>
-                                    @else
-                                    <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7">
-                                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
-                                            <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
-                                        </svg>
-                                    </div>
-                                    @endif
-                                    <div class="flex flex-col overflow-hidden max-w-[320px]">
-                                        <p class="text-[15px] font-bold text-gray-800 truncate"><a href="{{ $fileUrl }}" target="_blank" class="hover:text-blue-600 transition-colors">{{ $fileName }}</a></p>
-                                        <p class="text-[13.5px] text-gray-400 font-medium tracking-wide">{{ $isImage ? 'Gambar' : 'Dokumen' }} • Tersimpan</p>
-                                    </div>
-                                </div>
-                                <button type="button" wire:click="removeExistingFile({{ $index }})" class="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors p-2 shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>
-                                </button>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
                     @endif
                 </div>
 
-            </div>
+            @endif
 
-            <div class="bg-bg-light px-7 py-5 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl">
-                <div class="{{ $step === 1 ? 'flex' : 'hidden' }} gap-3">
-                    <x-atoms.button variant="secondary" size="md" x-on:click="show = false">Batal</x-atoms.button>
-                    <x-atoms.button wire:click="nextStep">Langkah Terakhir : Upload File</x-atoms.button>
-                </div>
-
-                <div class="{{ $step === 2 ? 'flex' : 'hidden' }} gap-3">
-                    <x-atoms.button variant="secondary" size="md" wire:click="previousStep">Kembali</x-atoms.button>
-                    <x-atoms.button wire:click="save">
-                        {{ $editingId ? 'Perbarui Kehadiran Siswa' : 'Simpan Kehadiran Siswa' }}
-                    </x-atoms.button>
-                </div>
-            </div>
         </div>
 
-        <div x-data="{ showStudentMenu: @entangle('showStudentModal') }" x-show="showStudentMenu"
-            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity"
-            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
-            <div class="bg-white w-full max-w-[500px] rounded-xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden" @click.away="showStudentMenu = false">
-                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-[20px] font-bold text-gray-900 leading-tight">Pilih Siswa</h2>
-                        <p class="text-[13px] text-gray-500 mt-0.5">Semua Siswa</p>
+        {{-- FOOTER ACTIONS ────────────────────────────────--}}
+        <div class="bg-bg-light px-7 py-5 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl gap-3">
+            <x-atoms.button variant="secondary" size="md" x-on:click="show = false">Batal</x-atoms.button>
+
+            @if($step === 1)
+                {{-- Step 1: Batal + Selanjutnya --}}
+                <x-atoms.button variant="primary" size="md" wire:click="nextStep">
+                    Selanjutnya
+                    <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </x-atoms.button>
+
+            @elseif($step === 2)
+                {{-- Step 2: Kembali + Selanjutnya --}}
+                <x-atoms.button variant="secondary" size="md" wire:click="prevStep">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Kembali
+                </x-atoms.button>
+                <x-atoms.button variant="primary" size="md" wire:click="nextStep">
+                    Selanjutnya
+                    <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </x-atoms.button>
+
+            @elseif($step === 3)
+                {{-- Step 3: Kembali + Simpan/Perbarui --}}
+                <x-atoms.button variant="secondary" size="md" wire:click="prevStep">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Kembali
+                </x-atoms.button>
+                <x-atoms.button wire:click="save" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="save">
+                        {{ $editingId ? 'Perbarui' : 'Simpan' }}
+                    </span>
+                    <span wire:loading wire:target="save">Menyimpan...</span>
+                </x-atoms.button>
+            @endif
+        </div>
+    </div>
+
+    {{-- MODAL PEMILIHAN SISWA ─────────────────────────--}}
+    <div x-data="{ showStudentMenu: @entangle('showStudentModal') }" x-show="showStudentMenu"
+        class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity"
+        x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        style="display: none;">
+        <div class="bg-white w-full max-w-[500px] rounded-xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden"
+            @click.away="showStudentMenu = false">
+            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0 flex justify-between items-center">
+                <div>
+                    <h2 class="text-[20px] font-bold text-gray-900 leading-tight">Pilih Siswa</h2>
+                    <p class="text-[13px] text-gray-500 mt-0.5">Semua Siswa</p>
+                </div>
+            </div>
+
+            <div class="px-6 py-5 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
+                <div class="flex gap-3 mb-5">
+                    <div class="relative grow">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+                        </div>
+                        <input type="text" wire:model.live="searchSiswa" placeholder="Cari Nama Atau NIS" class="w-full border border-gray-200 rounded-md pl-10 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm">
                     </div>
                 </div>
 
-                <div class="px-6 py-5 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
-                    <div class="flex gap-3 mb-5">
-                        <div class="relative grow">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <input type="text" wire:model.live="searchSiswa" placeholder="Cari Nama Atau NIS" class="w-full border border-gray-200 rounded-md pl-10 pr-3 py-2 text-[13px] text-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm">
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        @forelse($this->filteredStudents as $siswa)
-                        <div wire:click="selectStudent({{ $siswa->id }})" class="student-card border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa->id ? 'border-primary bg-bg-light' : '' }}">
+                <div class="flex flex-col gap-3">
+                    @forelse($this->filteredStudents as $siswa)
+                        <div wire:click="selectStudent({{ $siswa->id }})"
+                            class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa->id ? 'border-primary bg-bg-light' : '' }}">
                             <h4 class="text-[14px] font-bold text-gray-900">{{ $siswa->nama_lengkap ?? $siswa->nama }}</h4>
                             <p class="text-[12px] text-gray-500 mt-1">NIS: {{ $siswa->nis }} <span class="ml-2">Kelas: {{ $siswa->kelas_label }}</span></p>
                         </div>
-                        @empty
+                    @empty
                         <div class="p-6 text-center text-gray-500 text-sm">Tidak ada siswa ditemukan.</div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-2.5">
-                    <button type="button" wire:click="closeStudentModal" class="px-5 py-2 bg-white border border-gray-200 rounded-md text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
-                        Batal
-                    </button>
+                    @endforelse
                 </div>
             </div>
+
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-2.5">
+                <button type="button" wire:click="closeStudentModal" class="px-5 py-2 bg-white border border-gray-200 rounded-md text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+                    Batal
+                </button>
+            </div>
         </div>
+    </div>
     </x-shared.modal>
 </div>
