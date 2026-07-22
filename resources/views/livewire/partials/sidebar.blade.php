@@ -157,7 +157,6 @@ state([
                         'active' => request()->routeIs('konselor.asesmen.tes-bakat-minat.*'),
                         'variants' => 'analytics',
                     ],
-
                 ],
             ];
         }
@@ -173,24 +172,86 @@ state([
             ];
 
             $menus[] = [
-                'label' => 'Konsultasi',
-                'url' => route('admin.konsultasi.index'),
-                'active' => request()->routeIs('admin.konsultasi.*'),
-                'variants' => 'consultation'
+                'label' => 'Kelola User',
+                'url' => '#',
+                'active' =>
+                request()->routeIs('admin.kelola-user.siswa.*') ||
+                    request()->routeIs('admin.kelola-user.pegawai.*'),
+                'variants' => 'user',
+
+                'children' => [
+
+                    [
+                        'label' => 'Siswa',
+                        'url' => route('admin.kelola-user.siswa.index'),
+                        'active' => request()->routeIs('admin.kelola-user.siswa.*'),
+                        'variants' => 'student',
+                    ],
+
+                    [
+                        'label' => 'Pegawai',
+                        'url' => route('admin.kelola-user.pegawai.index'),
+                        'active' => request()->routeIs('admin.kelola-user.pegawai.*'),
+                        'variants' => 'employee',
+                    ],
+
+                ],
             ];
 
             $menus[] = [
-                'label' => 'Siswa',
-                'url' => route('admin.siswa.index'),
-                'active' => request()->routeIs('admin.siswa.*'),
-                'variants' => 'student'
+                'label' => 'Kelola Data',
+                'url' => '#',
+                'active' =>
+                request()->routeIs('admin.kelola-data.daftar-sekolah.*') ||
+                    request()->routeIs('admin.kelola-data.daftar-jurusan.*') ||
+                    request()->routeIs('admin.kelola-data.daftar-kelas.*') ||
+                    request()->routeIs('admin.kelola-data.daftar-tahun-ajaran.*'),
+                'variants' => 'database',
+
+                'children' => [
+
+                    [
+                        'label' => 'Daftar Sekolah',
+                        'variants' => 'school',
+                        'url' => route('admin.kelola-data.daftar-sekolah.index'),
+                        'active' => request()->routeIs('admin.kelola-data.daftar-sekolah.*'),
+                    ],
+
+                    [
+                        'label' => 'Daftar Jurusan',
+                        'variants' => 'category',
+                        'url' => route('admin.kelola-data.daftar-jurusan.index'),
+                        'active' => request()->routeIs('admin.kelola-data.daftar-jurusan.*'),
+                    ],
+
+                    [
+                        'label' => 'Daftar Kelas',
+                        'variants' => 'book',
+                        'url' => route('admin.kelola-data.daftar-kelas.index'),
+                        'active' => request()->routeIs('admin.kelola-data.daftar-kelas.*'),
+                    ],
+
+                    [
+                        'label' => 'Daftar Tahun Ajaran',
+                        'variants' => 'calendar',
+                        'url' => route('admin.kelola-data.daftar-tahun-ajaran.index'),
+                        'active' => request()->routeIs('admin.kelola-data.daftar-tahun-ajaran.*'),
+                    ],
+                ],
             ];
 
             $menus[] = [
-                'label' => 'User',
-                'url' => route('admin.user.index'),
-                'active' => request()->routeIs('admin.user.*'),
-                'variants' => 'user'
+                'label' => 'Rekap Absensi',
+                'url' => route('admin.rekap-absensi.index'),
+                'active' => request()->routeIs('admin.rekap-absensi.*'),
+                'variants' => 'attendance',
+            ];
+
+            $menus[] = [
+                'label' => 'Log Kasus',
+                'url' => route('admin.log-kasus.index'),
+                'active' => request()->routeIs('admin.log-kasus.*'),
+                'variants' => 'file',
             ];
         }
 
