@@ -2,8 +2,9 @@
 
     <nav class="container navbar-container">
 
-        <a href="{{ route('landing') }}" class="navbar-logo">
+        <a href="{{ route('landing') }}" class="navbar-logo d-flex align-items-center gap-3 text-decoration-none">
             <img src="{{ asset('asset/image/SMKLogo.png') }}" alt="Logo SMKN 9 Malang">
+            <span class="fw-bold fs-5 text-black mb-0" style="margin-top: 2px;">Aplikasi Konsultasi BK</span>
         </a>
 
         <ul class="navbar-menu">
