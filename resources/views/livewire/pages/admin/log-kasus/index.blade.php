@@ -2,23 +2,224 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Services\KasusBkService;
 
 new #[Layout('layouts.app')] class extends Component {
 
-};
+    public string $search = '';
+    public string $filterStatus = '';
+    public bool $showFilters = false;
+    public array $selected = [];
+    public bool $selectAll = false;
 
-?>
+    public function mount(): void
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+    }
 
-<div class="py-8">
-    <div class="mx-auto sm:px-6 lg:px-8">
+    public function with(): array
+    {
+        $service = app(KasusBkService::class);
 
-        <h1 class="text-3xl font-bold text-brand-teal">
-            Log Kasus
-        </h1>
+        $all = $service->all();
 
-        <p class="mt-2 text-gray-500">
-            Halaman ini masih dalam tahap pengembangan.
-        </p>
+        $statusOptions = $all->pluck('status')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
 
-    </div>
+        $data = $all;
+
+        if ($this->search) {
+
+            $needle = strtolower($this->search);
+
+            $data = $data->filter(function ($item) use ($needle) {
+
+                return
+                    str_contains(strtolower($item->judul ?? ''), $needle)
+                    || str_contains(strtolower($item->siswa?->nama ?? ''), $needle);
+
+            });
+
+        }
+
+        if ($this->filterStatus) {
+
+            $data = $data->where('status', $this->filterStatus);
+
+        }
+
+        return [
+
+            'records' => $data->values(),
+
+            'statusOptions' => $statusOptions,
+
+        ];
+    }
+
+        public function updatedSelectAll($value)
+        {
+            if ($value) {
+                $this->selected = $this->with()['records']
+                    ->pluck('id')
+                    ->map(fn ($id) => (string) $id)
+                    ->toArray();
+            } else {
+                $this->selected = [];
+            }
+        }
+
+        public function updatedSelected()
+        {
+            $count = $this->with()['records']->count();
+
+            $this->selectAll =
+                count($this->selected) === $count &&
+                $count > 0;
+        }
+
+    public function filterAction()
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
+    public function goToDetail($id)
+    {
+        $this->redirectRoute('admin.log-kasus.detail', [
+            'id' => $id
+        ], navigate: true);
+    }
+
+}; ?>
+
+<div class="flex-1 flex flex-col min-w-0 bg-white h-full">
+
+    <x-organisms.header>
+
+        <x-slot:search>
+            <x-molecules.search-input model="search" />
+        </x-slot>
+
+        Log Kasus
+
+    </x-organisms.header>
+
+    <x-organisms.table-toolbar onFilter="filterAction" onRefresh="$refresh">
+
+        <x-slot:pagination>
+            {{ count($records) }} data
+        </x-slot>
+
+    </x-organisms.table-toolbar>
+
+    @if(count($selected) > 0)
+        <div class="px-6 py-2 bg-teal-50 border-b border-teal-100 flex justify-between items-center text-sm">
+
+            <span class="text-xs font-medium text-brand-teal">
+                {{ count($selected) }} data dipilih
+            </span>
+
+            <button
+                wire:click="$set('selected', [])"
+                class="text-xs text-gray-500 hover:text-gray-700">
+
+                Batal Pilih
+
+            </button>
+
+        </div>
+    @endif
+
+    @if($showFilters)
+        <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4">
+
+            <span class="text-xs text-gray-500">
+                Filter Data:
+            </span>
+
+            <select
+                wire:model.live="filterStatus"
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 pr-8 w-40 bg-white">
+
+                <option value="">
+                    Semua Status
+                </option>
+
+                @foreach($statusOptions as $status)
+
+                    <option value="{{ $status }}">
+                        {{ $status }}
+                    </option>
+
+                @endforeach
+
+            </select>
+        </div>
+    @endif    
+
+    <x-organisms.data-table
+        :headers="['','Judul Kasus', 'Nama Siswa', 'Status']"
+        empty="Belum ada data log kasus.">
+
+        @forelse($records as $record)
+
+        <tr
+            wire:key="log-kasus-{{ $record->id }}"
+            wire:click="goToDetail({{ $record->id }})"
+            class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer
+                hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,.1),0_4px_6px_-4px_rgba(0,0,0,.1)]
+                hover:z-10 hover:rounded-md
+                {{ in_array((string)$record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}">
+
+            <td
+                class="w-16 text-center"
+                onclick="event.stopPropagation()">
+
+                <input
+                    type="checkbox"
+                    value="{{ $record->id }}"
+                    wire:model.live="selected"
+                    class="w-4 h-4 rounded border-gray-300 text-brand-teal focus:ring-brand-teal accent-brand-teal cursor-pointer">
+
+            </td>
+
+            <td class="px-4 py-2 font-medium">
+                {{ $record->judul }}
+            </td>
+
+            <td class="px-4 py-2">
+                {{ $record->siswa?->nama ?? '-' }}
+            </td>
+
+            <td class="px-4 py-2">
+                {{ $record->status }}
+            </td>
+
+        </tr>
+
+        @empty
+
+            <tr>
+                <td colspan="4" class="text-center py-4 text-sm text-gray-500">
+                    Tidak ada data.
+                </td>
+            </tr>
+
+        @endforelse
+
+
+    </x-organisms.data-table>
 </div>
