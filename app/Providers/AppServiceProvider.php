@@ -37,6 +37,11 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            \App\Repositories\Contracts\PegawaiRepositoryInterface::class,
+            \App\Repositories\Eloquent\PegawaiRepository::class
+        );
+
+        $this->app->bind(
             \App\Repositories\Contracts\TahunAjaranRepositoryInterface::class,
             \App\Repositories\Eloquent\TahunAjaranRepository::class
         );
