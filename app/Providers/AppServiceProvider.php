@@ -17,6 +17,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\PengunduranDiriRepositoryInterface::class,
             \App\Repositories\Eloquent\PengunduranDiriRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Contracts\PegawaiRepositoryInterface::class,
+            \App\Repositories\Eloquent\PegawaiRepository::class
+        );
     }
 
     public function boot(): void
