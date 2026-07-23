@@ -20,6 +20,10 @@
 
 
 <input
+    autocomplete="new-password"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
     @disabled($disabled)
     {{ $attributes->merge(['class' => "$baseClasses {$sizes[$size]}"]) }}
 >
