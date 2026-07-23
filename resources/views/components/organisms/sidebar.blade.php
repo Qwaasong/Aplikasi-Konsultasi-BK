@@ -1,6 +1,15 @@
 @props([
 'menus' => [],
+'title' => '',
 ])
+
+@php
+$title = match(auth()->user()->role) {
+        'admin' => 'Halaman Admin',
+        'guru_bk' => 'Halaman Konselor',
+        default => 'Dashboard',
+    };
+@endphp
 
 <aside x-data="{
     open: localStorage.getItem('sidebar') === 'true',
@@ -13,8 +22,22 @@
     <div class="flex flex-col flex-1 min-h-0 w-full">
 
         {{-- Logo --}}
-        <div class="h-20 flex items-center overflow-hidden whitespace-nowrap flex-shrink-0">
-            <x-atoms.application-logo class="w-10 h-10 object-contain" />
+        <div class="h-20 flex items-center gap-3 px-4">
+
+            <x-atoms.application-logo
+                class="w-10 h-10 object-contain" />
+
+            <div
+                x-show="open"
+                x-transition.opacity
+                class="whitespace-nowrap">
+
+                <h2 class="text-lg font-semibold text-brand-teal">
+                    {{ $title }}
+                </h2>
+
+            </div>
+
         </div>
 
         {{-- Menu --}}
