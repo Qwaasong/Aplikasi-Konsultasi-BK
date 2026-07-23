@@ -1,62 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\LayananKonseling\KelompokDetail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use App\Models\BimbinganKelompok;
-use App\Services\BimbinganKelompokService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public $record;
-
-    public $search = '';
-
-    // Refresh data setelah edit dari modal
-    #[On('refreshTable')]
-    public function refreshRecord()
-    {
-        if ($this->record) {
-            $this->record = app(BimbinganKelompokService::class)->findById($this->record->id);
-        }
-    }
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return BimbinganKelompok::with('siswa.siswa.user')
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = app(BimbinganKelompokService::class)->findById($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->route('konselor.layanan-konseling.kelompok');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-bimbingan-kelompok', id: $this->record->id);
-    }
-
-    public function delete()
-    {
-        app(BimbinganKelompokService::class)->delete($this->record->id);
-        session()->flash('success', 'Layanan konseling kelompok berhasil dihapus.');
-        return redirect()->route('konselor.layanan-konseling.kelompok');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends KelompokDetail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-gray-50/50 min-h-screen p-6 lg:p-10">
 

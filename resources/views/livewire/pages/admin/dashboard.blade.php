@@ -1,28 +1,10 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Admin\Dashboard;
 use Livewire\Attributes\Layout;
-use App\Services\UserService;
-use App\Services\SiswaService;
-use App\Services\KasusBkService;
 
-new #[Layout('layouts.app')] class extends Component {
-    public int $totalUsers = 0;
-    public int $totalSiswa = 0;
-    public int $totalKasus = 0;
-    public int $totalKonselor = 0;
+new #[Layout('layouts.app')] class extends Dashboard {}; ?>
 
-    public function mount(): void
-    {
-        $userService = app(UserService::class);
-        $stats = $userService->getStats();
-
-        $this->totalUsers = $stats['total'] ?? 0;
-        $this->totalKonselor = $stats['konselor'] ?? 0;
-        $this->totalSiswa = app(SiswaService::class)->getTotalSiswa();
-        $this->totalKasus = app(KasusBkService::class)->countKasus();
-    }
-}; ?>
 
 <div class="py-12">
     <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">

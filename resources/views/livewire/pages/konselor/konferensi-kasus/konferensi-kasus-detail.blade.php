@@ -1,61 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\KonferensiKasus\Detail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use App\Models\KonferensiKasus;
-use App\Services\KonferensiKasusService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public $record;
-
-    public $search = '';
-
-    #[On('refreshTable')]
-    public function refreshRecord()
-    {
-        if ($this->record) {
-            $this->record = app(KonferensiKasusService::class)->findById($this->record->id);
-        }
-    }
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return KonferensiKasus::with('kasus.siswa.user')
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = app(KonferensiKasusService::class)->findById($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->route('konselor.konferensi-kasus.index');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-konferensi-kasus', id: (int) $this->record->id);
-    }
-
-    public function delete()
-    {
-        app(KonferensiKasusService::class)->delete($this->record->id);
-        session()->flash('success', 'Konferensi kasus berhasil dihapus.');
-        return redirect()->route('konselor.konferensi-kasus.index');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-gray-50/50 min-h-screen p-6 lg:p-10">
 

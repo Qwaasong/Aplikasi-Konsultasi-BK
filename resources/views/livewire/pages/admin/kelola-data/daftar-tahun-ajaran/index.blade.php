@@ -1,89 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Admin\KelolaData\DaftarTahunAjaran\Index;
 use Livewire\Attributes\Layout;
-use App\Services\TahunAjaranService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public string $search = '';
-    public array $selected = [];
-    public bool $selectAll = false;
-
-    public function with(): array
-    {
-        $data = app(TahunAjaranService::class)->getAll();
-
-        if ($this->search) {
-
-            $needle = strtolower($this->search);
-
-            $data = $data->filter(function ($item) use ($needle) {
-
-                return
-                    str_contains(strtolower($item->tahun), $needle) ||
-                    str_contains(strtolower($item->semester), $needle);
-
-            });
-
-        }
-
-        return [
-            'records' => $data->values(),
-        ];
-    }
-
-    public function updatedSelectAll($value)
-    {
-        if ($value) {
-
-            $this->selected = $this->with()['records']
-                ->pluck('id')
-                ->map(fn($id)=>(string)$id)
-                ->toArray();
-
-        } else {
-
-            $this->selected = [];
-
-        }
-    }
-
-    public function updatedSelected()
-    {
-        $count = $this->with()['records']->count();
-
-        $this->selectAll =
-            count($this->selected)===$count &&
-            $count>0;
-    }
-
-    public function create()
-    {
-        $this->dispatch('create-tahun-ajaran');
-    }
-
-    public function edit($id)
-    {
-        $this->dispatch('edit-tahun-ajaran', id:$id);
-    }
-
-    public function delete($id)
-    {
-        app(TahunAjaranService::class)->delete($id);
-
-        session()->flash(
-            'success',
-            'Data tahun ajaran berhasil dihapus.'
-        );
-
-        $this->selected=array_diff(
-            $this->selected,
-            [(string)$id]
-        );
-    }
-};
-?>
+new #[Layout('layouts.app')] class extends Index {}; ?>
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full">
     
 <x-organisms.header action="create">

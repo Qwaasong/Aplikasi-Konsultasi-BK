@@ -1,59 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\Konsultasi\Detail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use App\Models\Konsultasi;
-use App\Services\KonsultasiService;
 
-new #[Layout('layouts.app')] class extends Component {
-    public $record;
-
-    public $search = '';
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return Konsultasi::with('siswa')
-            ->where(function ($query) {
-                $query->whereHas('siswa.user', function ($q) {
-                    $q->where('nama', 'like', '%' . $this->search . '%');
-                })
-                    ->orWhere('jenis_layanan', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $service = app(KonsultasiService::class);
-        $this->record = $service->findByIdForCurrentUser($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->to('/konselor/konsultasi');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-konsultasi', id: $this->record->id);
-    }
-
-    public function delete()
-    {
-        $service = app(KonsultasiService::class);
-        $service->deleteForCurrentUser($this->record->id);
-
-        session()->flash('success', 'Konsultasi berhasil dihapus!');
-        return redirect()->to('/konselor/konsultasi');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white min-h-screen p-8 lg:p-12">
 
