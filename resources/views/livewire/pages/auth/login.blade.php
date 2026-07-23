@@ -67,12 +67,17 @@ new #[Layout('layouts.guest')] class extends Component {
                 placeholder="Masukkan password" wire:model="form.password" />
             <x-molecules.auth-remember wire:model="form.remember" />
             <x-atoms.button variant="primary" size="md" type="submit" class="w-full">{{ __('Log in') }}</x-atoms.button>
+            <div class="text-center w-full mt-4">
+                <a href="{{ url('/') }}" class="inline-flex items-center justify-center font-semibold rounded-md px-4 py-2 text-sm w-full bg-white text-brand-teal border border-brand-teal hover:bg-brand-teal-light transition ease-in-out duration-150">
+                    Kembali ke Landing Page
+                </a>
+            </div>
         </form>
     </div>
 
     {{-- Kolom Kanan: Gambar --}}
     <div class="hidden md:block md:w-1/2 relative">
-        <img src="{{ asset("asset\image\BackgroundForest.webp") }}" alt="Background Forest"
+        <img src="{{ asset('asset/image/BackgroundForest.webp') }}" alt="Background Forest"
             class="absolute inset-0 w-full h-full object-cover" fetchpriority="high">
         <div class="absolute inset-0 bg-blue-900 bg-opacity-10 mix-blend-overlay"></div>
     </div>
