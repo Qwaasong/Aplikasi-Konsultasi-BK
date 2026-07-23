@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('/admin/kelola-data/daftar-kelas', 'pages.admin.kelola-data.daftar-kelas.index')->name('admin.kelola-data.daftar-kelas.index');
     Volt::route('/admin/kelola-data/daftar-tahun-ajaran', 'pages.admin.kelola-data.daftar-tahun-ajaran.index')->name('admin.kelola-data.daftar-tahun-ajaran.index');
     Volt::route('/admin/log-kasus', 'pages.admin.log-kasus.index')->name('admin.log-kasus.index');
+    Volt::route('/admin/log-kasus/{id}/detail', 'pages.admin.log-kasus.detail')->name('admin.log-kasus.detail');
     Volt::route('/admin/rekap-absensi', 'pages.admin.rekap-absensi.index')->name('admin.rekap-absensi.index');
 });
 
