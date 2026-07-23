@@ -135,6 +135,37 @@ section{
     flex-shrink: 0;
 }
 
+.navbar-brand{
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+
+    text-decoration: none;
+}
+
+.navbar-logo{
+    width: 42px;
+    flex-shrink: 0;
+}
+
+.navbar-brand-text{
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.navbar-brand-title{
+    font-size: 1.15rem;
+    font-weight: 700;
+
+    color: var(--text-color);
+}
+
+.navbar-brand-subtitle{
+    font-size: .85rem;
+    color: var(--text-light);
+}
+
 /* HERO */
 
 .hero-section{

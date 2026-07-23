@@ -1,6 +1,15 @@
 @props([
 'menus' => [],
+'title' => '',
 ])
+
+@php
+$title = match(auth()->user()->role) {
+        'admin' => 'Halaman Admin',
+        'guru_bk' => 'Halaman Konselor',
+        default => 'Dashboard',
+    };
+@endphp
 
 <aside x-data="{
     open: localStorage.getItem('sidebar') === 'true',
