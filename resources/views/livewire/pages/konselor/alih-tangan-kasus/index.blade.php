@@ -92,6 +92,11 @@ new #[Layout('layouts.app')] class extends Component {
     #[On('refreshTable')]
     public function refreshTable($id = null) {}
 
+    public function goToDetail($id)
+    {
+        $this->redirectRoute('konselor.alih-tangan-kasus.detail', ['id' => $id], navigate: true);
+    }
+
     public function edit($id)
     {
         $this->dispatch('edit-alih-tangan-kasus', id: (int) $id);
@@ -161,7 +166,8 @@ new #[Layout('layouts.app')] class extends Component {
         empty="Belum ada data alih tangan kasus.">
         @forelse($records as $record)
             <tr wire:key="atk-{{ $record->id }}"
-                class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md {{ in_array($record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}">
+                class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md {{ in_array($record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}"
+                wire:click="goToDetail({{ $record->id }})">
 
                 <td class="w-16 text-center align-middle rounded-l-md py-2" onclick="event.stopPropagation()">
                     <input type="checkbox" value="{{ $record->id }}" wire:model.live="selected"
