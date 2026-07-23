@@ -2,11 +2,8 @@
 
 namespace App\Livewire\Auth;
 
-use App\Models\User;
-use App\Models\Pegawai;
-use Illuminate\Auth\Events\Registered;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Volt\Component;
 
@@ -38,33 +35,27 @@ class Register extends Component
     /**
      * Handle an incoming registration request.
      */
-    public function register(): void
+    public function register(UserService $service): void
     {
-        $validated = $this->validate([
+        $this->validate([
             'nama' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'lowercase', 'max:255', 'unique:' . User::class],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'username' => ['required', 'string', 'lowercase', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'no_hp' => ['required', 'string', 'max:20'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'role' => ['required', 'string', 'in:guru_bk,admin'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        $validated['foto'] = '';
-
-        $user = User::create($validated);
-
-        // Buat entri pegawai otomatis untuk role Guru_BK dan Admin
-        if (in_array($user->role, ['guru_bk', 'admin'])) {
-            Pegawai::create([
-                'user_id' => $user->id,
-                'nip' => $this->generateNip($user),
-                'jabatan' => $user->role === 'admin' ? 'Admin' : 'Guru BK',
-            ]);
-        }
-
-        event(new Registered($user));
+        $user = $service->register([
+            'nama' => $this->nama,
+            'username' => $this->username,
+            'email' => $this->email,
+            'no_hp' => $this->no_hp,
+            'jenis_kelamin' => $this->jenis_kelamin,
+            'role' => $this->role,
+            'password' => $this->password,
+        ]);
 
         Auth::login($user);
 
@@ -80,17 +71,5 @@ class Register extends Component
         }
 
         $this->redirect($route, navigate: true);
-    }
-
-    /**
-     * Generate NIP otomatis berdasarkan tahun + urutan.
-     */
-    private function generateNip(User $user): string
-    {
-        $prefix = $user->role === 'admin' ? 'ADM' : 'GBK';
-        $count = Pegawai::count() + 1;
-        $date = date('Ymd');
-
-        return "{$prefix}{$date}{$count}";
     }
 }

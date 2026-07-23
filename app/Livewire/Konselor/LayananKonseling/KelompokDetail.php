@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\LayananKonseling;
 
-use App\Models\BimbinganKelompok;
 use App\Services\BimbinganKelompokService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -34,10 +33,7 @@ class KelompokDetail extends Component
             return [];
         }
 
-        return BimbinganKelompok::with('siswa.siswa.user')
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
+        return app(BimbinganKelompokService::class)->search($this->search);
     }
 
     public function mount(int $id): void

@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\LayananKonseling;
 
-use App\Models\BimbinganIndividu;
 use App\Services\BimbinganIndividuService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -26,10 +25,7 @@ class IndividuDetail extends Component
             return [];
         }
 
-        return BimbinganIndividu::with('kasus.siswa.user')
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
+        return app(BimbinganIndividuService::class)->search($this->search);
     }
 
     public function mount(int $id): void

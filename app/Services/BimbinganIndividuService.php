@@ -86,4 +86,12 @@ class BimbinganIndividuService
     {
         BimbinganIndividu::findOrFail($id)->delete();
     }
+
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return BimbinganIndividu::with('kasus.siswa.user')
+            ->where('uraian_masalah', 'like', "%{$keyword}%")
+            ->take($limit)
+            ->get();
+    }
 }

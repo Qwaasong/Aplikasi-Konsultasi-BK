@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Konselor;
 
-use App\Models\KasusBk;
 use App\Models\Pegawai;
+use App\Services\KasusBkService;
 use Livewire\Volt\Component;
 
 class Dashboard extends Component
@@ -16,23 +16,13 @@ class Dashboard extends Component
     public int $countKelas11 = 0;
     public int $countKelas12 = 0;
 
-    public function mount(): void
+    public function mount(KasusBkService $service): void
     {
         $pegawaiId = Pegawai::where('user_id', auth()->id())->value('id');
+        $counts = $service->getCaseCountsByGuruBk($pegawaiId);
 
-        $this->countKelas10 = KasusBk::where('guru_bk_id', $pegawaiId)
-            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 10)))
-            ->distinct()
-            ->count('siswa_id');
-
-        $this->countKelas11 = KasusBk::where('guru_bk_id', $pegawaiId)
-            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 11)))
-            ->distinct()
-            ->count('siswa_id');
-
-        $this->countKelas12 = KasusBk::where('guru_bk_id', $pegawaiId)
-            ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 12)))
-            ->distinct()
-            ->count('siswa_id');
+        $this->countKelas10 = $counts['kelas_10'];
+        $this->countKelas11 = $counts['kelas_11'];
+        $this->countKelas12 = $counts['kelas_12'];
     }
 }

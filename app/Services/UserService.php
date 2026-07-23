@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Pegawai;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class UserService
@@ -86,5 +89,37 @@ class UserService
                 'username' => "Username '{$username}' sudah digunakan oleh pengguna lain.",
             ]);
         }
+    }
+
+    /**
+     * Register user baru + buat entri pegawai otomatis.
+     */
+    public function register(array $data): User
+    {
+        $data['password'] = Hash::make($data['password']);
+        $data['foto'] = '';
+
+        $user = $this->userRepository->create($data);
+
+        if (in_array($user->role, ['guru_bk', 'admin'])) {
+            Pegawai::create([
+                'user_id' => $user->id,
+                'nip' => $this->generateNip($user),
+                'jabatan' => $user->role === 'admin' ? 'Admin' : 'Guru BK',
+            ]);
+        }
+
+        event(new Registered($user));
+
+        return $user;
+    }
+
+    private function generateNip(User $user): string
+    {
+        $prefix = $user->role === 'admin' ? 'ADM' : 'GBK';
+        $count = Pegawai::count() + 1;
+        $date = date('Ymd');
+
+        return "{$prefix}{$date}{$count}";
     }
 }

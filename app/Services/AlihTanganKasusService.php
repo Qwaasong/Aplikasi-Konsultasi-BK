@@ -67,6 +67,14 @@ class AlihTanganKasusService
         AlihtanganKasus::findOrFail($id)->delete();
     }
 
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return AlihtanganKasus::with('kasus.siswa.user')
+            ->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+            ->take($limit)
+            ->get();
+    }
+
     /**
      * Reassign all records terkait ke guru BK baru.
      */

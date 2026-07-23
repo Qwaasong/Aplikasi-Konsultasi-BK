@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\Konsultasi;
 
-use App\Models\KasusBk;
 use App\Services\KasusBkService;
 use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
@@ -24,15 +23,7 @@ class Detail extends Component
             return [];
         }
 
-        return KasusBk::with('siswa')
-            ->where(function ($query) {
-                $query->whereHas('siswa.user', function ($q) {
-                    $q->where('nama', 'like', '%' . $this->search . '%');
-                })
-                    ->orWhere('penanganan', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
+        return app(KasusBkService::class)->search($this->search);
     }
 
     public function mount(int $id): void

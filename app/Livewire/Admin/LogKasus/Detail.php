@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin\LogKasus;
 
-use App\Models\KasusBk;
 use App\Services\KasusBkService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -34,10 +33,7 @@ class Detail extends Component
             return [];
         }
 
-        return KasusBk::with(['siswa.user', 'guruBk.user', 'kategori', 'lampirans'])
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
+        return app(KasusBkService::class)->search($this->search);
     }
 
     public function mount(int $id): void

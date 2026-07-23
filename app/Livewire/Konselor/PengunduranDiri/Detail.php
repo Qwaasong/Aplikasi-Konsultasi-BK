@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\PengunduranDiri;
 
-use App\Models\PengunduranDiri;
 use App\Services\PengunduranDiriService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -34,12 +33,7 @@ class Detail extends Component
             return [];
         }
 
-        return PengunduranDiri::with('siswa.user')
-            ->whereHas('siswa.user', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
+        return app(PengunduranDiriService::class)->search($this->search);
     }
 
     public function mount(int $id): void

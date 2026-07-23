@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\KunjunganRumah;
 
-use App\Models\HomeVisit;
 use App\Services\HomeVisitService;
 use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
@@ -25,13 +24,7 @@ class Detail extends Component
             return [];
         }
 
-        // FIX: Gunakan HomeVisit alih-alih Konsultasi yang tidak ada
-        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
-            ->whereHas('kasus.siswa.user', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
+        return app(HomeVisitService::class)->search($this->search);
     }
 
     public function mount(int $id): void

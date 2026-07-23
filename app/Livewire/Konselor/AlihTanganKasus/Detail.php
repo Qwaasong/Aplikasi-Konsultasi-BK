@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Konselor\AlihTanganKasus;
 
-use App\Models\AlihtanganKasus;
 use App\Services\AlihTanganKasusService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -34,12 +33,7 @@ class Detail extends Component
             return [];
         }
 
-        return AlihtanganKasus::with('kasus.siswa.user')
-            ->whereHas('kasus.siswa.user', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
+        return app(AlihTanganKasusService::class)->search($this->search);
     }
 
     public function mount(int $id): void

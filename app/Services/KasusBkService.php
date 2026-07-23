@@ -36,6 +36,38 @@ class KasusBkService
         return $this->kasusBkRepository->countKasus();
     }
 
+    /**
+     * Hitung jumlah kasus per tingkat kelas untuk guru BK tertentu.
+     */
+    public function getCaseCountsByGuruBk(int $pegawaiId): array
+    {
+        return [
+            'kelas_10' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 10)))
+                ->distinct()->count('siswa_id'),
+            'kelas_11' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 11)))
+                ->distinct()->count('siswa_id'),
+            'kelas_12' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 12)))
+                ->distinct()->count('siswa_id'),
+        ];
+    }
+
+    /**
+     * Cari kasus BK berdasarkan keyword.
+     */
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return KasusBk::with('siswa')
+            ->where(function ($query) use ($keyword) {
+                $query->whereHas('siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('penanganan', 'like', "%{$keyword}%");
+            })
+            ->take($limit)
+            ->get();
+    }
+
     public function findById(int $id): ?KasusBk
     {
         return $this->kasusBkRepository->findById($id);

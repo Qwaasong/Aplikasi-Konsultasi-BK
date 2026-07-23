@@ -3,7 +3,6 @@
 namespace App\Livewire\Admin\Siswa;
 
 use App\Constants\GlobalMessages;
-use App\Models\DataSiswa;
 use App\Services\SiswaService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
@@ -52,7 +51,7 @@ class Index extends Component
     public ?int $exportPreviewCount = null;
 
     public bool $showDetail = false;
-    public ?DataSiswa $detailSiswa = null;
+    public ?object $detailSiswa = null;
 
     public array $jenisKelaminOptions = [
         ['value' => 'L', 'label' => 'Laki-laki'],

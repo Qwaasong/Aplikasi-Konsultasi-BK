@@ -79,4 +79,12 @@ class BimbinganKelompokService
     {
         BimbinganKelompok::findOrFail($id)->delete();
     }
+
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return BimbinganKelompok::with('siswa.siswa.user')
+            ->where('uraian_masalah', 'like', "%{$keyword}%")
+            ->take($limit)
+            ->get();
+    }
 }

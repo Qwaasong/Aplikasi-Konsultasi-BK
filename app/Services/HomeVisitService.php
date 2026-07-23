@@ -82,6 +82,14 @@ class HomeVisitService
         HomeVisit::findOrFail($id)->delete();
     }
 
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
+            ->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+            ->take($limit)
+            ->get();
+    }
+
     private function resolveGurubkId(): int
     {
         $pegawai = Pegawai::where('user_id', auth()->id())->first();

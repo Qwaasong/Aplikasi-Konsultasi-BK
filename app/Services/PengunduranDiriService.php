@@ -37,4 +37,12 @@ class PengunduranDiriService
     {
         PengunduranDiri::findOrFail($id)->delete();
     }
+
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return PengunduranDiri::with('siswa.user')
+            ->whereHas('siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+            ->take($limit)
+            ->get();
+    }
 }
