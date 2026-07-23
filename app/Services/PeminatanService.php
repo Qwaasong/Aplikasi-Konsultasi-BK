@@ -2,39 +2,39 @@
 
 namespace App\Services;
 
-use App\Models\Peminatan;
-use App\Models\Pegawai;
+use App\Repositories\Contracts\PeminatanRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class PeminatanService
 {
+    public function __construct(
+        protected PeminatanRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return Peminatan::with(['siswa.user', 'siswa.kelas.jurusan'])
-            ->latest('tanggal')
-            ->get();
+        return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?Peminatan
+    public function findById(int $id): ?\App\Models\Peminatan
     {
-        return Peminatan::with(['siswa.user', 'siswa.kelas.jurusan'])
-            ->find($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data): Peminatan
+    public function create(array $data): \App\Models\Peminatan
     {
-        return Peminatan::create($data);
+        return $this->repo->create($data);
     }
 
-    public function update(int $id, array $data): Peminatan
+    public function update(int $id, array $data): \App\Models\Peminatan
     {
-        $record = Peminatan::findOrFail($id);
-        $record->update($data);
-        return $record->fresh(['siswa.user', 'siswa.kelas.jurusan']);
+        $this->repo->update($id, $data);
+
+        return $this->repo->findById($id);
     }
 
     public function delete(int $id): void
     {
-        Peminatan::findOrFail($id)->delete();
+        $this->repo->delete($id);
     }
 }

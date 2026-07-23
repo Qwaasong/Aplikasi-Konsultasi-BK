@@ -2,40 +2,31 @@
 
 namespace App\Services;
 
-use App\Models\BimbinganIndividu;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\Pegawai;
 use App\Models\TahunAjaran;
-use Illuminate\Validation\ValidationException;
+use App\Repositories\Contracts\BimbinganIndividuRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class BimbinganIndividuService
 {
+    public function __construct(
+        protected BimbinganIndividuRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-        ])
-            ->latest('tanggal_layanan')
-            ->get();
+        return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?BimbinganIndividu
+    public function findById(int $id): ?\App\Models\BimbinganIndividu
     {
-        return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-        ])
-            ->findOrFail($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data): BimbinganIndividu
+    public function create(array $data): \App\Models\BimbinganIndividu
     {
         $pegawai = Pegawai::where('user_id', auth()->id())->first();
         if (!$pegawai) {
@@ -46,12 +37,10 @@ class BimbinganIndividuService
         $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');
 
-        // Buat atau dapatkan KasusBk untuk siswa ini
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
 
         if ($siswaId) {
-            // Cari kasus yang sudah ada untuk siswa ini, atau buat baru
             $kasus = KasusBk::firstOrCreate(
                 ['siswa_id' => $siswaId],
                 [
@@ -68,30 +57,27 @@ class BimbinganIndividuService
             $data['kasus_id'] = $kasus->id;
         }
 
-        return BimbinganIndividu::create($data);
+        return $this->repo->create($data);
     }
 
-    public function update(int $id, array $data): BimbinganIndividu
+    public function update(int $id, array $data): \App\Models\BimbinganIndividu
     {
-        $record = BimbinganIndividu::findOrFail($id);
+        $record = $this->repo->findById($id);
 
-        // Jangan update relasi
         unset($data['siswa_id']);
 
-        $record->update($data);
+        $this->repo->update($id, $data);
+
         return $record->fresh(['guruBk.user', 'tahunAjaran', 'kasus.siswa.user', 'kasus.siswa.kelas.jurusan']);
     }
 
     public function delete(int $id): void
     {
-        BimbinganIndividu::findOrFail($id)->delete();
+        $this->repo->delete($id);
     }
 
-    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    public function search(string $keyword, int $limit = 5): Collection
     {
-        return BimbinganIndividu::with('kasus.siswa.user')
-            ->where('uraian_masalah', 'like', "%{$keyword}%")
-            ->take($limit)
-            ->get();
+        return $this->repo->search($keyword, $limit);
     }
 }

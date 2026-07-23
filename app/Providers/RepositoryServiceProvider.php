@@ -63,6 +63,18 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\SosiometriRepositoryInterface::class,
             \App\Repositories\Eloquent\SosiometriRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\HomeVisitRepositoryInterface::class,
+            \App\Repositories\Eloquent\HomeVisitRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\BimbinganIndividuRepositoryInterface::class,
+            \App\Repositories\Eloquent\BimbinganIndividuRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\PeminatanRepositoryInterface::class,
+            \App\Repositories\Eloquent\PeminatanRepository::class
+        );
     }
 
     /**

@@ -2,41 +2,42 @@
 
 namespace App\Services;
 
-use App\Models\HomeVisit;
 use App\Models\KasusBk;
-use App\Models\Pegawai;
 use App\Models\KategoriKasus;
+use App\Models\Pegawai;
+use App\Repositories\Contracts\HomeVisitRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class HomeVisitService
 {
+    public function __construct(
+        protected HomeVisitRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'kasus.lampirans', 'guruBk.user'])
-            ->latest('tanggal_kunjungan')
-            ->get();
+        return $this->repo->getAll();
     }
 
     public function getByGurubk(?int $pegawaiId = null): Collection
     {
         $id = $pegawaiId ?? $this->resolveGurubkId();
-        return HomeVisit::with(['kasus.siswa.user', 'kasus.lampirans', 'guruBk.user'])
+
+        return $this->repo->query()
             ->where('guru_bk_id', $id)
             ->latest('tanggal_kunjungan')
             ->get();
     }
 
-    public function findById(int $id): ?HomeVisit
+    public function findById(int $id): ?\App\Models\HomeVisit
     {
-        return HomeVisit::with(['kasus.siswa.user', 'kasus.siswa.kelas.jurusan', 'kasus.lampirans', 'guruBk.user'])
-            ->find($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data): HomeVisit
+    public function create(array $data): \App\Models\HomeVisit
     {
         $gurubkId = $this->resolveGurubkId();
 
-        // Resolve kasus_id dari siswa_id
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
 
@@ -64,30 +65,28 @@ class HomeVisitService
 
         $data['guru_bk_id'] = $gurubkId;
 
-        return HomeVisit::create($data);
+        return $this->repo->create($data);
     }
 
-    public function update(int $id, array $data): HomeVisit
+    public function update(int $id, array $data): \App\Models\HomeVisit
     {
-        $record = HomeVisit::findOrFail($id);
+        $record = $this->repo->findById($id);
 
         unset($data['siswa_id']);
 
-        $record->update($data);
+        $this->repo->update($id, $data);
+
         return $record->fresh(['kasus.siswa.user', 'kasus.lampirans', 'guruBk.user']);
     }
 
     public function delete(int $id): void
     {
-        HomeVisit::findOrFail($id)->delete();
+        $this->repo->delete($id);
     }
 
-    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    public function search(string $keyword, int $limit = 5): Collection
     {
-        return HomeVisit::with(['kasus.siswa.user', 'guruBk.user'])
-            ->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
-            ->take($limit)
-            ->get();
+        return $this->repo->search($keyword, $limit);
     }
 
     private function resolveGurubkId(): int

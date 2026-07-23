@@ -2,36 +2,29 @@
 
 namespace App\Services;
 
-use App\Models\BimbinganKelompok;
 use App\Models\BimbinganKelompokSiswa;
 use App\Models\Pegawai;
 use App\Models\TahunAjaran;
+use App\Repositories\Contracts\BimbinganKelompokRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class BimbinganKelompokService
 {
+    public function __construct(
+        protected BimbinganKelompokRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return BimbinganKelompok::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'siswa.siswa.user',
-        ])
-            ->latest('tanggal_layanan')
-            ->get();
+        return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?BimbinganKelompok
+    public function findById(int $id): ?\App\Models\BimbinganKelompok
     {
-        return BimbinganKelompok::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'siswa.siswa.user',
-        ])
-            ->findOrFail($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data, array $siswaIds = []): BimbinganKelompok
+    public function create(array $data, array $siswaIds = []): \App\Models\BimbinganKelompok
     {
         $pegawai = Pegawai::where('user_id', auth()->id())->first();
         $data['guru_bk_id'] = $pegawai?->id;
@@ -39,9 +32,8 @@ class BimbinganKelompokService
             ?? TahunAjaran::latest()->value('id');
         $data['kasus_id'] = $data['kasus_id'] ?? null;
 
-        $record = BimbinganKelompok::create($data);
+        $record = $this->repo->create($data);
 
-        // Simpan peserta bimbingan kelompok (many-to-many)
         if (!empty($siswaIds)) {
             $peserta = collect($siswaIds)->map(fn($id) => [
                 'bimbingan_kelompok_id' => $record->id,
@@ -55,12 +47,10 @@ class BimbinganKelompokService
         return $record->fresh(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user']);
     }
 
-    public function update(int $id, array $data, array $siswaIds = []): BimbinganKelompok
+    public function update(int $id, array $data, array $siswaIds = []): \App\Models\BimbinganKelompok
     {
-        $record = BimbinganKelompok::findOrFail($id);
-        $record->update($data);
+        $this->repo->update($id, $data);
 
-        // Update peserta: hapus semua yang lama, insert yang baru
         if (!empty($siswaIds)) {
             BimbinganKelompokSiswa::where('bimbingan_kelompok_id', $id)->delete();
             $peserta = collect($siswaIds)->map(fn($sid) => [
@@ -72,19 +62,16 @@ class BimbinganKelompokService
             BimbinganKelompokSiswa::insert($peserta->toArray());
         }
 
-        return $record->fresh(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user']);
+        return $this->repo->findById($id);
     }
 
     public function delete(int $id): void
     {
-        BimbinganKelompok::findOrFail($id)->delete();
+        $this->repo->delete($id);
     }
 
-    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    public function search(string $keyword, int $limit = 5): Collection
     {
-        return BimbinganKelompok::with('siswa.siswa.user')
-            ->where('uraian_masalah', 'like', "%{$keyword}%")
-            ->take($limit)
-            ->get();
+        return $this->repo->search($keyword, $limit);
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\Kehadiran;
+use App\Models\Peminatan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
-interface KehadiranRepositoryInterface
+interface PeminatanRepositoryInterface
 {
     public function getAll(): Collection;
-    public function findById(int $id): ?Kehadiran;
-    public function create(array $data): Kehadiran;
+    public function findById(int $id): ?Peminatan;
+    public function create(array $data): Peminatan;
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;
     public function query(): Builder;

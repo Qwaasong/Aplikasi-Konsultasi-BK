@@ -3,39 +3,42 @@
 namespace App\Services;
 
 use App\Models\Kehadiran;
+use App\Repositories\Contracts\KehadiranRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KehadiranService
 {
+    public function __construct(
+        protected KehadiranRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return Kehadiran::with(['siswa.user', 'tahunAjaran'])
-            ->latest('tanggal_kehadiran')
-            ->get();
+        return $this->repo->getAll();
     }
 
     public function findById(int $id): ?Kehadiran
     {
-        return Kehadiran::find($id);
+        return $this->repo->findById($id);
     }
 
     public function findByIdForCurrentUser(int $id): Kehadiran
     {
-        return Kehadiran::findOrFail($id);
+        return $this->repo->findById($id);
     }
 
     public function create(array $data): Kehadiran
     {
-        return Kehadiran::create($data);
+        return $this->repo->create($data);
     }
 
     public function update(int $id, array $data): bool
     {
-        return Kehadiran::findOrFail($id)->update($data);
+        return $this->repo->update($id, $data);
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id): void
     {
-        return (bool) Kehadiran::findOrFail($id)->delete();
+        $this->repo->delete($id);
     }
 }

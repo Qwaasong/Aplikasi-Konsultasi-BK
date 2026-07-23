@@ -3,32 +3,16 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\KonferensiKasus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 interface KonferensiKasusRepositoryInterface
 {
-    /**
-     * Ambil semua data konferensi kasus.
-     */
     public function getAll(): Collection;
-
-    /**
-     * Cari data konferensi kasus berdasarkan ID.
-     */
     public function findById(int $id): ?KonferensiKasus;
-
-    /**
-     * Tambah data konferensi kasus.
-     */
     public function create(array $data): KonferensiKasus;
-
-    /**
-     * Update data konferensi kasus.
-     */
     public function update(int $id, array $data): bool;
-
-    /**
-     * Hapus data konferensi kasus.
-     */
     public function delete(int $id): bool;
+    public function search(string $keyword, int $limit = 5): Collection;
+    public function query(): Builder;
 }
