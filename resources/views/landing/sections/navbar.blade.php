@@ -2,9 +2,25 @@
 
     <nav class="container navbar-container">
 
-        <a href="{{ route('landing') }}" class="navbar-logo d-flex align-items-center gap-3 text-decoration-none">
-            <img src="{{ asset('asset/image/SMKLogo.png') }}" alt="Logo SMKN 9 Malang">
-            <span class="fw-bold fs-5 text-black mb-0" style="margin-top: 2px;">Aplikasi Konsultasi BK</span>
+        <a href="{{ route('landing') }}" class="navbar-brand">
+
+            <img
+                src="{{ asset('asset/image/SMKLogo.png') }}"
+                alt="Logo SMKN 9 Malang"
+                class="navbar-logo">
+
+            <div class="navbar-brand-text">
+
+                <span class="navbar-brand-title">
+                    Aplikasi Konsultasi BK
+                </span>
+
+                <span class="navbar-brand-subtitle">
+                    SMK Negeri 9 Malang
+                </span>
+
+            </div>
+
         </a>
 
         <ul class="navbar-menu">
