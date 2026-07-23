@@ -24,30 +24,21 @@ class Index extends Component
     public function with(): array
     {
         $service = app(SiswaService::class);
-        $all = $service->getAll();
 
-        $kelasOptions = $all->pluck('kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('jurusan_label')->filter()->unique()->sort()->values()->toArray();
-        $jenisKelaminOptions = $all->pluck('jenis_kelamin')->filter()->unique()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
+        ];
 
-        $data = $all;
+        $options = $service->getFilterOptions();
 
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->nama ?? ''), $needle)
-                    || str_contains((string) $item->nis, $needle)
-                    || str_contains(strtolower($item->kelas_label ?? ''), $needle)
-                    || str_contains(strtolower($item->jurusan_label ?? ''), $needle);
-            });
-        }
-
-        if ($this->filterKelas) {
-            $data = $data->where('kelas_label', $this->filterKelas);
-        }
-
-        if ($this->filterJurusan) {
-            $data = $data->where('jurusan_label', $this->filterJurusan);
+        return [
+            'records' => $service->getFiltered($filters),
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
         }
 
         if ($this->filterJenisKelamin) {

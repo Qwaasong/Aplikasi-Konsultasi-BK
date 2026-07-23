@@ -24,42 +24,21 @@ class Index extends Component
     public function with(): array
     {
         $service = app(KelasService::class);
-        $all = $service->getAll();
 
-        $sekolahOptions = $all->pluck('sekolah.nama_sekolah')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('jurusan.nama_jurusan')->filter()->unique()->sort()->values();
-        $tingkatOptions = $all->pluck('tingkat')->filter()->unique()->sort()->values();
+        $filters = [
+            'search' => $this->search ?: null,
+            'sekolah' => $this->filterSekolah ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'tingkat' => $this->filterTingkat ?: null,
+        ];
 
-        $data = $all;
-
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->nama_kelas ?? ''), $needle)
-                    || str_contains(strtolower($item->tingkat ?? ''), $needle)
-                    || str_contains(strtolower($item->jurusan?->nama_jurusan ?? ''), $needle)
-                    || str_contains(strtolower($item->jurusan?->sekolah?->nama_sekolah ?? ''), $needle)
-                    || str_contains(strtolower($item->waliKelas?->user?->nama ?? ''), $needle);
-            });
-        }
-
-        if ($this->filterSekolah) {
-            $data = $data->filter(fn($item) => $item->jurusan?->sekolah?->nama_sekolah === $this->filterSekolah);
-        }
-
-        if ($this->filterJurusan) {
-            $data = $data->filter(fn($item) => $item->jurusan?->nama_jurusan === $this->filterJurusan);
-        }
-
-        if ($this->filterTingkat) {
-            $data = $data->filter(fn($item) => $item->tingkat === $this->filterTingkat);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'sekolahOptions' => $sekolahOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'tingkatOptions' => $tingkatOptions,
+            'records' => $service->getFiltered($filters),
+            'sekolahOptions' => $options['sekolahOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'tingkatOptions' => $options['tingkatOptions'] ?? [],
         ];
     }
 

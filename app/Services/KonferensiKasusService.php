@@ -97,4 +97,37 @@ class KonferensiKasusService
     {
         return $this->repo->search($keyword, $limit);
     }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('uraian_masalah', 'like', "%{$keyword}%")
+                    ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
+            });
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        return $query->latest('tanggal_konferensi')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+        ];
+    }
 }

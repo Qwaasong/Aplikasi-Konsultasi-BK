@@ -68,6 +68,76 @@ class KasusBkService
             ->get();
     }
 
+    /**
+     * Ambil data terfilter berdasarkan filters array.
+     * Supports: search, status, prioritas, kelas, jurusan, jenis_kelamin, guru_bk_id
+     */
+    public function getFiltered(array $filters = []): \Illuminate\Support\Collection
+    {
+        $query = KasusBk::with(['siswa.kelas.jurusan', 'kategori', 'lampirans', 'guruBk.user']);
+
+        // Scope by guru BK jika ada
+        if (!empty($filters['guru_bk_id'])) {
+            $query->where('guru_bk_id', $filters['guru_bk_id']);
+        }
+
+        // Search
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('penanganan', 'like', "%{$keyword}%")
+                    ->orWhere('uraian_masalah', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Status filter
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Prioritas filter
+        if (!empty($filters['prioritas'])) {
+            $query->where('prioritas', $filters['prioritas']);
+        }
+
+        // Kelas filter (computed attribute — perlu whereHas via siswa.kelas)
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('siswa', fn($q) => $q->where('kelas_id', function ($q2) use ($filters) {
+                // Resolve kelas_label to kelas_id
+                $q2->whereIn('id', \App\Models\Kelas::where('nama_kelas', $filters['kelas'])->pluck('id'));
+            }));
+        }
+
+        // Jurusan filter (computed attribute — perlu whereHas via siswa.kelas.jurusan)
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        // Jenis Kelamin filter
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('siswa', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
+        return $query->latest()->get();
+    }
+
+    /**
+     * Ambil opsi filter dari database.
+     */
+    public function getFilterOptions(): array
+    {
+        $all = $this->all();
+
+        return [
+            'statusOptions' => $all->pluck('status')->filter()->unique()->sort()->values()->toArray(),
+            'prioritasOptions' => $all->pluck('prioritas')->filter()->unique()->sort()->values()->toArray(),
+            'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('siswa.jurusan_label')->filter()->unique()->map(fn($j) => (string) $j)->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
+        ];
+    }
+
     public function findById(int $id): ?KasusBk
     {
         return $this->kasusBkRepository->findById($id);

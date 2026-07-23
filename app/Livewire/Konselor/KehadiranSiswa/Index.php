@@ -33,23 +33,17 @@ class Index extends Component
 
     public function loadData()
     {
-        $records = app(KehadiranService::class)->getAll();
+        $service = app(KehadiranService::class);
 
-        if ($this->search !== '') {
-            $records = $records->filter(fn($item) => str_contains(strtolower($item->siswa?->nama ?? ''), strtolower($this->search)));
-        }
-        if ($this->filterKelas !== '') {
-            $records = $records->filter(fn($item) => ($item->siswa?->kelas_label ?? '') === $this->filterKelas);
-        }
-        if ($this->filterStatus !== '') {
-            $records = $records->filter(fn($item) => $item->status === $this->filterStatus);
-        }
-        if ($this->filterTanggal !== '') {
-            $records = $records->filter(fn($item) => $item->tanggal_kehadiran == $this->filterTanggal);
-        }
-        if ($this->filterTahun !== '') {
-            $records = $records->filter(fn($item) => (string) ($item->tahunAjaran?->tahun ?? '') === (string) $this->filterTahun);
-        }
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'status' => $this->filterStatus ?: null,
+            'tanggal' => $this->filterTanggal ?: null,
+            'tahun' => $this->filterTahun ?: null,
+        ];
+
+        $records = $service->getFiltered($filters);
 
         $this->records = $records->map(function ($item) {
             return [

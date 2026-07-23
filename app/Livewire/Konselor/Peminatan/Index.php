@@ -23,31 +23,19 @@ class Index extends Component
     public function with(): array
     {
         $service = app(PeminatanService::class);
-        $all = $service->getAll();
 
-        $kelasOptions = $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+        ];
 
-        $records = $all;
-
-        if ($this->search) {
-            $keyword = strtolower($this->search);
-            $records = $records->filter(fn($item) => str_contains(strtolower($item->siswa->nama ?? ''), $keyword)
-                || str_contains(strtolower($item->hasil ?? ''), $keyword));
-        }
-
-        if ($this->filterKelas !== '') {
-            $records = $records->filter(fn($item) => (string) ($item->siswa->kelas_label ?? '') === $this->filterKelas);
-        }
-
-        if ($this->filterJurusan !== '') {
-            $records = $records->filter(fn($item) => ($item->siswa->jurusan_label ?? '') === $this->filterJurusan);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $records->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
+            'records' => $service->getFiltered($filters),
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
         ];
     }
 

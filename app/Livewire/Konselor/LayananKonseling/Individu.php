@@ -25,37 +25,21 @@ class Individu extends Component
     public function with(): array
     {
         $service = app(BimbinganIndividuService::class);
-        $all = $service->getAll();
 
-        $kelasOptions = $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray();
-        $jenisKelaminOptions = $all->pluck('kasus.siswa.jenis_kelamin')->filter()->unique()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
+        ];
 
-        $data = $all;
-
-        if ($this->search) {
-            $needle = (string) $this->search;
-            $data = $data->filter(fn($item) => mb_stripos($item->uraian_masalah ?? '', $needle) !== false
-                || mb_stripos($item->kasus?->siswa?->nama ?? '', $needle) !== false);
-        }
-
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(fn($item) => (string) ($item->kasus?->siswa?->kelas_label ?? '') === (string) $this->filterKelas);
-        }
-
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->kasus?->siswa?->jurusan_label ?? ''), $this->filterJurusan) === 0);
-        }
-
-        if ($this->filterJenisKelamin !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->kasus?->siswa?->jenis_kelamin ?? ''), $this->filterJenisKelamin) === 0);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'jenisKelaminOptions' => $jenisKelaminOptions,
+            'records' => $service->getFiltered($filters),
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
         ];
     }
 

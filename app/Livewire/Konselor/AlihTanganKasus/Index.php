@@ -25,35 +25,20 @@ class Index extends Component
     public function with(): array
     {
         $service = app(AlihTanganKasusService::class);
-        $all = $service->getAll();
 
-        $kelasOptions = $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'tanggal' => $this->filterTanggal ?: null,
+        ];
 
-        $data = $all;
-
-        if ($this->search) {
-            $needle = (string) $this->search;
-            $data = $data->filter(fn($item) => mb_stripos($item->kasus?->siswa?->nama ?? '', $needle) !== false
-                || mb_stripos($item->alasan_alih ?? '', $needle) !== false);
-        }
-
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(fn($item) => (string) ($item->kasus?->siswa?->kelas_label ?? '') === (string) $this->filterKelas);
-        }
-
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->kasus?->siswa?->jurusan_label ?? ''), $this->filterJurusan) === 0);
-        }
-
-        if ($this->filterTanggal !== '') {
-            $data = $data->filter(fn($item) => \Carbon\Carbon::parse($item->tanggal_alih)->toDateString() === $this->filterTanggal);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
+            'records' => $service->getFiltered($filters),
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
         ];
     }
 

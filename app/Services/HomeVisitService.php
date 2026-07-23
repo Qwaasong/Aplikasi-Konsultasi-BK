@@ -89,6 +89,40 @@ class HomeVisitService
         return $this->repo->search($keyword, $limit);
     }
 
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['guru_bk_id'])) {
+            $query->where('guru_bk_id', $filters['guru_bk_id']);
+        }
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"));
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        return $query->latest('tanggal_kunjungan')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+        ];
+    }
+
     private function resolveGurubkId(): int
     {
         $pegawai = Pegawai::where('user_id', auth()->id())->first();

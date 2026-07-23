@@ -33,4 +33,26 @@ class SekolahService
     {
         Sekolah::findOrFail($id)->delete();
     }
+
+    public function getFiltered(array $filters = []): \Illuminate\Support\Collection
+    {
+        $query = \App\Models\Sekolah::query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama_sekolah', 'like', "%{$keyword}%")
+                    ->orWhere('alamat', 'like', "%{$keyword}%")
+                    ->orWhere('telepon', 'like', "%{$keyword}%")
+                    ->orWhere('email', 'like', "%{$keyword}%");
+            });
+        }
+
+        return $query->latest()->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        return [];
+    }
 }

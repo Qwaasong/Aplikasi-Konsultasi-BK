@@ -37,4 +37,37 @@ class PeminatanService
     {
         $this->repo->delete($id);
     }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('hasil', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        return $query->latest()->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+        ];
+    }
 }

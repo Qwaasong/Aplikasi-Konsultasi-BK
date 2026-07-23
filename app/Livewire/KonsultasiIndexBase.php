@@ -22,59 +22,30 @@ abstract class KonsultasiIndexBase extends Component
         parent::__construct();
     }
 
-    abstract protected function getData(): \Illuminate\Support\Collection;
+    abstract protected function getFiltered(array $filters): \Illuminate\Support\Collection;
+    abstract protected function getFilterOptions(): array;
     abstract protected function deleteRecord(int $id): void;
     abstract protected function getDetailRoute(): string;
 
     public function with(): array
     {
-        $all = $this->getData();
+        $filters = [
+            'search' => $this->search ?: null,
+            'penanganan' => $this->filterJenisLayanan ?: null,
+            'format' => $this->filterFormat ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
+        ];
 
-        $layananOptions = $all->pluck('penanganan')->filter()->unique()->sort()->values()->toArray();
-        $kelasOptions = $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('siswa.jurusan_label')->filter()->unique()->map(fn($j) => (string) $j)->sort()->values()->toArray();
-        $jenisKelaminOptions = $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray();
-
-        $data = $all;
-
-        if ($this->search) {
-            $needle = (string) $this->search;
-            $data = $data->filter(function ($item) use ($needle) {
-                $name = (string) ($item->siswa->nama ?? 'Anonim');
-                $jenis = (string) ($item->penanganan ?? '');
-                $desc = (string) ($item->uraian_masalah ?? '');
-                return (mb_stripos($name, $needle) !== false)
-                    || (mb_stripos($jenis, $needle) !== false)
-                    || (mb_stripos($desc, $needle) !== false);
-            });
-        }
-
-        if ($this->filterJenisLayanan) {
-            $data = $data->filter(fn($item) => $item->penanganan === $this->filterJenisLayanan);
-        }
-
-        if ($this->filterFormat) {
-            $data = $data->filter(fn($item) => strtolower($item->penanganan ?? '') === strtolower($this->filterFormat));
-        }
-
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(fn($item) => (string) ($item->siswa->kelas_label ?? '') === (string) $this->filterKelas);
-        }
-
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jurusan_label ?? ''), $this->filterJurusan) === 0);
-        }
-
-        if ($this->filterJenisKelamin !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jenis_kelamin ?? ''), $this->filterJenisKelamin) === 0);
-        }
+        $options = $this->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'layananOptions' => $layananOptions,
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'jenisKelaminOptions' => $jenisKelaminOptions,
+            'records' => $this->getFiltered($filters),
+            'layananOptions' => $options['layananOptions'] ?? [],
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
         ];
     }
 

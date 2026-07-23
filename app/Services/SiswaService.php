@@ -138,6 +138,46 @@ class SiswaService
         $this->siswaRepository->delete($id);
     }
 
+    public function getFiltered(array $filters = []): \Illuminate\Support\Collection
+    {
+        $query = \App\Models\DataSiswa::with(['user', 'kelas.jurusan.sekolah']);
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama', 'like', "%{$keyword}%")
+                    ->orWhere('nis', 'like', "%{$keyword}%")
+                    ->orWhereHas('kelas', fn($q2) => $q2->where('nama_kelas', 'like', "%{$keyword}%"))
+                    ->orWhereHas('kelas.jurusan', fn($q2) => $q2->where('nama_jurusan', 'like', "%{$keyword}%"));
+            });
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('kelas', fn($q) => $q->where('nama_kelas', $filters['kelas']));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->where('jenis_kelamin', $filters['jenis_kelamin']);
+        }
+
+        return $query->latest()->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('jenis_kelamin')->filter()->unique()->values()->toArray(),
+        ];
+    }
+
     // ─────────────────────────────────────────
     // IMPORT
     // ─────────────────────────────────────────

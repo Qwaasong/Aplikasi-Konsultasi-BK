@@ -74,4 +74,39 @@ class BimbinganKelompokService
     {
         return $this->repo->search($keyword, $limit);
     }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where('uraian_masalah', 'like', "%{$keyword}%");
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('siswa.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('siswa.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('siswa.siswa', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
+        return $query->latest('tanggal_layanan')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('siswa')->flatten()->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('siswa')->flatten()->pluck('siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('siswa')->flatten()->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
+        ];
+    }
 }

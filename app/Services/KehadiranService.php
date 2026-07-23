@@ -41,4 +41,43 @@ class KehadiranService
     {
         $this->repo->delete($id);
     }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->whereHas('siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"));
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['tanggal'])) {
+            $query->whereDate('tanggal_kehadiran', $filters['tanggal']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $query->whereHas('tahunAjaran', fn($q) => $q->where('tahun', $filters['tahun']));
+        }
+
+        return $query->latest('tanggal_kehadiran')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'statusOptions' => $all->pluck('status')->filter()->unique()->values()->toArray(),
+            'tahunOptions' => $all->pluck('tahunAjaran.tahun')->filter()->unique()->values()->toArray(),
+        ];
+    }
 }

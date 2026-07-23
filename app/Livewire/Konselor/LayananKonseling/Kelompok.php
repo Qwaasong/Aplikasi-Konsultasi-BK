@@ -25,43 +25,21 @@ class Kelompok extends Component
     public function with(): array
     {
         $service = app(BimbinganKelompokService::class);
-        $all = $service->getAll();
 
-        $kelasOptions = $all->pluck('siswa')->flatten()->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('siswa')->flatten()->pluck('siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray();
-        $jenisKelaminOptions = $all->pluck('siswa')->flatten()->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
+        ];
 
-        $data = $all;
-
-        if ($this->search) {
-            $needle = (string) $this->search;
-            $data = $data->filter(fn($item) => mb_stripos($item->uraian_masalah ?? '', $needle) !== false
-                || mb_stripos($item->guruBk?->user?->nama ?? '', $needle) !== false);
-        }
-
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(function ($item) {
-                return $item->siswa->contains(fn($peserta) => ($peserta->siswa->kelas_label ?? '') === $this->filterKelas);
-            });
-        }
-
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(function ($item) {
-                return $item->siswa->contains(fn($peserta) => strcasecmp(($peserta->siswa->jurusan_label ?? ''), $this->filterJurusan) === 0);
-            });
-        }
-
-        if ($this->filterJenisKelamin !== '') {
-            $data = $data->filter(function ($item) {
-                return $item->siswa->contains(fn($peserta) => strcasecmp(($peserta->siswa->jenis_kelamin ?? ''), $this->filterJenisKelamin) === 0);
-            });
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'jenisKelaminOptions' => $jenisKelaminOptions,
+            'records' => $service->getFiltered($filters),
+            'kelasOptions' => $options['kelasOptions'] ?? [],
+            'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
         ];
     }
 

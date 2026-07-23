@@ -22,27 +22,17 @@ class Index extends Component
     public function with(): array
     {
         $service = app(JurusanService::class);
-        $all = $service->getAll();
-        $sekolahOptions = $all->pluck('sekolah.nama_sekolah')->filter()->unique()->sort()->values()->toArray();
 
-        $data = $all;
+        $filters = [
+            'search' => $this->search ?: null,
+            'sekolah' => $this->filterSekolah ?: null,
+        ];
 
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->kode_jurusan ?? ''), $needle)
-                    || str_contains(strtolower($item->nama_jurusan ?? ''), $needle)
-                    || str_contains(strtolower($item->sekolah?->nama_sekolah ?? ''), $needle);
-            });
-        }
-
-        if ($this->filterSekolah) {
-            $data = $data->filter(fn($item) => $item->sekolah?->nama_sekolah === $this->filterSekolah);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'sekolahOptions' => $sekolahOptions,
+            'records' => $service->getFiltered($filters),
+            'sekolahOptions' => $options['sekolahOptions'] ?? [],
         ];
     }
 

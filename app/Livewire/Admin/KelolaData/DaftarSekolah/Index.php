@@ -21,20 +21,14 @@ class Index extends Component
 
     public function with(): array
     {
-        $data = app(SekolahService::class)->getAll();
+        $service = app(SekolahService::class);
 
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->nama_sekolah ?? ''), $needle)
-                    || str_contains(strtolower($item->alamat ?? ''), $needle)
-                    || str_contains(strtolower($item->telepon ?? ''), $needle)
-                    || str_contains(strtolower($item->email ?? ''), $needle);
-            });
-        }
+        $filters = [
+            'search' => $this->search ?: null,
+        ];
 
         return [
-            'records' => $data->values(),
+            'records' => $service->getFiltered($filters),
         ];
     }
 

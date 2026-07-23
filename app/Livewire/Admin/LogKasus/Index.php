@@ -22,27 +22,17 @@ class Index extends Component
     public function with(): array
     {
         $service = app(KasusBkService::class);
-        $all = $service->all();
 
-        $statusOptions = $all->pluck('status')->filter()->unique()->sort()->values()->toArray();
+        $filters = [
+            'search' => $this->search ?: null,
+            'status' => $this->filterStatus ?: null,
+        ];
 
-        $data = $all;
-
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->judul ?? ''), $needle)
-                    || str_contains(strtolower($item->siswa?->nama ?? ''), $needle);
-            });
-        }
-
-        if ($this->filterStatus) {
-            $data = $data->where('status', $this->filterStatus);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'statusOptions' => $statusOptions,
+            'records' => $service->getFiltered($filters),
+            'statusOptions' => $options['statusOptions'] ?? [],
         ];
     }
 

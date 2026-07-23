@@ -92,6 +92,35 @@ class PegawaiService
         $this->pegawaiRepository->delete($id);
     }
 
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = Pegawai::with('user');
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('nip', 'like', "%{$keyword}%")
+                    ->orWhere('jabatan', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($filters['jabatan'])) {
+            $query->where('jabatan', $filters['jabatan']);
+        }
+
+        return $query->latest()->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'jabatanOptions' => $all->pluck('jabatan')->filter()->unique()->sort()->values()->toArray(),
+        ];
+    }
+
     // ===========================
     // PRIVATE
     // ===========================

@@ -22,27 +22,17 @@ class Index extends Component
     public function with(): array
     {
         $service = app(PegawaiService::class);
-        $all = $service->getAll();
-        $jabatanOptions = $all->pluck('jabatan')->filter()->unique()->sort()->values()->toArray();
 
-        $data = $all;
+        $filters = [
+            'search' => $this->search ?: null,
+            'jabatan' => $this->filterJabatan ?: null,
+        ];
 
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->user?->nama ?? ''), $needle)
-                    || str_contains(strtolower($item->nip ?? ''), $needle)
-                    || str_contains(strtolower($item->jabatan ?? ''), $needle);
-            });
-        }
-
-        if ($this->filterJabatan) {
-            $data = $data->where('jabatan', $this->filterJabatan);
-        }
+        $options = $service->getFilterOptions();
 
         return [
-            'records' => $data->values(),
-            'jabatanOptions' => $jabatanOptions,
+            'records' => $service->getFiltered($filters),
+            'jabatanOptions' => $options['jabatanOptions'] ?? [],
         ];
     }
 

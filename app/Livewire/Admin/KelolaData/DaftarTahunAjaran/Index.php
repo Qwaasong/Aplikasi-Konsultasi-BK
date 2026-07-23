@@ -19,18 +19,14 @@ class Index extends Component
 
     public function with(): array
     {
-        $data = app(TahunAjaranService::class)->getAll();
+        $service = app(TahunAjaranService::class);
 
-        if ($this->search) {
-            $needle = strtolower($this->search);
-            $data = $data->filter(function ($item) use ($needle) {
-                return str_contains(strtolower($item->tahun), $needle)
-                    || str_contains(strtolower($item->semester), $needle);
-            });
-        }
+        $filters = [
+            'search' => $this->search ?: null,
+        ];
 
         return [
-            'records' => $data->values(),
+            'records' => $service->getFiltered($filters),
         ];
     }
 
