@@ -15,6 +15,15 @@
         {{-- Logo --}}
         <div class="h-20 flex items-center overflow-hidden whitespace-nowrap flex-shrink-0">
             <x-atoms.application-logo class="w-10 h-10 object-contain" />
+            <span x-show="open" x-transition.opacity.duration.200ms class="font-bold text-lg text-gray-900 -ml-1">
+                @if(Auth::check())
+                    @if(Auth::user()->role === 'admin')
+                        Halaman Admin
+                    @elseif(Auth::user()->role === 'guru_bk')
+                        Halaman Konselor
+                    @endif
+                @endif
+            </span>
         </div>
 
         {{-- Menu --}}
