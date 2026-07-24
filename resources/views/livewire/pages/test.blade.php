@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\TestPage;
+use App\Livewire\Pages\TestPage;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.guest')] class extends TestPage {}; ?>

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Base;
 
 use Livewire\Volt\Component;
 
-abstract class KonsultasiIndexBase extends Component
+abstract class KasusBkIndexBase extends Component
 {
     public string $search = '';
-    public string $filterJenisLayanan = '';
-    public string $filterFormat = '';
+    public string $filterStatus = '';
+    public string $filterPrioritas = '';
     public string $filterKelas = '';
     public string $filterJurusan = '';
     public string $filterJenisKelamin = '';
@@ -31,8 +31,8 @@ abstract class KonsultasiIndexBase extends Component
     {
         $filters = [
             'search' => $this->search ?: null,
-            'penanganan' => $this->filterJenisLayanan ?: null,
-            'format' => $this->filterFormat ?: null,
+            'status' => $this->filterStatus ?: null,
+            'prioritas' => $this->filterPrioritas ?: null,
             'kelas' => $this->filterKelas ?: null,
             'jurusan' => $this->filterJurusan ?: null,
             'jenis_kelamin' => $this->filterJenisKelamin ?: null,
@@ -42,7 +42,8 @@ abstract class KonsultasiIndexBase extends Component
 
         return [
             'records' => $this->getFiltered($filters),
-            'layananOptions' => $options['layananOptions'] ?? [],
+            'statusOptions' => $options['statusOptions'] ?? [],
+            'prioritasOptions' => $options['prioritasOptions'] ?? [],
             'kelasOptions' => $options['kelasOptions'] ?? [],
             'jurusanOptions' => $options['jurusanOptions'] ?? [],
             'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
@@ -72,13 +73,13 @@ abstract class KonsultasiIndexBase extends Component
 
     public function edit($id)
     {
-        $this->dispatch('edit-konsultasi', id: $id);
+        $this->dispatch('edit-kasus-bk', id: $id);
     }
 
     public function delete($id)
     {
         $this->deleteRecord($id);
-        session()->flash('success', 'Konsultasi berhasil dihapus!');
+        session()->flash('success', 'Kasus BK berhasil dihapus!');
         $this->selected = array_diff($this->selected, [(string) $id]);
     }
 
@@ -95,8 +96,8 @@ abstract class KonsultasiIndexBase extends Component
     public function resetFilters(): void
     {
         $this->search = '';
-        $this->filterJenisLayanan = '';
-        $this->filterFormat = '';
+        $this->filterStatus = '';
+        $this->filterPrioritas = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
         $this->filterJenisKelamin = '';
