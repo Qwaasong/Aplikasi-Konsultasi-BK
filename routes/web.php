@@ -22,6 +22,33 @@ Route::get('/', function () {
 
 Volt::route('test', 'pages.test');
 
+// Landing Page
+Route::view('/', 'landing.index')->name('landing');
+
+// Kehadiran Siswa
+Route::view('/kehadiran', 'landing.kehadiran.index')
+    ->name('kehadiran');
+
+// Asesmen
+Route::prefix('asesmen')->name('asesmen.')->group(function () {
+
+    Route::view('/akpd', 'landing.asesmen.akpd.index')
+        ->name('akpd');
+
+    Route::view('/gaya-belajar', 'landing.asesmen.gaya-belajar.index')
+        ->name('gaya-belajar');
+
+    Route::view('/dcm', 'landing.asesmen.dcm.index')
+        ->name('dcm');
+
+    Route::view('/sosiometri', 'landing.asesmen.sosiometri.index')
+        ->name('sosiometri');
+
+    Route::view('/tes-bakat-minat', 'landing.asesmen.tes-bakat-minat.index')
+        ->name('tes-bakat-minat');
+
+});
+
 // ── Export Word ──────────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
     Route::get('/konsultasi/{id}/export/{template}', [WordExportController::class, 'export'])
