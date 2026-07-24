@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KasusBk;
 
-use App\Livewire\KasusBkIndexBase;
+use App\Livewire\Base\KasusBkIndexBase;
 use App\Services\KasusBkService;
 
 class Index extends KasusBkIndexBase

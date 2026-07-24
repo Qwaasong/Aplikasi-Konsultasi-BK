@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\KasusBk;
 
-use App\Livewire\KasusBkIndexBase;
+use App\Livewire\Base\KasusBkIndexBase;
 use App\Services\KasusBkService;
 use App\Services\PegawaiService;
 

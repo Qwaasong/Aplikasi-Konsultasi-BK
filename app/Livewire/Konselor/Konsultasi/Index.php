@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\Konsultasi;
 
-use App\Livewire\KonsultasiIndexBase;
+use App\Livewire\Base\KonsultasiIndexBase;
 use App\Services\KasusBkService;
 
 class Index extends KonsultasiIndexBase

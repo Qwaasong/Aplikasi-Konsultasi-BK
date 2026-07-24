@@ -14,11 +14,17 @@
                 Layanan BK SMK Negeri 9 Malang
             </p>
 
-            <a href="{{ route('login') }}" class="hero-button btn-primary"
-                data-aos="fade-up"
-                data-aos-delay="300">
-                Login
-            </a>
+            <div class="hero-actions" data-aos="fade-up" data-aos-delay="250">
+
+                <a href="{{ route('login') }}" class="hero-button btn-outline">
+                    Login
+                </a>
+
+                <a href="{{ route('register') }}" class="hero-button btn-primary">
+                    Daftar
+                </a>
+
+            </div>
 
         </div>
 
