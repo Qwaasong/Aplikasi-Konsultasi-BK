@@ -45,9 +45,17 @@
 
         </ul>
 
-        <a href="{{ route('login') }}" class="login-button btn-primary">
-            Login
-        </a>
+        <div class="navbar-actions">
+
+            <a href="{{ route('login') }}" class="login-button btn-outline">
+                Login
+            </a>
+
+            <a href="{{ route('register') }}" class="login-button btn-primary">
+                Daftar
+            </a>
+
+        </div>
 
     </nav>
 

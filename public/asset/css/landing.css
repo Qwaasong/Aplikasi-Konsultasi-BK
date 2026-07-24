@@ -65,15 +65,8 @@ section{
 }
 
 .btn-primary{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: .8rem 2rem;
     background: var(--primary-color);
     color: var(--white);
-    border-radius: 10px;
-    font-weight: 600;
-    transition: .3s;
 }
 
 .btn-primary:hover{
@@ -94,10 +87,6 @@ section{
     display: flex;
     align-items: center;
     min-height: 90px;
-}
-
-.navbar-logo{
-    flex-shrink: 0;
 }
 
 .navbar-logo img{
@@ -131,7 +120,20 @@ section{
 }
 
 .login-button{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     min-width: 120px;
+    height: 52px;
+
+    padding: 0 2rem;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+    transition: .3s;
+
     flex-shrink: 0;
 }
 
@@ -164,6 +166,24 @@ section{
 .navbar-brand-subtitle{
     font-size: .85rem;
     color: var(--text-light);
+}
+
+.navbar-actions{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-outline{
+    background: var(--white);
+    color: #056C88;
+
+    border: 2px solid #056C88;
+}
+
+.btn-outline:hover{
+    background: #056C88;
+    color: var(--white);
 }
 
 /* HERO */
@@ -252,6 +272,30 @@ section{
 
 .hero-button{
     min-width: 140px;
+}
+
+.hero-actions{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    margin-top: 2rem;
+}
+
+.hero-button{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 120px;
+    height: 52px;
+
+    padding: 0 2rem;
+
+    border-radius: 10px;
+
+    font-weight: 600;
 }
 
 /* ABOUT */

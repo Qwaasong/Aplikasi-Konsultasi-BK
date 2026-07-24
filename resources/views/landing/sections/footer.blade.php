@@ -53,6 +53,12 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ route('register') }}" class="footer-link">
+                        Daftar
+                    </a>
+                </li>
+                
             </ul>
 
         </div>
