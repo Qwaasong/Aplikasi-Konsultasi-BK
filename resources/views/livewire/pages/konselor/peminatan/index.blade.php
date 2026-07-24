@@ -12,7 +12,6 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
         <x-slot:search>
             <x-molecules.search-input model="search" />
         </x-slot:search>
-
         Peminatan
     </x-organisms.header>
 
@@ -97,8 +96,6 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             <tr
                 wire:key="peminatan-{{ $record->id }}"
-                wire:click="goToDetail({{ $record->id }})"
-
                 class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:z-10 hover:rounded-md bg-white">
 
                 <td
