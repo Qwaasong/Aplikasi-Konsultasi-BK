@@ -32,15 +32,52 @@
             </li>
 
             <li>
-                <a href="#" class="navbar-link">
+                <a href="{{ route('kehadiran') }}" class="navbar-link">
                     Kehadiran Siswa
                 </a>
             </li>
 
-            <li>
+            <li class="navbar-dropdown">
+
                 <a href="#" class="navbar-link">
-                    Peminatan Siswa
+                    Asesmen
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
                 </a>
+
+                <ul class="nav-dropdown-menu">
+
+                    <li>
+                        <a href="{{ route('asesmen.akpd') }}" class="nav-dropdown-item">
+                            AKPD
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('asesmen.gaya-belajar') }}" class="nav-dropdown-item">
+                            Gaya Belajar
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('asesmen.dcm') }}" class="nav-dropdown-item">
+                            DCM
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('asesmen.sosiometri') }}" class="nav-dropdown-item">
+                            Sosiometri
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('asesmen.tes-bakat-minat') }}" class="nav-dropdown-item">
+                            Tes Bakat Minat
+                        </a>
+                    </li>
+
+                </ul>
+
             </li>
 
         </ul>

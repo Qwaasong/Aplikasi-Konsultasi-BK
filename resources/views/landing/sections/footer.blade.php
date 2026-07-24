@@ -2,7 +2,6 @@
 
     <div class="container footer-container" data-aos="fade-up">
 
-        {{-- Logo & Identitas --}}
         <div class="footer-brand">
 
             <img
@@ -15,19 +14,20 @@
             </h2>
 
             <p class="footer-subtitle">
-                Layanan BK SMK Negeri 9 Malang
+                Layanan Bimbingan dan Konseling
+                SMK Negeri 9 Malang.
             </p>
 
         </div>
 
-        {{-- Menu --}}
+        {{-- MENU --}}
         <div class="footer-column">
 
             <h3 class="footer-heading">
                 Menu
             </h3>
 
-            <ul class="footer-list">
+            <ul class="footer-menu">
 
                 <li>
                     <a href="{{ route('landing') }}" class="footer-link">
@@ -36,15 +36,52 @@
                 </li>
 
                 <li>
-                    <a href="#" class="footer-link">
+                    <a href="{{ route('kehadiran') }}" class="footer-link">
                         Kehadiran Siswa
                     </a>
                 </li>
 
-                <li>
-                    <a href="#" class="footer-link">
-                        Peminatan Siswa
+                <li class="footer-dropdown">
+
+                    <a href="#" class="footer-dropdown-toggle footer-link">
+                        Asesmen
+                        <i class="fa-solid fa-chevron-right"></i>
                     </a>
+
+                    <ul class="footer-dropdown-menu">
+
+                        <li>
+                            <a href="{{ route('asesmen.akpd') }}">
+                                AKPD
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('asesmen.gaya-belajar') }}">
+                                Gaya Belajar
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('asesmen.dcm') }}">
+                                DCM
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('asesmen.sosiometri') }}">
+                                Sosiometri
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('asesmen.tes-bakat-minat') }}">
+                                Tes Bakat Minat
+                            </a>
+                        </li>
+
+                    </ul>
+
                 </li>
 
                 <li>
@@ -55,15 +92,15 @@
 
                 <li>
                     <a href="{{ route('register') }}" class="footer-link">
-                        Daftar
+                        Register
                     </a>
                 </li>
-                
+
             </ul>
 
         </div>
 
-        {{-- Layanan --}}
+        {{-- LAYANAN --}}
         <div class="footer-column">
 
             <h3 class="footer-heading">
@@ -86,7 +123,7 @@
 
         </div>
 
-        {{-- Kontak --}}
+        {{-- KONTAK --}}
         <div class="footer-column">
 
             <h3 class="footer-heading">
@@ -103,14 +140,14 @@
                 </li>
 
                 <li>
-                    <a href="#" class="footer-link">
+                    <a href="tel:(0341)000000" class="footer-link">
                         <i class="fa-solid fa-phone"></i>
                         No. Telp
                     </a>
                 </li>
 
                 <li>
-                    <a href="#" class="footer-link">
+                    <a href="mailto:bk@smkn9malang.sch.id" class="footer-link">
                         <i class="fa-solid fa-envelope"></i>
                         Email
                     </a>
@@ -122,7 +159,7 @@
 
     </div>
 
-    {{-- Copyright --}}
+    {{-- COPYRIGHT --}}
     <div class="footer-bottom">
 
         <div class="container">
