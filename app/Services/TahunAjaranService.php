@@ -38,4 +38,24 @@ class TahunAjaranService
     {
         TahunAjaran::findOrFail($id)->delete();
     }
+
+    public function getFiltered(array $filters = []): \Illuminate\Support\Collection
+    {
+        $query = TahunAjaran::query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('tahun', 'like', "%{$keyword}%")
+                    ->orWhere('semester', 'like', "%{$keyword}%");
+            });
+        }
+
+        return $query->latest()->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        return [];
+    }
 }

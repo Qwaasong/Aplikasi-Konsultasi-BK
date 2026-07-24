@@ -2,42 +2,32 @@
 
 namespace App\Services;
 
-use App\Models\BimbinganIndividu;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
-use App\Models\Pegawai;
 use App\Models\TahunAjaran;
-use Illuminate\Validation\ValidationException;
+use App\Repositories\Contracts\BimbinganIndividuRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class BimbinganIndividuService
 {
+    public function __construct(
+        protected BimbinganIndividuRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-        ])
-            ->latest('tanggal_layanan')
-            ->get();
+        return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?BimbinganIndividu
+    public function findById(int $id): ?\App\Models\BimbinganIndividu
     {
-        return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-        ])
-            ->findOrFail($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data): BimbinganIndividu
+    public function create(array $data): \App\Models\BimbinganIndividu
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
         if (!$pegawai) {
             throw ValidationException::withMessages(['guru_bk' => 'Data pegawai tidak ditemukan.']);
         }
@@ -46,12 +36,10 @@ class BimbinganIndividuService
         $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');
 
-        // Buat atau dapatkan KasusBk untuk siswa ini
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
 
         if ($siswaId) {
-            // Cari kasus yang sudah ada untuk siswa ini, atau buat baru
             $kasus = KasusBk::firstOrCreate(
                 ['siswa_id' => $siswaId],
                 [
@@ -68,22 +56,65 @@ class BimbinganIndividuService
             $data['kasus_id'] = $kasus->id;
         }
 
-        return BimbinganIndividu::create($data);
+        return $this->repo->create($data);
     }
 
-    public function update(int $id, array $data): BimbinganIndividu
+    public function update(int $id, array $data): \App\Models\BimbinganIndividu
     {
-        $record = BimbinganIndividu::findOrFail($id);
+        $record = $this->repo->findById($id);
 
-        // Jangan update relasi
         unset($data['siswa_id']);
 
-        $record->update($data);
+        $this->repo->update($id, $data);
+
         return $record->fresh(['guruBk.user', 'tahunAjaran', 'kasus.siswa.user', 'kasus.siswa.kelas.jurusan']);
     }
 
     public function delete(int $id): void
     {
-        BimbinganIndividu::findOrFail($id)->delete();
+        $this->repo->delete($id);
+    }
+
+    public function search(string $keyword, int $limit = 5): Collection
+    {
+        return $this->repo->search($keyword, $limit);
+    }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('uraian_masalah', 'like', "%{$keyword}%")
+                    ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
+            });
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('kasus.siswa', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
+        return $query->latest('tanggal_layanan')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('kasus.siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
+        ];
     }
 }

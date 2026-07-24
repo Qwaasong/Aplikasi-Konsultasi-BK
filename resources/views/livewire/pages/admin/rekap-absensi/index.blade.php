@@ -1,13 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Admin\RekapAbsensi\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Component {
-
-};
-
-?>
+new #[Layout('layouts.app')] class extends Index {}; ?>
 
 <div class="py-8">
     <div class="mx-auto sm:px-6 lg:px-8">

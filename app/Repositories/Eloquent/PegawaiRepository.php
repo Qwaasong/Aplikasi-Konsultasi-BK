@@ -62,4 +62,9 @@ class PegawaiRepository implements PegawaiRepositoryInterface
     {
         return Pegawai::findOrFail($id)->delete();
     }
+
+    public function findByUserId(int $userId): ?Pegawai
+    {
+        return Pegawai::where('user_id', $userId)->first();
+    }
 }

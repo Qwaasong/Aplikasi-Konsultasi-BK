@@ -1,148 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\KasusBk\Index;
 use Livewire\Attributes\Layout;
-use App\Services\KasusBkService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    // ── State untuk Pencarian & Filter ──────────
-    public string $search = '';
-    public string $filterStatus = '';
-    public string $filterPrioritas = '';
-    public string $filterKelas = '';
-    public string $filterJurusan = '';
-    public string $filterJenisKelamin = '';
-    public bool $showFilters = false;
-
-    // ── State untuk Fitur Select All ────────────
-    public array $selected = [];
-    public bool $selectAll = false;
-
-    public function with(): array
-    {
-        $service = app(KasusBkService::class);
-
-        // Ambil data kasus milik guru BK yang sedang login
-        $all = $service->getByGurubk();
-
-        // Opsi filter yang tersedia
-        $statusOptions = $all->pluck('status')->filter()->unique()->sort()->values()->toArray();
-        $prioritasOptions = $all->pluck('prioritas')->filter()->unique()->sort()->values()->toArray();
-        $kelasOptions = $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray();
-        $jurusanOptions = $all->pluck('siswa.jurusan_label')->filter()
-            ->unique()->map(fn($j) => (string) $j)->sort()->values()->toArray();
-        $jenisKelaminOptions = $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray();
-
-        // Mulai dari keseluruhan data, lalu terapkan filter
-        $data = $all;
-
-        // 1. Filter Pencarian
-        if ($this->search) {
-            $needle = (string) $this->search;
-            $data = $data->filter(function ($item) use ($needle) {
-                $name = (string) ($item->siswa->nama ?? 'Anonim');
-                $judul = (string) ($item->judul ?? '');
-                $desc = (string) ($item->deksripsi ?? '');
-
-                return (mb_stripos($name, $needle) !== false)
-                    || (mb_stripos($judul, $needle) !== false)
-                    || (mb_stripos($desc, $needle) !== false);
-            });
-        }
-
-        // 2. Filter Status
-        if ($this->filterStatus) {
-            $data = $data->filter(fn($item) => $item->status === $this->filterStatus);
-        }
-
-        // 3. Filter Prioritas
-        if ($this->filterPrioritas) {
-            $data = $data->filter(fn($item) => $item->prioritas === $this->filterPrioritas);
-        }
-
-        // 4. Filter Kelas
-        if ($this->filterKelas !== '') {
-            $data = $data->filter(fn($item) => (string) ($item->siswa->kelas_label ?? '') === (string) $this->filterKelas);
-        }
-
-        // 5. Filter Jurusan
-        if ($this->filterJurusan !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jurusan_label ?? ''), $this->filterJurusan) === 0);
-        }
-
-        // 6. Filter Jenis Kelamin
-        if ($this->filterJenisKelamin !== '') {
-            $data = $data->filter(fn($item) => strcasecmp(($item->siswa->jenis_kelamin ?? ''), $this->filterJenisKelamin) === 0);
-        }
-
-        return [
-            'records' => $data->values(),
-            'statusOptions' => $statusOptions,
-            'prioritasOptions' => $prioritasOptions,
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'jenisKelaminOptions' => $jenisKelaminOptions,
-        ];
-    }
-
-    public function updatedSelectAll($value)
-    {
-        if ($value) {
-            $records = $this->with()['records'];
-            $this->selected = $records->pluck('id')->map(fn($id) => (string) $id)->toArray();
-        } else {
-            $this->selected = [];
-        }
-    }
-
-    public function updatedSelected()
-    {
-        $recordsCount = $this->with()['records']->count();
-        $this->selectAll = (count($this->selected) === $recordsCount && $recordsCount > 0);
-    }
-
-    public function create()
-    {
-        $this->dispatch('create-konsultasi');
-    }
-
-    public function edit($id)
-    {
-        $this->dispatch('edit-kasus-bk', id: $id);
-    }
-
-    public function delete($id)
-    {
-        $service = app(KasusBkService::class);
-        $service->deleteForCurrentUser($id);
-
-        session()->flash('success', 'Kasus BK berhasil dihapus!');
-        $this->selected = array_diff($this->selected, [(string) $id]);
-    }
-
-    public function goToDetail($id)
-    {
-        $this->redirectRoute('konselor.kasus-bk.detail', ['id' => $id], navigate: true);
-    }
-
-    public function filterAction()
-    {
-        $this->showFilters = !$this->showFilters;
-    }
-
-    public function resetFilters(): void
-    {
-        $this->search = '';
-        $this->filterStatus = '';
-        $this->filterPrioritas = '';
-        $this->filterKelas = '';
-        $this->filterJurusan = '';
-        $this->filterJenisKelamin = '';
-        $this->selected = [];
-        $this->selectAll = false;
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full" x-data="{ loading: false }"
     x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"
@@ -255,24 +116,24 @@ new #[Layout('layouts.app')] class extends Component {
 
                 <td class="px-4 py-2 align-middle text-xs">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                        {{ match($record->status)
-                            case 'Open' => 'bg-green-100 text-green-700',
-                            case 'Pending' => 'bg-yellow-100 text-yellow-700',
-                            case 'Closed' => 'bg-blue-100 text-blue-700',
-                            default => 'bg-gray-100 text-gray-700'
-                        }}">
+                        {{ match($record->status) {
+                            'Open' => 'bg-green-100 text-green-700',
+                            'Pending' => 'bg-yellow-100 text-yellow-700',
+                            'Closed' => 'bg-blue-100 text-blue-700',
+                            default => 'bg-gray-100 text-gray-700',
+                        } }}">
                         {{ $record->status }}
                     </span>
                 </td>
 
                 <td class="px-4 py-2 align-middle text-xs">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                        {{ match($record->prioritas)
-                            case 'Tinggi' => 'bg-red-100 text-red-700',
-                            case 'Sedang' => 'bg-yellow-100 text-yellow-700',
-                            case 'Rendah' => 'bg-green-100 text-green-700',
-                            default => 'bg-gray-100 text-gray-700'
-                        }}">
+                        {{ match($record->prioritas) {
+                            'Tinggi' => 'bg-red-100 text-red-700',
+                            'Sedang' => 'bg-yellow-100 text-yellow-700',
+                            'Rendah' => 'bg-green-100 text-green-700',
+                            default => 'bg-gray-100 text-gray-700',
+                        } }}">
                         {{ $record->prioritas }}
                     </span>
                 </td>

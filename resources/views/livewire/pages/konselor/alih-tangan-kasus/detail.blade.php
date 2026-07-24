@@ -1,62 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\AlihTanganKasus\Detail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use App\Models\AlihtanganKasus;
-use App\Services\AlihTanganKasusService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public $record;
-    public $search = '';
-
-    #[On('refreshTable')]
-    public function refreshRecord()
-    {
-        if ($this->record) {
-            $this->record = app(AlihTanganKasusService::class)->findById($this->record->id);
-        }
-    }
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return AlihtanganKasus::with('kasus.siswa.user')
-            ->whereHas('kasus.siswa.user', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = app(AlihTanganKasusService::class)->findById($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->route('konselor.alih-tangan-kasus.index');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-alih-tangan-kasus', id: (int) $this->record->id);
-    }
-
-    public function delete()
-    {
-        app(AlihTanganKasusService::class)->delete($this->record->id);
-        session()->flash('success', 'Alih tangan kasus berhasil dihapus.');
-        return redirect()->route('konselor.alih-tangan-kasus.index');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-gray-50/50 min-h-screen p-6 lg:p-10">
 

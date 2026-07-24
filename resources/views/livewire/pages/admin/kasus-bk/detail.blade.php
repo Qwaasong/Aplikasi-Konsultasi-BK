@@ -1,58 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Admin\KasusBk\Detail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use App\Models\KasusBk;
-use App\Services\KasusBkService;
 
-new #[Layout('layouts.app')] class extends Component {
-    public $record;
-
-    public $search = '';
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return KasusBk::with('siswa')
-            ->where(function ($query) {
-                $query->whereHas('siswa.user', function ($q) {
-                    $q->where('nama', 'like', '%' . $this->search . '%');
-                })
-                    ->orWhere('penanganan', 'like', '%' . $this->search . '%');
-            })
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = KasusBk::with(['siswa.kelas.jurusan', 'kategori', 'lampirans', 'guruBk.user'])->findOrFail($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->to('/admin/konsultasi');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-kasus-bk', id: $this->record->id);
-    }
-
-    public function delete()
-    {
-        $service = app(KasusBkService::class);
-        $service->deleteForCurrentUser($this->record->id);
-
-        session()->flash('success', 'Kasus BK berhasil dihapus!');
-        return redirect()->to('/admin/konsultasi');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white min-h-screen p-8 lg:p-12">
 
@@ -179,24 +130,24 @@ new #[Layout('layouts.app')] class extends Component {
                 <div>
                     <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Status</h3>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        {{ match($record->status)
-                            case 'Open' => 'bg-green-100 text-green-700',
-                            case 'Pending' => 'bg-yellow-100 text-yellow-700',
-                            case 'Closed' => 'bg-blue-100 text-blue-700',
-                            default => 'bg-gray-100 text-gray-700'
-                        }}">
+                        {{ match($record->status) {
+                            'Open' => 'bg-green-100 text-green-700',
+                            'Pending' => 'bg-yellow-100 text-yellow-700',
+                            'Closed' => 'bg-blue-100 text-blue-700',
+                            default => 'bg-gray-100 text-gray-700',
+                        } }}">
                         {{ $record->status }}
                     </span>
                 </div>
                 <div>
                     <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Prioritas</h3>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        {{ match($record->prioritas)
-                            case 'Tinggi' => 'bg-red-100 text-red-700',
-                            case 'Sedang' => 'bg-yellow-100 text-yellow-700',
-                            case 'Rendah' => 'bg-green-100 text-green-700',
-                            default => 'bg-gray-100 text-gray-700'
-                        }}">
+                        {{ match($record->prioritas) {
+                            'Tinggi' => 'bg-red-100 text-red-700',
+                            'Sedang' => 'bg-yellow-100 text-yellow-700',
+                            'Rendah' => 'bg-green-100 text-green-700',
+                            default => 'bg-gray-100 text-gray-700',
+                        } }}">
                         {{ $record->prioritas }}
                     </span>
                 </div>

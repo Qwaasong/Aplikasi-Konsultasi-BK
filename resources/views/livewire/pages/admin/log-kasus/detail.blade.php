@@ -1,57 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Admin\LogKasus\Detail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use App\Models\KasusBk;
-use App\Services\KasusBkService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public $record;
-
-    public string $search = '';
-
-    #[On('refreshTable')]
-    public function refreshRecord()
-    {
-        if ($this->record) {
-            $this->record = app(KasusBkService::class)
-                ->findById($this->record->id);
-        }
-    }
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return KasusBk::with([
-            'siswa.user',
-            'guruBk.user',
-            'kategori',
-            'lampirans',
-        ])
-        ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-        ->take(5)
-        ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = app(KasusBkService::class)
-            ->findById($id);
-    }
-
-    public function goBack()
-    {
-        return redirect()->route('admin.log-kasus.index');
-    }
-
-}; ?>
+new #[Layout('layouts.app')] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-gray-50/50 min-h-screen p-6 lg:p-10">
 

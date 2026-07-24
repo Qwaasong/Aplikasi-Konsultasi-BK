@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\KasusBk;
 use App\Models\KonsultasiLampiran;
-use App\Models\Pegawai;
 use App\Models\TahunAjaran;
 use App\Repositories\Contracts\KasusBkRepositoryInterface;
 use Illuminate\Http\UploadedFile;
@@ -34,6 +33,108 @@ class KasusBkService
     public function countKasus(): int
     {
         return $this->kasusBkRepository->countKasus();
+    }
+
+    /**
+     * Hitung jumlah kasus per tingkat kelas untuk guru BK tertentu.
+     */
+    public function getCaseCountsByGuruBk(int $pegawaiId): array
+    {
+        return [
+            'kelas_10' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 10)))
+                ->distinct()->count('siswa_id'),
+            'kelas_11' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 11)))
+                ->distinct()->count('siswa_id'),
+            'kelas_12' => KasusBk::where('guru_bk_id', $pegawaiId)
+                ->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($qk) => $qk->where('tingkat', 12)))
+                ->distinct()->count('siswa_id'),
+        ];
+    }
+
+    /**
+     * Cari kasus BK berdasarkan keyword.
+     */
+    public function search(string $keyword, int $limit = 5): \Illuminate\Support\Collection
+    {
+        return KasusBk::with('siswa')
+            ->where(function ($query) use ($keyword) {
+                $query->whereHas('siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('penanganan', 'like', "%{$keyword}%");
+            })
+            ->take($limit)
+            ->get();
+    }
+
+    /**
+     * Ambil data terfilter berdasarkan filters array.
+     * Supports: search, status, prioritas, kelas, jurusan, jenis_kelamin, guru_bk_id
+     */
+    public function getFiltered(array $filters = []): \Illuminate\Support\Collection
+    {
+        $query = KasusBk::with(['siswa.kelas.jurusan', 'kategori', 'lampirans', 'guruBk.user']);
+
+        // Scope by guru BK jika ada
+        if (!empty($filters['guru_bk_id'])) {
+            $query->where('guru_bk_id', $filters['guru_bk_id']);
+        }
+
+        // Search
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
+                    ->orWhere('penanganan', 'like', "%{$keyword}%")
+                    ->orWhere('uraian_masalah', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Status filter
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Prioritas filter
+        if (!empty($filters['prioritas'])) {
+            $query->where('prioritas', $filters['prioritas']);
+        }
+
+        // Kelas filter (computed attribute — perlu whereHas via siswa.kelas)
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('siswa', fn($q) => $q->where('kelas_id', function ($q2) use ($filters) {
+                // Resolve kelas_label to kelas_id
+                $q2->whereIn('id', \App\Models\Kelas::where('nama_kelas', $filters['kelas'])->pluck('id'));
+            }));
+        }
+
+        // Jurusan filter (computed attribute — perlu whereHas via siswa.kelas.jurusan)
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        // Jenis Kelamin filter
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('siswa', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
+        return $query->latest()->get();
+    }
+
+    /**
+     * Ambil opsi filter dari database.
+     */
+    public function getFilterOptions(): array
+    {
+        $all = $this->all();
+
+        return [
+            'statusOptions' => $all->pluck('status')->filter()->unique()->sort()->values()->toArray(),
+            'prioritasOptions' => $all->pluck('prioritas')->filter()->unique()->sort()->values()->toArray(),
+            'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('siswa.jurusan_label')->filter()->unique()->map(fn($j) => (string) $j)->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
+        ];
     }
 
     public function findById(int $id): ?KasusBk
@@ -163,7 +264,7 @@ class KasusBkService
      */
     private function resolveGurubkId(): int
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         if (!$pegawai) {
             abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');

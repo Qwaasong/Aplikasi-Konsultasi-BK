@@ -1,61 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\LayananKonseling\IndividuDetail;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use App\Models\BimbinganIndividu;
-use App\Services\BimbinganIndividuService;
 
-new #[Layout('layouts.app')] class extends Component {
-
-    public $record;
-
-    public $search = '';
-
-    #[Computed]
-    public function searchResults()
-    {
-        if (strlen($this->search) < 2) {
-            return [];
-        }
-
-        return BimbinganIndividu::with('kasus.siswa.user')
-            ->where('uraian_masalah', 'like', '%' . $this->search . '%')
-            ->take(5)
-            ->get();
-    }
-
-    public function mount($id)
-    {
-        $this->record = app(BimbinganIndividuService::class)->findById($id);
-    }
-
-    #[On('refreshTable')]
-    public function refreshRecord()
-    {
-        if ($this->record) {
-            $this->record = app(BimbinganIndividuService::class)->findById($this->record->id);
-        }
-    }
-
-    public function goBack()
-    {
-        return redirect()->route('konselor.layanan-konseling.individu');
-    }
-
-    public function edit()
-    {
-        $this->dispatch('edit-bimbingan-individu', id: $this->record->id);
-    }
-
-    public function delete()
-    {
-        app(BimbinganIndividuService::class)->delete($this->record->id);
-        session()->flash('success', 'Layanan konseling individu berhasil dihapus.');
-        return redirect()->route('konselor.layanan-konseling.individu');
-    }
-}; ?>
+new #[Layout('layouts.app')] class extends IndividuDetail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-gray-50/50 min-h-screen p-6 lg:p-10">
 

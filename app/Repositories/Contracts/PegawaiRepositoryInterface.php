@@ -36,4 +36,6 @@ interface PegawaiRepositoryInterface
      * Hapus data pegawai.
      */
     public function delete(int $id): bool;
+
+    public function findByUserId(int $userId): ?Pegawai;
 }

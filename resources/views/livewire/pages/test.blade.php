@@ -1,11 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\TestPage;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.guest')] class extends Component {
-    //
-}; ?>
+new #[Layout('layouts.guest')] class extends TestPage {}; ?>
 <div>
     {{-- Test Komponen --}}
     <livewire:partials.sidebar />

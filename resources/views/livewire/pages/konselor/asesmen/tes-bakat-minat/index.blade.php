@@ -1,13 +1,9 @@
 <?php
 
-use Livewire\Volt\Component;
+use App\Livewire\Konselor\Asesmen\TesBakatMinat\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Component {
-
-};
-
-?>
+new #[Layout('layouts.app')] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col bg-gray-50">
 

@@ -4,18 +4,29 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\AlihtanganKasus;
 use App\Repositories\Contracts\AlihtanganKasusRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class AlihtanganKasusRepository implements AlihtanganKasusRepositoryInterface
 {
     public function getAll(): Collection
     {
-        return AlihtanganKasus::latest()->get();
+        return AlihtanganKasus::with([
+            'kasus.siswa.user',
+            'kasus.siswa.kelas.jurusan',
+            'guruBkAsal.user',
+            'guruBkTujuan.user',
+        ])->latest('tanggal_alih')->get();
     }
 
     public function findById(int $id): ?AlihtanganKasus
     {
-        return AlihtanganKasus::find($id);
+        return AlihtanganKasus::with([
+            'kasus.siswa.user',
+            'kasus.siswa.kelas.jurusan',
+            'guruBkAsal.user',
+            'guruBkTujuan.user',
+        ])->findOrFail($id);
     }
 
     public function create(array $data): AlihtanganKasus
@@ -31,5 +42,23 @@ class AlihtanganKasusRepository implements AlihtanganKasusRepositoryInterface
     public function delete(int $id): bool
     {
         return AlihtanganKasus::findOrFail($id)->delete();
+    }
+
+    public function search(string $keyword, int $limit = 5): Collection
+    {
+        return AlihtanganKasus::with('kasus.siswa.user')
+            ->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"))
+            ->take($limit)
+            ->get();
+    }
+
+    public function query(): Builder
+    {
+        return AlihtanganKasus::with([
+            'kasus.siswa.user',
+            'kasus.siswa.kelas.jurusan',
+            'guruBkAsal.user',
+            'guruBkTujuan.user',
+        ]);
     }
 }

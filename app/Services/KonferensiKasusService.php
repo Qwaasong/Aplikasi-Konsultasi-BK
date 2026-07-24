@@ -2,38 +2,31 @@
 
 namespace App\Services;
 
-use App\Models\KonferensiKasus;
 use App\Models\KonferensiKasusPeserta;
 use App\Models\KasusBk;
-use App\Models\Pegawai;
 use App\Models\KategoriKasus;
+use App\Repositories\Contracts\KonferensiKasusRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KonferensiKasusService
 {
+    public function __construct(
+        protected KonferensiKasusRepositoryInterface $repo
+    ) {}
+
     public function getAll(): Collection
     {
-        return KonferensiKasus::with([
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-            'kasus.lampirans',
-            'peserta',
-        ])->latest('tanggal_konferensi')->get();
+        return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?KonferensiKasus
+    public function findById(int $id): ?\App\Models\KonferensiKasus
     {
-        return KonferensiKasus::with([
-            'kasus.siswa.user',
-            'kasus.siswa.kelas.jurusan',
-            'kasus.lampirans',
-            'peserta',
-        ])->findOrFail($id);
+        return $this->repo->findById($id);
     }
 
-    public function create(array $data, array $pesertaData = []): KonferensiKasus
+    public function create(array $data, array $pesertaData = []): \App\Models\KonferensiKasus
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
@@ -59,7 +52,7 @@ class KonferensiKasusService
             $data['kasus_id'] = $kasus->id;
         }
 
-        $record = KonferensiKasus::create($data);
+        $record = $this->repo->create($data);
 
         if (!empty($pesertaData)) {
             $insert = collect($pesertaData)->map(fn($p) => [
@@ -75,11 +68,9 @@ class KonferensiKasusService
         return $record->fresh(['kasus.siswa.user', 'kasus.lampirans', 'peserta']);
     }
 
-    public function update(int $id, array $data, array $pesertaData = []): KonferensiKasus
+    public function update(int $id, array $data, array $pesertaData = []): \App\Models\KonferensiKasus
     {
-        $record = KonferensiKasus::findOrFail($id);
-        unset($data['siswa_id']);
-        $record->update($data);
+        $this->repo->update($id, $data);
 
         if (!empty($pesertaData)) {
             KonferensiKasusPeserta::where('konferensi_kasus_id', $id)->delete();
@@ -93,11 +84,49 @@ class KonferensiKasusService
             KonferensiKasusPeserta::insert($insert->toArray());
         }
 
-        return $record->fresh(['kasus.siswa.user', 'kasus.lampirans', 'peserta']);
+        return $this->repo->findById($id);
     }
 
     public function delete(int $id): void
     {
-        KonferensiKasus::findOrFail($id)->delete();
+        $this->repo->delete($id);
+    }
+
+    public function search(string $keyword, int $limit = 5): Collection
+    {
+        return $this->repo->search($keyword, $limit);
+    }
+
+    public function getFiltered(array $filters = []): Collection
+    {
+        $query = $this->repo->query();
+
+        if (!empty($filters['search'])) {
+            $keyword = $filters['search'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('uraian_masalah', 'like', "%{$keyword}%")
+                    ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
+            });
+        }
+
+        if (!empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        }
+
+        return $query->latest('tanggal_konferensi')->get();
+    }
+
+    public function getFilterOptions(): array
+    {
+        $all = $this->getAll();
+
+        return [
+            'kelasOptions' => $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
+            'jurusanOptions' => $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+        ];
     }
 }
