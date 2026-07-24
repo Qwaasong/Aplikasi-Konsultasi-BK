@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
-use App\Models\Pegawai;
 use App\Repositories\Contracts\HomeVisitRepositoryInterface;
 use Illuminate\Support\Collection;
 
@@ -125,7 +124,7 @@ class HomeVisitService
 
     private function resolveGurubkId(): int
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
         if (!$pegawai) {
             abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');
         }

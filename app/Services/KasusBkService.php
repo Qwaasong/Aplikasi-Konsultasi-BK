@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\KasusBk;
 use App\Models\KonsultasiLampiran;
-use App\Models\Pegawai;
 use App\Models\TahunAjaran;
 use App\Repositories\Contracts\KasusBkRepositoryInterface;
 use Illuminate\Http\UploadedFile;
@@ -265,7 +264,7 @@ class KasusBkService
      */
     private function resolveGurubkId(): int
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         if (!$pegawai) {
             abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');

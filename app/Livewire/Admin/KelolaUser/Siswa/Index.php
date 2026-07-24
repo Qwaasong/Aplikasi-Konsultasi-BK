@@ -39,17 +39,6 @@ class Index extends Component
             'kelasOptions' => $options['kelasOptions'] ?? [],
             'jurusanOptions' => $options['jurusanOptions'] ?? [],
             'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
-        }
-
-        if ($this->filterJenisKelamin) {
-            $data = $data->where('jenis_kelamin', $this->filterJenisKelamin);
-        }
-
-        return [
-            'records' => $data->values(),
-            'kelasOptions' => $kelasOptions,
-            'jurusanOptions' => $jurusanOptions,
-            'jenisKelaminOptions' => $jenisKelaminOptions,
         ];
     }
 

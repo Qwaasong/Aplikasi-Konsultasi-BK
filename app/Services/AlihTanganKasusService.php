@@ -7,7 +7,6 @@ use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\KonferensiKasus;
-use App\Models\Pegawai;
 use App\Repositories\Contracts\AlihtanganKasusRepositoryInterface;
 use Illuminate\Support\Collection;
 
@@ -29,7 +28,7 @@ class AlihTanganKasusService
 
     public function create(array $data): \App\Models\AlihtanganKasus
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         $data['nama_asal'] = $pegawai?->id;
 
@@ -115,7 +114,7 @@ class AlihTanganKasusService
      */
     public function getKasusOptions(): Collection
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         return KasusBk::with(['siswa.user', 'kategori'])
             ->where('guru_bk_id', $pegawai?->id)

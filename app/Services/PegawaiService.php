@@ -121,6 +121,14 @@ class PegawaiService
         ];
     }
 
+    /**
+     * Ambil pegawai untuk user yang sedang login.
+     */
+    public function getCurrentPegawai(): ?\App\Models\Pegawai
+    {
+        return $this->pegawaiRepository->findByUserId(auth()->id());
+    }
+
     // ===========================
     // PRIVATE
     // ===========================

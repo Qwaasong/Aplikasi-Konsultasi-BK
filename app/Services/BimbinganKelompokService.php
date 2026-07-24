@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\BimbinganKelompokSiswa;
-use App\Models\Pegawai;
 use App\Models\TahunAjaran;
 use App\Repositories\Contracts\BimbinganKelompokRepositoryInterface;
 use Illuminate\Support\Collection;
@@ -26,7 +25,7 @@ class BimbinganKelompokService
 
     public function create(array $data, array $siswaIds = []): \App\Models\BimbinganKelompok
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
         $data['guru_bk_id'] = $pegawai?->id;
         $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
             ?? TahunAjaran::latest()->value('id');

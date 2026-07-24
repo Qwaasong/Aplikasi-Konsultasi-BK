@@ -3,14 +3,15 @@
 namespace App\Livewire\Konselor\KasusBk;
 
 use App\Livewire\KasusBkIndexBase;
-use App\Models\Pegawai;
 use App\Services\KasusBkService;
+use App\Services\PegawaiService;
 
 class Index extends KasusBkIndexBase
 {
     protected function getFiltered(array $filters): \Illuminate\Support\Collection
     {
-        $pegawaiId = Pegawai::where('user_id', auth()->id())->value('id');
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
+        $pegawaiId = $pegawai?->id;
         $filters['guru_bk_id'] = $pegawaiId;
 
         return app(KasusBkService::class)->getFiltered($filters);

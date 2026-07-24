@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Konselor;
 
-use App\Models\Pegawai;
 use App\Services\KasusBkService;
+use App\Services\PegawaiService;
 use Livewire\Volt\Component;
 
 class Dashboard extends Component
@@ -18,8 +18,8 @@ class Dashboard extends Component
 
     public function mount(KasusBkService $service): void
     {
-        $pegawaiId = Pegawai::where('user_id', auth()->id())->value('id');
-        $counts = $service->getCaseCountsByGuruBk($pegawaiId);
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
+        $counts = $service->getCaseCountsByGuruBk($pegawai->id);
 
         $this->countKelas10 = $counts['kelas_10'];
         $this->countKelas11 = $counts['kelas_11'];

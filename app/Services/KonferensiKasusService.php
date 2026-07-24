@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\KonferensiKasusPeserta;
 use App\Models\KasusBk;
-use App\Models\Pegawai;
 use App\Models\KategoriKasus;
 use App\Repositories\Contracts\KonferensiKasusRepositoryInterface;
 use Illuminate\Support\Collection;
@@ -27,7 +26,7 @@ class KonferensiKasusService
 
     public function create(array $data, array $pesertaData = []): \App\Models\KonferensiKasus
     {
-        $pegawai = Pegawai::where('user_id', auth()->id())->first();
+        $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);

@@ -167,17 +167,6 @@ class SiswaService
         return $query->latest()->get();
     }
 
-    public function getFilterOptions(): array
-    {
-        $all = $this->getAll();
-
-        return [
-            'kelasOptions' => $all->pluck('kelas_label')->filter()->unique()->sort()->values()->toArray(),
-            'jurusanOptions' => $all->pluck('jurusan_label')->filter()->unique()->sort()->values()->toArray(),
-            'jenisKelaminOptions' => $all->pluck('jenis_kelamin')->filter()->unique()->values()->toArray(),
-        ];
-    }
-
     // ─────────────────────────────────────────
     // IMPORT
     // ─────────────────────────────────────────
