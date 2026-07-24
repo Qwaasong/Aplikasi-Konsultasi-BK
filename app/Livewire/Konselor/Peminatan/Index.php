@@ -55,6 +55,14 @@ class Index extends Component
         session()->flash('success', 'Data peminatan berhasil dihapus.');
     }
 
+    public function goToDetail(int $id)
+    {
+        return $this->redirect(
+            route('konselor.peminatan.detail', $id),
+            navigate: true
+        );
+    }
+    
     public function filterAction()
     {
         $this->showFilters = !$this->showFilters;

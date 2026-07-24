@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\Contracts\PeminatanRepositoryInterface;
 use Illuminate\Support\Collection;
+use App\Models\Peminatan;
 
 class PeminatanService
 {
@@ -36,6 +37,17 @@ class PeminatanService
     public function delete(int $id): void
     {
         $this->repo->delete($id);
+    }
+
+    public function search(string $keyword)
+    {
+        return Peminatan::with('siswa')
+            ->whereHas('siswa', function ($q) use ($keyword) {
+                $q->where('nama', 'like', "%{$keyword}%")
+                ->orWhere('nis', 'like', "%{$keyword}%");
+            })
+            ->limit(10)
+            ->get();
     }
 
     public function getFiltered(array $filters = []): Collection
