@@ -12,7 +12,6 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
         <x-slot:search>
             <x-molecules.search-input model="search" />
         </x-slot:search>
-
         Peminatan
     </x-organisms.header>
 

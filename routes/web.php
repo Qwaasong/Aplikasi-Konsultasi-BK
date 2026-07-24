@@ -76,7 +76,8 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/pengunduran-diri', 'pages.konselor.pengunduran-diri.index')->name('konselor.pengunduran-diri.index');
     Volt::route('konselor/pengunduran-diri/{id}/detail', 'pages.konselor.pengunduran-diri.detail')->name('konselor.pengunduran-diri.detail');
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
-
+    Volt::route('konselor/peminatan/{id}/detail', 'pages.konselor.peminatan.detail')->name('konselor.peminatan.detail');
+    
     // Asesmen
     Volt::route('konselor/asesmen', 'pages.konselor.asesmen.index')->name('konselor.asesmen.index');
     Volt::route('konselor/asesmen/akpd', 'pages.konselor.asesmen.akpd.index')->name('konselor.asesmen.akpd.index');

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use App\Models\Pegawai;
 use App\Models\BimbinganIndividu;
 use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
