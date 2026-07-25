@@ -45,4 +45,19 @@ class Detail extends Component
     {
         return redirect()->route('admin.log-kasus.index');
     }
+
+    public function edit()
+    {
+        $this->dispatch('edit-kasus-bk', id: $this->record->id);
+    }
+
+    public function delete()
+    {
+        $service = app(KasusBkService::class);
+        $service->deleteForCurrentUser($this->record->id);
+
+        session()->flash('success', 'Kasus BK berhasil dihapus!');
+
+        return redirect()->route('admin.log-kasus.index');
+    }
 }
