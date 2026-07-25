@@ -185,11 +185,11 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
                 </p>
             </div>
 
-            <!-- Hasil Akhir -->
+            <!-- Tindak Lanjut -->
             <div>
-                <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Hasil Akhir</h3>
+                <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Tindak Lanjut</h3>
                 <p class="text-sm text-gray-600 leading-relaxed text-justify">
-                    {{ $record->hasil_akhir ?? 'Belum ada catatan hasil akhir.' }}
+                    {{ $record->tindak_lanjut ?? 'Belum ada catatan tindak lanjut.' }}
                 </p>
             </div>
         </div>

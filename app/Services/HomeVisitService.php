@@ -53,6 +53,7 @@ class HomeVisitService
                     'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
                     'penanganan'    => $data['penanganan'] ?? 'Kunjungan Rumah',
                     'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
+                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
                     'tanggal_mulai' => $data['tanggal_kunjungan'] ?? now()->toDateString(),
                     'status'        => 'Open',
                     'prioritas'     => 'Sedang',
@@ -64,6 +65,9 @@ class HomeVisitService
 
         $data['guru_bk_id'] = $gurubkId;
 
+        // Hapus field yang tidak ada di tabel home_visits (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
+
         return $this->repo->create($data);
     }
 
@@ -72,6 +76,9 @@ class HomeVisitService
         $record = $this->repo->findById($id);
 
         unset($data['siswa_id']);
+
+        // Hapus field yang tidak ada di tabel home_visits (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
         $this->repo->update($id, $data);
 

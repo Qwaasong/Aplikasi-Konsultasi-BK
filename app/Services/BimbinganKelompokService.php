@@ -31,6 +31,9 @@ class BimbinganKelompokService
             ?? TahunAjaran::latest()->value('id');
         $data['kasus_id'] = $data['kasus_id'] ?? null;
 
+        // Hapus field yang tidak ada di tabel bimbingan_kelompok (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
+
         $record = $this->repo->create($data);
 
         if (!empty($siswaIds)) {
@@ -80,7 +83,7 @@ class BimbinganKelompokService
 
         if (!empty($filters['search'])) {
             $keyword = $filters['search'];
-            $query->where('uraian_masalah', 'like', "%{$keyword}%");
+            $query->whereHas('kasus', fn($q) => $q->where('uraian_masalah', 'like', "%{$keyword}%"));
         }
 
         if (!empty($filters['kelas'])) {

@@ -107,7 +107,7 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
                     <h3 class="font-bold text-gray-900 text-[15px]">Tindakan & Hasil Tindak Lanjut</h3>
                 </div>
                 <p class="text-sm leading-relaxed text-gray-700 whitespace-pre-line text-justify">
-                    {{ $record->hasil_tindak_lanjut ?: 'Belum ada hasil tindak lanjut.' }}
+                    {{ $record->tindak_lanjut ?: 'Belum ada hasil tindak lanjut.' }}
                 </p>
             </div>
 

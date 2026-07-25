@@ -17,9 +17,6 @@ new class extends Component {
     // Form Fields
     public $siswa_id = '';
     public $tanggal_konferensi = '';
-    public $uraian_masalah = '';
-    public $penanganan = '';
-    public $tindak_lanjut = '';
     public $tempat_pertemuan = '';
 
     // Peserta
@@ -48,12 +45,6 @@ new class extends Component {
             }
             if (empty($this->tanggal_konferensi)) {
                 $errors['tanggal_konferensi'] = 'Tanggal konferensi wajib diisi.';
-            }
-            if (empty(trim($this->uraian_masalah))) {
-                $errors['uraian_masalah'] = 'Uraian masalah wajib diisi.';
-            }
-            if (empty(trim($this->penanganan))) {
-                $errors['penanganan'] = 'Penanganan wajib diisi.';
             }
             if (empty($this->peserta)) {
                 $errors['peserta'] = 'Minimal harus ada 1 peserta.';
@@ -172,8 +163,7 @@ new class extends Component {
     {
         $this->resetValidation();
         $this->reset([
-            'editingId', 'siswa_id', 'uraian_masalah', 'penanganan',
-            'tindak_lanjut', 'tempat_pertemuan', 'peserta',
+            'editingId', 'siswa_id', 'tempat_pertemuan', 'peserta',
             'searchSiswa', 'showStudentModal', 'newFiles',
             'existingLampiran', 'deletedLampiran',
         ]);
@@ -195,9 +185,6 @@ new class extends Component {
         $this->tanggal_konferensi = $record->tanggal_konferensi
             ? \Carbon\Carbon::parse($record->tanggal_konferensi)->format('Y-m-d')
             : date('Y-m-d');
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->penanganan = $record->penanganan;
-        $this->tindak_lanjut = $record->tindak_lanjut;
         $this->tempat_pertemuan = $record->tempat_pertemuan;
 
         $this->peserta = $record->peserta->map(fn($p) => [
@@ -227,9 +214,6 @@ new class extends Component {
         $data = [
             'siswa_id' => $this->siswa_id,
             'tanggal_konferensi' => $this->tanggal_konferensi,
-            'uraian_masalah' => $this->uraian_masalah,
-            'penanganan' => $this->penanganan,
-            'tindak_lanjut' => $this->tindak_lanjut ?: null,
             'tempat_pertemuan' => $this->tempat_pertemuan ?: null,
         ];
 
@@ -263,8 +247,7 @@ new class extends Component {
         }
 
         $this->reset([
-            'editingId', 'siswa_id', 'uraian_masalah', 'penanganan',
-            'tindak_lanjut', 'tempat_pertemuan', 'peserta',
+            'editingId', 'siswa_id', 'tempat_pertemuan', 'peserta',
             'searchSiswa', 'showStudentModal', 'newFiles',
             'existingLampiran', 'deletedLampiran',
         ]);
@@ -477,45 +460,6 @@ new class extends Component {
                         @enderror
                     </div>
 
-                    {{-- URAIAN MASALAH --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="uraian_masalah" size="sm">
-                            Uraian Masalah <span class="text-red-500">*</span>
-                        </x-atoms.input-label>
-                        <textarea id="uraian_masalah" wire:model="uraian_masalah" rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan uraian masalah yang dibahas..."></textarea>
-                        @error('uraian_masalah')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- PENANGANAN --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="penanganan" size="sm">
-                            Penanganan <span class="text-red-500">*</span>
-                        </x-atoms.input-label>
-                        <textarea id="penanganan" wire:model="penanganan" rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan penanganan yang dilakukan..."></textarea>
-                        @error('penanganan')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- TINDAK LANJUT --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="tindak_lanjut" size="sm">
-                            Tindak Lanjut
-                        </x-atoms.input-label>
-                        <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>
-                        @error('tindak_lanjut')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
                 </div>{{-- END STEP 1 --}}
 
                 {{-- ============================================================ --}}
@@ -620,43 +564,6 @@ new class extends Component {
                                 <p class="text-[11px] text-gray-400 mt-0.5">Tidak diisi</p>
                             @endif
                         </div>
-                    </div>
-
-                    {{-- Uraian Masalah --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Uraian Masalah</span>
-                        </div>
-                        <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $uraian_masalah ?: '-' }}</p>
-                    </div>
-
-                    {{-- Penanganan --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Penanganan</span>
-                        </div>
-                        <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $penanganan ?: '-' }}</p>
-                    </div>
-
-                    {{-- Tindak Lanjut --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Tindak Lanjut</span>
-                        </div>
-                        @if($tindak_lanjut)
-                            <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $tindak_lanjut }}</p>
-                        @else
-                            <p class="text-[13px] text-gray-400 italic">Tidak ada tindak lanjut</p>
-                        @endif
                     </div>
 
                 </div>{{-- END STEP 2 --}}

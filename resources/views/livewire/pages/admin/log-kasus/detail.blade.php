@@ -132,10 +132,10 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3-3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
                         </svg>
                     </div>
-                    <h3 class="font-bold text-gray-900 text-[15px]">Rencana Hasil Akhir</h3>
+                    <h3 class="font-bold text-gray-900 text-[15px]">Tindak Lanjut</h3>
                 </div>
                 <p class="text-sm leading-relaxed text-gray-700 whitespace-pre-line text-justify">
-                    {{ $record->hasil_akhir ?: 'Belum ada catatan hasil akhir.' }}
+                    {{ $record->tindak_lanjut ?: 'Belum ada catatan tindak lanjut.' }}
                 </p>
             </div>
 

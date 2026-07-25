@@ -17,9 +17,6 @@ class HomeVisitFactory extends Factory
             'kasus_id' => KasusBk::factory(),
             'guru_bk_id' => Pegawai::factory()->guruBk(),
             'tanggal_kunjungan' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
-            'uraian_masalah' => $this->faker->paragraph(),
-            'penanganan' => $this->faker->paragraph(),
-            'tindak_lanjut' => $this->faker->optional()->paragraph(),
             'status' => $this->faker->randomElement(['diproses', 'ditunda', 'dibatalkan']),
         ];
     }

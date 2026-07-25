@@ -21,15 +21,6 @@ new class extends Component {
     #[Validate('required|date')]
     public $tanggal_kunjungan = '';
 
-    #[Validate('required|string')]
-    public $penanganan = '';
-
-    #[Validate('required|string')]
-    public $uraian_masalah = '';
-
-    #[Validate('nullable|string')]
-    public $tindak_lanjut = '';
-
     #[Validate('required|in:diproses,ditunda,dibatalkan')]
     public $status = 'diproses';
 
@@ -53,9 +44,6 @@ new class extends Component {
             $this->validate([
                 'siswa_id'           => 'required|integer',
                 'tanggal_kunjungan'  => 'required|date',
-                'penanganan'         => 'required|string',
-                'uraian_masalah'     => 'required|string',
-                'tindak_lanjut'      => 'nullable|string',
                 'status'             => 'required|in:diproses,ditunda,dibatalkan',
             ]);
         }
@@ -135,8 +123,7 @@ new class extends Component {
     {
         $this->resetValidation();
         $this->reset([
-            'editingId', 'siswa_id', 'penanganan', 'uraian_masalah',
-            'tindak_lanjut', 'status', 'uploadedFiles',
+            'editingId', 'siswa_id', 'status', 'uploadedFiles',
             'existingLampiran', 'deletedLampiran',
         ]);
         $this->step = 1;
@@ -156,9 +143,6 @@ new class extends Component {
 
         $this->editingId = $id;
         $this->tanggal_kunjungan = \Carbon\Carbon::parse($record->tanggal_kunjungan)->format('Y-m-d');
-        $this->penanganan = $record->penanganan;
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->tindak_lanjut = $record->tindak_lanjut;
         $this->status = $record->status;
         $this->siswa_id = $record->kasus?->siswa_id ?? '';
         $this->uploadedFiles = [];
@@ -185,9 +169,6 @@ new class extends Component {
         $data = [
             'siswa_id'          => $this->siswa_id,
             'tanggal_kunjungan' => $this->tanggal_kunjungan,
-            'penanganan'        => $this->penanganan,
-            'uraian_masalah'    => $this->uraian_masalah,
-            'tindak_lanjut'     => $this->tindak_lanjut,
             'status'            => $this->status,
         ];
 
@@ -220,8 +201,7 @@ new class extends Component {
         }
 
         $this->reset([
-            'editingId', 'siswa_id', 'penanganan', 'uraian_masalah',
-            'tindak_lanjut', 'uploadedFiles', 'existingLampiran', 'deletedLampiran',
+            'editingId', 'siswa_id', 'uploadedFiles', 'existingLampiran', 'deletedLampiran',
         ]);
         $this->step = 1;
         $this->tanggal_kunjungan = date('Y-m-d');
@@ -349,39 +329,6 @@ new class extends Component {
                     @error('status') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- URAIAN MASALAH --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="uraian_masalah" size="sm">
-                        Uraian Masalah <span class="text-red-500">*</span>
-                    </x-atoms.input-label>
-                    <textarea id="uraian_masalah" wire:model="uraian_masalah" rows="3"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan uraian masalah yang ditemukan..."></textarea>
-                    @error('uraian_masalah') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- PENANGANAN --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="penanganan" size="sm">
-                        Penanganan <span class="text-red-500">*</span>
-                    </x-atoms.input-label>
-                    <textarea id="penanganan" wire:model="penanganan" rows="3"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan penanganan yang dilakukan..."></textarea>
-                    @error('penanganan') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- TINDAK LANJUT --}}
-                <div class="mb-6">
-                    <x-atoms.input-label for="tindak_lanjut" size="sm">
-                        Tindak Lanjut
-                    </x-atoms.input-label>
-                    <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
-                        class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>
-                    @error('tindak_lanjut') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
-                </div>
-
             {{-- ═══════════════════════════════════════════════
                  STEP 2: REVIEW / CONFIRMATION
                  ═══════════════════════════════════════════════ --}}
@@ -433,24 +380,6 @@ new class extends Component {
                             {{ $status === 'dibatalkan' ? 'bg-red-100 text-red-700' : '' }}">
                             {{ ucfirst($status) }}
                         </span>
-                    </div>
-
-                    {{-- URAIAN MASALAH --}}
-                    <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Uraian Masalah</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $uraian_masalah ?: '-' }}</p>
-                    </div>
-
-                    {{-- PENANGANAN --}}
-                    <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Penanganan</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $penanganan ?: '-' }}</p>
-                    </div>
-
-                    {{-- TINDAK LANJUT --}}
-                    <div class="px-5 py-4">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tindak Lanjut</p>
-                        <p class="text-[14px] text-gray-900 whitespace-pre-line">{{ $tindak_lanjut ?: '-' }}</p>
                     </div>
 
                 </div>

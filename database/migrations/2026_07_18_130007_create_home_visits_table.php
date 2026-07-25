@@ -16,9 +16,6 @@ return new class extends Migration
             $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
             $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
             $table->date('tanggal_kunjungan');
-            $table->text('uraian_masalah');
-            $table->text('penanganan');
-            $table->text('tindak_lanjut')->nullable();
             $table->enum('status', ['diproses', 'ditunda', 'dibatalkan'])->default('diproses');
             $table->timestamps();
         });

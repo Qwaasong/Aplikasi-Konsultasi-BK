@@ -18,9 +18,6 @@ class BimbinganKelompok extends Model
         'tahun_ajaran_id',
         'kasus_id',
         'tanggal_layanan',
-        'uraian_masalah',
-        'penanganan',
-        'tindak_lanjut',
     ];
 
     protected $casts = [
@@ -45,5 +42,24 @@ class BimbinganKelompok extends Model
     public function siswa(): HasMany
     {
         return $this->hasMany(BimbinganKelompokSiswa::class, 'bimbingan_kelompok_id');
+    }
+
+    // ─────────────────────────────────────────
+    // DELEGATION ACCESSORS (data dari kasus_bk)
+    // ─────────────────────────────────────────
+
+    public function getPenangananAttribute()
+    {
+        return $this->kasus?->penanganan;
+    }
+
+    public function getUraianMasalahAttribute()
+    {
+        return $this->kasus?->uraian_masalah;
+    }
+
+    public function getTindakLanjutAttribute()
+    {
+        return $this->kasus?->tindak_lanjut;
     }
 }

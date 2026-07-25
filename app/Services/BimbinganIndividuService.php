@@ -46,8 +46,9 @@ class BimbinganIndividuService
                     'guru_bk_id' => $pegawai->id,
                     'tahun_ajaran_id' => $data['tahun_ajaran_id'],
                     'kategori_id' => KategoriKasus::inRandomOrder()->value('id'),
-                    'penanganan' => $data['uraian_masalah'] ?? 'Konseling Individu',
+                    'penanganan' => $data['penanganan'] ?? 'Konseling Individu',
                     'uraian_masalah' => $data['uraian_masalah'] ?? 'Konseling Individu',
+                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
                     'status' => 'Open',
                     'prioritas' => 'Sedang',
                     'tanggal_mulai' => $data['tanggal_layanan'] ?? now()->format('Y-m-d'),
@@ -55,6 +56,9 @@ class BimbinganIndividuService
             );
             $data['kasus_id'] = $kasus->id;
         }
+
+        // Hapus field yang tidak ada di tabel bimbingan_individus (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
         return $this->repo->create($data);
     }
@@ -87,7 +91,7 @@ class BimbinganIndividuService
         if (!empty($filters['search'])) {
             $keyword = $filters['search'];
             $query->where(function ($q) use ($keyword) {
-                $q->where('uraian_masalah', 'like', "%{$keyword}%")
+                $q->whereHas('kasus', fn($q2) => $q2->where('uraian_masalah', 'like', "%{$keyword}%"))
                     ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
             });
         }

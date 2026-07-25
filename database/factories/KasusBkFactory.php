@@ -18,7 +18,7 @@ class KasusBkFactory extends Factory
         $status = $this->faker->randomElement(['Open', 'Pending', 'Closed']);
         $tanggalMulai = $this->faker->dateTimeBetween('-1 month', 'now');
         $tanggalSelesai = $status === 'Closed' ? $this->faker->dateTimeBetween($tanggalMulai, 'now') : null;
-        $hasilAkhir = $status === 'Closed' ? $this->faker->sentence() : null;
+        $tindakLanjut = $status === 'Closed' ? $this->faker->sentence() : null;
 
         return [
             'siswa_id' => DataSiswa::factory(),
@@ -31,7 +31,7 @@ class KasusBkFactory extends Factory
             'prioritas' => $this->faker->randomElement(['Rendah', 'Sedang', 'Tinggi']),
             'tanggal_mulai' => $tanggalMulai->format('Y-m-d'),
             'tanggal_selesai' => $tanggalSelesai ? $tanggalSelesai->format('Y-m-d') : null,
-            'hasil_akhir' => $hasilAkhir,
+            'tindak_lanjut' => $tindakLanjut,
         ];
     }
 }

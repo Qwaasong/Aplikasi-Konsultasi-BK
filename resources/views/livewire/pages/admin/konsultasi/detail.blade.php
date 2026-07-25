@@ -151,8 +151,8 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Hasil Layanan</h3>
                 <p class="text-sm text-gray-600 leading-relaxed text-justify">
-                    <!-- Gunakan Null Coalescing (??) jika data hasil_tindak_lanjut bisa jadi kosong -->
-                    {{ $record->hasil_tindak_lanjut ?? 'Belum ada catatan hasil layanan.' }}
+                    <!-- Gunakan Null Coalescing (??) jika data tindak_lanjut bisa jadi kosong -->
+                    {{ $record->tindak_lanjut ?? 'Belum ada catatan hasil layanan.' }}
                 </p>
             </div>
 
@@ -160,7 +160,7 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
             <div>
                 <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-3">Tindak Lanjut</h3>
                 <p class="text-sm text-gray-600 leading-relaxed text-justify">
-                    {{ $record->hasil_tindak_lanjut ?? 'Belum ada catatan tindak lanjut.' }}
+                    {{ $record->tindak_lanjut ?? 'Belum ada catatan tindak lanjut.' }}
                 </p>
             </div>
         </div>

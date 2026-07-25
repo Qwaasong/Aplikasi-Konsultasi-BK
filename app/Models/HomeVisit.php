@@ -15,9 +15,6 @@ class HomeVisit extends Model
         'kasus_id',
         'guru_bk_id',
         'tanggal_kunjungan',
-        'uraian_masalah',
-        'penanganan',
-        'tindak_lanjut',
         'status',
     ];
 
@@ -36,37 +33,41 @@ class HomeVisit extends Model
     }
 
     // ─────────────────────────────────────────
-    // BACKWARD COMPATIBILITY ACCESSORS/MUTATORS
+    // DELEGATION ACCESSORS (data dari kasus_bk)
+    // ─────────────────────────────────────────
+
+    public function getPenangananAttribute()
+    {
+        return $this->kasus?->penanganan;
+    }
+
+    public function getUraianMasalahAttribute()
+    {
+        return $this->kasus?->uraian_masalah;
+    }
+
+    public function getTindakLanjutAttribute()
+    {
+        return $this->kasus?->tindak_lanjut;
+    }
+
+    // ─────────────────────────────────────────
+    // BACKWARD COMPATIBILITY ACCESSORS
     // ─────────────────────────────────────────
 
     public function getJudulAttribute()
     {
-        return $this->penanganan;
-    }
-
-    public function setJudulAttribute($value)
-    {
-        $this->attributes['penanganan'] = $value;
+        return $this->kasus?->penanganan;
     }
 
     public function getIsiKonsultasiAttribute()
     {
-        return $this->uraian_masalah;
-    }
-
-    public function setIsiKonsultasiAttribute($value)
-    {
-        $this->attributes['uraian_masalah'] = $value;
+        return $this->kasus?->uraian_masalah;
     }
 
     public function getHasilTindakLanjutAttribute()
     {
-        return $this->tindak_lanjut;
-    }
-
-    public function setHasilTindakLanjutAttribute($value)
-    {
-        $this->attributes['tindak_lanjut'] = $value;
+        return $this->kasus?->tindak_lanjut;
     }
 
     public function getTanggalKonsultasiAttribute()

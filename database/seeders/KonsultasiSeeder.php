@@ -48,7 +48,7 @@ class KonsultasiSeeder extends Seeder
             $status = $item['status'];
             $tanggalMulai = Carbon::now()->subDays($item['hari']);
             $tanggalSelesai = $status === 'Closed' ? Carbon::now() : null;
-            $hasilAkhir = $status === 'Closed' ? 'Selesai ditangani' : null;
+            $tindakLanjut = $status === 'Closed' ? 'Selesai ditangani' : null;
 
             KasusBk::create([
                 'siswa_id'           => $siswaIds[$item['siswa_no']],
@@ -61,7 +61,7 @@ class KonsultasiSeeder extends Seeder
                 'prioritas'          => 'Sedang',
                 'tanggal_mulai'      => $tanggalMulai->format('Y-m-d'),
                 'tanggal_selesai'    => $tanggalSelesai ? $tanggalSelesai->format('Y-m-d') : null,
-                'hasil_akhir'        => $hasilAkhir,
+                'tindak_lanjut'      => $tindakLanjut,
             ]);
         }
     }

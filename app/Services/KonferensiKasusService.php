@@ -42,8 +42,9 @@ class KonferensiKasusService
                     'siswa_id'      => $siswaId,
                     'guru_bk_id'    => $pegawai?->id ?? 1,
                     'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
-                    'penanganan'    => $data['uraian_masalah'] ?? 'Konferensi Kasus',
+                    'penanganan'    => $data['penanganan'] ?? 'Konferensi Kasus',
                     'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
+                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
                     'tanggal_mulai' => $data['tanggal_konferensi'] ?? now()->toDateString(),
                     'status'        => 'Open',
                     'prioritas'     => 'Sedang',
@@ -51,6 +52,9 @@ class KonferensiKasusService
             }
             $data['kasus_id'] = $kasus->id;
         }
+
+        // Hapus field yang tidak ada di tabel konferensi_kasus (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
         $record = $this->repo->create($data);
 
@@ -104,7 +108,7 @@ class KonferensiKasusService
         if (!empty($filters['search'])) {
             $keyword = $filters['search'];
             $query->where(function ($q) use ($keyword) {
-                $q->where('uraian_masalah', 'like', "%{$keyword}%")
+                $q->whereHas('kasus', fn($q2) => $q2->where('uraian_masalah', 'like', "%{$keyword}%"))
                     ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
             });
         }
