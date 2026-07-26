@@ -19,9 +19,6 @@ class BimbinganKelompokFactory extends Factory
             'tahun_ajaran_id' => TahunAjaran::factory()->aktif(),
             'kasus_id' => KasusBk::factory(),
             'tanggal_layanan' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
-            'uraian_masalah' => $this->faker->sentence(),
-            'penanganan' => $this->faker->optional()->paragraph(),
-            'tindak_lanjut' => $this->faker->optional()->paragraph(),
         ];
     }
 }

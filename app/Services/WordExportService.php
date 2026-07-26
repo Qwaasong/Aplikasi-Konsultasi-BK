@@ -53,7 +53,7 @@ class WordExportService
                 ? \Carbon\Carbon::parse($kasus->tanggal_mulai)->format('d/m/Y')
                 : '-',
             'deksripsi'          => $kasus->uraian_masalah ?? '-',
-            'hasil_akhir'        => $kasus->hasil_akhir ?? '-',
+            'hasil_akhir'        => $kasus->tindak_lanjut ?? '-',
             'status'             => $kasus->status ?? '-',
             'nama_konselor'      => $kasus->guruBk->user->nama ?? '-',
             'nip_konselor'       => $kasus->guruBk->nip ?? '-',

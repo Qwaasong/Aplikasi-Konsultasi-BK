@@ -4,7 +4,6 @@ use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
-use App\Services\SiswaService;
 use App\Services\KonferensiKasusService;
 use App\Services\LampiranService;
 
@@ -15,11 +14,8 @@ new class extends Component {
     public int $step = 1;
 
     // Form Fields
-    public $siswa_id = '';
+    public $kasus_id = '';
     public $tanggal_konferensi = '';
-    public $uraian_masalah = '';
-    public $penanganan = '';
-    public $tindak_lanjut = '';
     public $tempat_pertemuan = '';
 
     // Peserta
@@ -30,8 +26,8 @@ new class extends Component {
     public array $existingLampiran = [];
     public array $deletedLampiran = [];
 
-    public $searchSiswa = '';
-    public $showStudentModal = false;
+    public $searchKasus = '';
+    public $showKasusModal = false;
 
     public function mount()
     {
@@ -43,17 +39,11 @@ new class extends Component {
         if ($this->step === 1) {
             $errors = [];
 
-            if (empty($this->siswa_id)) {
-                $errors['siswa_id'] = 'Pilih siswa terlebih dahulu.';
+            if (empty($this->kasus_id)) {
+                $errors['kasus_id'] = 'Pilih kasus terlebih dahulu.';
             }
             if (empty($this->tanggal_konferensi)) {
                 $errors['tanggal_konferensi'] = 'Tanggal konferensi wajib diisi.';
-            }
-            if (empty(trim($this->uraian_masalah))) {
-                $errors['uraian_masalah'] = 'Uraian masalah wajib diisi.';
-            }
-            if (empty(trim($this->penanganan))) {
-                $errors['penanganan'] = 'Penanganan wajib diisi.';
             }
             if (empty($this->peserta)) {
                 $errors['peserta'] = 'Minimal harus ada 1 peserta.';
@@ -91,34 +81,43 @@ new class extends Component {
         }
     }
 
-    public function selectStudent(int $id)
+    public function selectKasus(int $id)
     {
-        $this->siswa_id = $id;
-        $this->showStudentModal = false;
-        $this->searchSiswa = '';
+        $this->kasus_id = $id;
+        $this->showKasusModal = false;
+        $this->searchKasus = '';
     }
 
-    public function openStudentModal()
+    public function openKasusModal()
     {
-        $this->showStudentModal = true;
+        $this->showKasusModal = true;
     }
 
-    public function closeStudentModal()
+    public function closeKasusModal()
     {
-        $this->showStudentModal = false;
-    }
-
-    #[Computed]
-    public function selectedStudent()
-    {
-        if (!$this->siswa_id) return null;
-        return app(SiswaService::class)->findById($this->siswa_id);
+        $this->showKasusModal = false;
     }
 
     #[Computed]
-    public function filteredStudents()
+    public function kasusOptions()
     {
-        return app(SiswaService::class)->search($this->searchSiswa, 50);
+        $options = app(\App\Services\KonferensiKasusService::class)->getKasusOptions();
+        if (empty($this->searchKasus)) return $options;
+        $needle = strtolower($this->searchKasus);
+        return $options->filter(fn($k) =>
+            str_contains(strtolower($k['nama_siswa']), $needle) ||
+            str_contains(strtolower($k['penanganan']), $needle) ||
+            str_contains(strtolower($k['nis']), $needle)
+        )->values();
+    }
+
+    #[Computed]
+    public function selectedKasus()
+    {
+        if (!$this->kasus_id) return null;
+        return app(\App\Services\KonferensiKasusService::class)
+            ->getKasusOptions()
+            ->firstWhere('id', (int) $this->kasus_id);
     }
 
     public function getInitials(?string $name): string
@@ -172,9 +171,8 @@ new class extends Component {
     {
         $this->resetValidation();
         $this->reset([
-            'editingId', 'siswa_id', 'uraian_masalah', 'penanganan',
-            'tindak_lanjut', 'tempat_pertemuan', 'peserta',
-            'searchSiswa', 'showStudentModal', 'newFiles',
+            'editingId', 'kasus_id', 'tempat_pertemuan', 'peserta',
+            'searchKasus', 'showKasusModal', 'newFiles',
             'existingLampiran', 'deletedLampiran',
         ]);
         $this->tanggal_konferensi = date('Y-m-d');
@@ -191,13 +189,10 @@ new class extends Component {
         $record = $service->findById($id);
 
         $this->editingId = $id;
-        $this->siswa_id = $record->kasus?->siswa_id;
+        $this->kasus_id = $record->kasus_id;
         $this->tanggal_konferensi = $record->tanggal_konferensi
             ? \Carbon\Carbon::parse($record->tanggal_konferensi)->format('Y-m-d')
             : date('Y-m-d');
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->penanganan = $record->penanganan;
-        $this->tindak_lanjut = $record->tindak_lanjut;
         $this->tempat_pertemuan = $record->tempat_pertemuan;
 
         $this->peserta = $record->peserta->map(fn($p) => [
@@ -225,11 +220,8 @@ new class extends Component {
         $service = app(KonferensiKasusService::class);
 
         $data = [
-            'siswa_id' => $this->siswa_id,
+            'kasus_id' => $this->kasus_id,
             'tanggal_konferensi' => $this->tanggal_konferensi,
-            'uraian_masalah' => $this->uraian_masalah,
-            'penanganan' => $this->penanganan,
-            'tindak_lanjut' => $this->tindak_lanjut ?: null,
             'tempat_pertemuan' => $this->tempat_pertemuan ?: null,
         ];
 
@@ -263,9 +255,8 @@ new class extends Component {
         }
 
         $this->reset([
-            'editingId', 'siswa_id', 'uraian_masalah', 'penanganan',
-            'tindak_lanjut', 'tempat_pertemuan', 'peserta',
-            'searchSiswa', 'showStudentModal', 'newFiles',
+            'editingId', 'kasus_id', 'tempat_pertemuan', 'peserta',
+            'searchKasus', 'showKasusModal', 'newFiles',
             'existingLampiran', 'deletedLampiran',
         ]);
         $this->tanggal_konferensi = date('Y-m-d');
@@ -331,49 +322,33 @@ new class extends Component {
                 {{-- ============================================================ --}}
                 <div class="{{ $step === 1 ? 'block' : 'hidden' }}">
 
-                    {{-- SISWA --}}
+                    {{-- KASUS PICKER --}}
                     <div class="mb-6">
-                        <x-atoms.input-label for="siswa_id" size="sm">
-                            Siswa <span class="text-red-500">*</span>
+                        <x-atoms.input-label for="kasus_id" size="sm">
+                            Pilih Kasus <span class="text-red-500">*</span>
                         </x-atoms.input-label>
 
-                        @if($this->selectedStudent)
-                            <div class="bg-bg-light border border-teal-100/60 rounded-lg p-4 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-[45px] h-[45px] bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[16px]">
-                                        {{ $this->getInitials($this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama) }}
+                        @if($this->selectedKasus)
+                            <div class="flex items-center justify-between border border-gray-200 rounded-xl p-4 bg-gray-50">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-11 h-11 rounded-full bg-teal-500/10 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0">
+                                        {{ strtoupper(substr($this->selectedKasus['nama_siswa'], 0, 2)) }}
                                     </div>
-                                    <div>
-                                        <h3 class="text-[14px] font-bold text-gray-900">
-                                            {{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}
-                                        </h3>
-                                        <p class="text-[12px] text-gray-400 mt-0.5">
-                                            Kelas {{ $this->selectedStudent->kelas_label }}
-                                            {{ $this->selectedStudent->jurusan_label }} - NIS {{ $this->selectedStudent->nis }}
-                                        </p>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $this->selectedKasus['nama_siswa'] }}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">{{ $this->selectedKasus['penanganan'] }} &middot; {{ $this->selectedKasus['kategori'] }}</p>
+                                        <p class="text-[11px] text-gray-400 mt-0.5">NIS {{ $this->selectedKasus['nis'] }} &middot; {{ $this->selectedKasus['kelas_label'] }}</p>
                                     </div>
                                 </div>
-                                <button type="button" wire:click="openStudentModal"
-                                    class="text-[13px] font-bold text-gray-500 hover:text-gray-800 transition-colors">
-                                    Ganti
-                                </button>
+                                <button type="button" wire:click="$set('kasus_id', '')" class="text-xs text-gray-400 hover:text-red-500 ml-2 shrink-0">Ganti</button>
                             </div>
                         @else
-                            <div class="bg-bg-light border border-teal-100/60 rounded-lg p-5 flex flex-col items-center justify-center text-center">
-                                <div class="w-[56px] h-[56px] bg-icon-bg rounded-full flex items-center justify-center mb-3 text-primary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                    </svg>
-                                </div>
-                                <h3 class="text-[15px] font-bold text-gray-700 mb-1">Tidak Ada Siswa Yang Dipilih</h3>
-                                <p class="text-[13px] text-gray-400 mb-4">Pilih Siswa Untuk Melanjutkan</p>
-                                <button type="button" wire:click="openStudentModal"
-                                    class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md text-[13px] font-semibold transition-colors">
-                                    Pilih Siswa
-                                </button>
-                            </div>
+                            <button type="button" wire:click="openKasusModal"
+                                class="w-full border border-dashed border-gray-300 rounded-xl p-4 text-left text-sm text-gray-500 hover:border-teal-400 hover:bg-teal-50/50 transition">
+                                + Klik untuk memilih kasus
+                            </button>
                         @endif
-                        @error('siswa_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                        @error('kasus_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- PESERTA KONFERENSI --}}
@@ -477,45 +452,6 @@ new class extends Component {
                         @enderror
                     </div>
 
-                    {{-- URAIAN MASALAH --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="uraian_masalah" size="sm">
-                            Uraian Masalah <span class="text-red-500">*</span>
-                        </x-atoms.input-label>
-                        <textarea id="uraian_masalah" wire:model="uraian_masalah" rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan uraian masalah yang dibahas..."></textarea>
-                        @error('uraian_masalah')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- PENANGANAN --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="penanganan" size="sm">
-                            Penanganan <span class="text-red-500">*</span>
-                        </x-atoms.input-label>
-                        <textarea id="penanganan" wire:model="penanganan" rows="3"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan penanganan yang dilakukan..."></textarea>
-                        @error('penanganan')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- TINDAK LANJUT --}}
-                    <div class="mb-6">
-                        <x-atoms.input-label for="tindak_lanjut" size="sm">
-                            Tindak Lanjut
-                        </x-atoms.input-label>
-                        <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                            placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>
-                        @error('tindak_lanjut')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
                 </div>{{-- END STEP 1 --}}
 
                 {{-- ============================================================ --}}
@@ -535,30 +471,14 @@ new class extends Component {
                         <p class="text-[13px] text-gray-500 ml-10">Pastikan semua data yang dimasukkan sudah benar sebelum menyimpan.</p>
                     </div>
 
-                    {{-- Siswa --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                        <div class="flex items-center gap-2 mb-3">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Siswa</span>
-                        </div>
-                        @if($this->selectedStudent)
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[14px] shrink-0">
-                                    {{ $this->getInitials($this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama) }}
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-[14px] font-bold text-gray-900">
-                                        {{ $this->selectedStudent->nama_lengkap ?? $this->selectedStudent->nama }}
-                                    </p>
-                                    <p class="text-[12px] text-gray-400 mt-0.5">
-                                        NIS {{ $this->selectedStudent->nis }} - Kelas {{ $this->selectedStudent->kelas_label }} {{ $this->selectedStudent->jurusan_label }}
-                                    </p>
-                                </div>
-                            </div>
+                    {{-- Kasus --}}
+                    <div class="px-5 py-4 border-b border-gray-100">
+                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Kasus</p>
+                        @if($this->selectedKasus)
+                            <p class="text-[14px] text-gray-900 font-medium">{{ $this->selectedKasus['nama_siswa'] }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ $this->selectedKasus['penanganan'] }} &middot; {{ $this->selectedKasus['kategori'] }}</p>
                         @else
-                            <p class="text-[13px] text-red-500 font-medium">Belum memilih siswa</p>
+                            <p class="text-[14px] text-gray-400">-</p>
                         @endif
                     </div>
 
@@ -620,43 +540,6 @@ new class extends Component {
                                 <p class="text-[11px] text-gray-400 mt-0.5">Tidak diisi</p>
                             @endif
                         </div>
-                    </div>
-
-                    {{-- Uraian Masalah --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Uraian Masalah</span>
-                        </div>
-                        <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $uraian_masalah ?: '-' }}</p>
-                    </div>
-
-                    {{-- Penanganan --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Penanganan</span>
-                        </div>
-                        <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $penanganan ?: '-' }}</p>
-                    </div>
-
-                    {{-- Tindak Lanjut --}}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                            </svg>
-                            <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Tindak Lanjut</span>
-                        </div>
-                        @if($tindak_lanjut)
-                            <p class="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{{ $tindak_lanjut }}</p>
-                        @else
-                            <p class="text-[13px] text-gray-400 italic">Tidak ada tindak lanjut</p>
-                        @endif
                     </div>
 
                 </div>{{-- END STEP 2 --}}
@@ -791,57 +674,89 @@ new class extends Component {
             </div>
         </div>
 
-        {{-- STUDENT SELECTION MODAL --}}
-        <div x-data="{ showStudentMenu: @entangle('showStudentModal') }" x-show="showStudentMenu"
-            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity"
-            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-            x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        {{-- Kasus Modal --}}
+        <div x-data="{ showKasusMenu: @entangle('showKasusModal') }"
+            x-show="showKasusMenu"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            @click.away="showKasusMenu = false"
             style="display: none;">
-            <div class="bg-white w-full max-w-[500px] rounded-xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden"
-                @click.away="showStudentMenu = false">
-                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-[20px] font-bold text-gray-900 leading-tight">Pilih Siswa</h2>
-                        <p class="text-[13px] text-gray-500 mt-0.5">Pilih siswa untuk konferensi kasus</p>
+
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-[600px] mx-4 max-h-[80vh] flex flex-col overflow-hidden"
+                @click.stop>
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <h3 class="font-bold text-gray-900 text-[15px]">Pilih Kasus</h3>
+                    <button wire:click="closeKasusModal" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+                </div>
+
+                {{-- Search --}}
+                <div class="px-5 pt-4 pb-2">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input type="text" wire:model.live="searchKasus"
+                            placeholder="Cari nama siswa, judul kasus, atau NIS..."
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400" />
                     </div>
                 </div>
 
-                <div class="px-6 py-5 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
-                    <div class="flex gap-3 mb-5">
-                        <div class="relative grow">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <input type="text" wire:model.live="searchSiswa" placeholder="Cari Nama Atau NIS"
-                                class="w-full border border-gray-200 rounded-md pl-10 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm">
-                        </div>
-                    </div>
+                {{-- List --}}
+                <div class="flex-1 overflow-y-auto px-5 pb-4 space-y-2">
+                    @forelse($this->kasusOptions as $k)
+                        <div wire:click="selectKasus({{ $k['id'] }})"
+                            class="border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-all {{ $kasus_id == $k['id'] ? 'border-teal-400 bg-teal-50 shadow-sm' : '' }}">
 
-                    <div class="flex flex-col gap-3">
-                        @forelse($this->filteredStudents as $siswa)
-                            <div wire:click="selectStudent({{ $siswa->id }})"
-                                class="flex items-center gap-3 border border-gray-200 rounded-md p-4 cursor-pointer transition-colors
-                                    {{ $siswa_id == $siswa->id ? 'border-teal-400 bg-teal-50' : 'hover:border-primary hover:bg-bg-light' }}">
-                                <div class="flex-1">
-                                    <h4 class="text-[14px] font-bold text-gray-900">
-                                        {{ $siswa->nama_lengkap ?? $siswa->nama }}
-                                    </h4>
-                                    <p class="text-[12px] text-gray-500 mt-1">
-                                        NIS: {{ $siswa->nis }} <span class="ml-2">Kelas: {{ $siswa->kelas_label }}</span>
-                                    </p>
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-full bg-teal-500/10 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0">
+                                        {{ strtoupper(substr($k['nama_siswa'], 0, 2)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $k['nama_siswa'] }}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">{{ $k['penanganan'] }}</p>
+                                    </div>
                                 </div>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0
+                                    {{ match($k['prioritas']) {
+                                        'Tinggi' => 'bg-red-100 text-red-700',
+                                        'Sedang' => 'bg-yellow-100 text-yellow-700',
+                                        default => 'bg-green-100 text-green-700',
+                                    } }}">
+                                    {{ $k['prioritas'] }}
+                                </span>
                             </div>
-                        @empty
-                            <div class="p-6 text-center text-gray-500 text-sm">Tidak ada siswa ditemukan.</div>
-                        @endforelse
-                    </div>
+
+                            <div class="flex items-center gap-2 mt-2 ml-[52px] text-xs text-gray-400">
+                                <span>{{ $k['kategori'] }}</span>
+                                <span>&middot;</span>
+                                <span>{{ $k['kelas_label'] }}</span>
+                                <span>&middot;</span>
+                                <span>NIS {{ $k['nis'] }}</span>
+                                <span>&middot;</span>
+                                <span>{{ $k['tanggal_mulai'] }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <p class="text-sm text-gray-400">
+                                @if(!empty($searchKasus)) Tidak ada kasus ditemukan. @else Tidak ada kasus yang tersedia. @endif
+                            </p>
+                        </div>
+                    @endforelse
                 </div>
 
-                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-2.5">
-                    <button type="button" wire:click="closeStudentModal"
-                        class="px-5 py-2 bg-white border border-gray-200 rounded-md text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+                {{-- Footer --}}
+                <div class="px-5 py-3 border-t border-gray-100 flex justify-end">
+                    <button wire:click="closeKasusModal"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition">
                         Tutup
                     </button>
                 </div>

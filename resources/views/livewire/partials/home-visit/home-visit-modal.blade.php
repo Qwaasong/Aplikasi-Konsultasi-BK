@@ -156,9 +156,9 @@ new class extends Component {
 
         $this->editingId = $id;
         $this->tanggal_kunjungan = \Carbon\Carbon::parse($record->tanggal_kunjungan)->format('Y-m-d');
-        $this->penanganan = $record->penanganan;
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->tindak_lanjut = $record->tindak_lanjut;
+        $this->penanganan = $record->penanganan ?? '';
+        $this->uraian_masalah = $record->uraian_masalah ?? '';
+        $this->tindak_lanjut = $record->tindak_lanjut ?? '';
         $this->status = $record->status;
         $this->siswa_id = $record->kasus?->siswa_id ?? '';
         $this->uploadedFiles = [];
@@ -373,9 +373,7 @@ new class extends Component {
 
                 {{-- TINDAK LANJUT --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="tindak_lanjut" size="sm">
-                        Tindak Lanjut
-                    </x-atoms.input-label>
+                    <x-atoms.input-label for="tindak_lanjut" size="sm">Tindak Lanjut</x-atoms.input-label>
                     <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
                         placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>

@@ -17,9 +17,6 @@ return new class extends Migration
             $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
             $table->date('tanggal_layanan');
-            $table->text('uraian_masalah');
-            $table->text('penanganan');
-            $table->text('tindak_lanjut')->nullable();
             $table->timestamps();
         });
     }

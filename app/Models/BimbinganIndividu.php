@@ -15,9 +15,6 @@ class BimbinganIndividu extends Model
         'guru_bk_id',
         'tahun_ajaran_id',
         'tanggal_layanan',
-        'uraian_masalah',
-        'penanganan',
-        'tindak_lanjut',
     ];
 
     protected $casts = [
@@ -37,5 +34,24 @@ class BimbinganIndividu extends Model
     public function tahunAjaran()
     {
         return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
+    }
+
+    // ─────────────────────────────────────────
+    // DELEGATION ACCESSORS (data dari kasus_bk)
+    // ─────────────────────────────────────────
+
+    public function getPenangananAttribute()
+    {
+        return $this->kasus?->penanganan;
+    }
+
+    public function getUraianMasalahAttribute()
+    {
+        return $this->kasus?->uraian_masalah;
+    }
+
+    public function getTindakLanjutAttribute()
+    {
+        return $this->kasus?->tindak_lanjut;
     }
 }

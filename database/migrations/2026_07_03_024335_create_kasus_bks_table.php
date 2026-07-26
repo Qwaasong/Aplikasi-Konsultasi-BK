@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->enum('prioritas', ['Rendah', 'Sedang', 'Tinggi'])->default('Rendah');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai')->nullable();
-            $table->text('hasil_akhir')->nullable();
+            $table->text('tindak_lanjut')->nullable();
             $table->timestamps();
         });
     }

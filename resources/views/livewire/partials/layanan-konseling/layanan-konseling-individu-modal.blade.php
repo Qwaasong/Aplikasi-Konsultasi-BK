@@ -22,10 +22,10 @@ new class extends Component {
     public $tahun_ajaran_id = '';
 
     #[Validate('required|string')]
-    public $uraian_masalah = '';
+    public $penanganan = '';
 
     #[Validate('required|string')]
-    public $penanganan = '';
+    public $uraian_masalah = '';
 
     #[Validate('nullable|string')]
     public $tindak_lanjut = '';
@@ -57,9 +57,9 @@ new class extends Component {
                 'siswa_id'         => 'required|integer',
                 'tanggal_layanan'  => 'required|date',
                 'tahun_ajaran_id'  => 'required|integer',
-                'uraian_masalah'   => 'required|string',
-                'penanganan'       => 'required|string',
-                'tindak_lanjut'    => 'nullable|string',
+                'penanganan'     => 'required|string',
+                'uraian_masalah' => 'required|string',
+                'tindak_lanjut'  => 'nullable|string',
             ]);
         }
 
@@ -131,8 +131,8 @@ new class extends Component {
     {
         $this->resetValidation();
         $this->reset([
-            'editingId', 'tahun_ajaran_id', 'uraian_masalah',
-            'penanganan', 'tindak_lanjut', 'siswa_id', 'uploadedFiles',
+            'editingId', 'tahun_ajaran_id', 'siswa_id', 'uploadedFiles',
+            'penanganan', 'uraian_masalah', 'tindak_lanjut',
         ]);
         $this->step = 1;
         $this->tanggal_layanan = date('Y-m-d');
@@ -151,10 +151,10 @@ new class extends Component {
         $this->editingId = $id;
         $this->tahun_ajaran_id = $record->tahun_ajaran_id;
         $this->tanggal_layanan = \Carbon\Carbon::parse($record->tanggal_layanan)->format('Y-m-d');
-        $this->uraian_masalah = $record->uraian_masalah;
-        $this->penanganan = $record->penanganan;
-        $this->tindak_lanjut = $record->tindak_lanjut;
         $this->siswa_id = $record->kasus?->siswa_id ?? '';
+        $this->penanganan = $record->penanganan ?? '';
+        $this->uraian_masalah = $record->uraian_masalah ?? '';
+        $this->tindak_lanjut = $record->tindak_lanjut ?? '';
         $this->uploadedFiles = [];
         $this->step = 1;
 
@@ -170,9 +170,9 @@ new class extends Component {
             'siswa_id' => $this->siswa_id,
             'tahun_ajaran_id' => $this->tahun_ajaran_id,
             'tanggal_layanan' => $this->tanggal_layanan,
+            'penanganan'     => $this->penanganan,
             'uraian_masalah' => $this->uraian_masalah,
-            'penanganan' => $this->penanganan,
-            'tindak_lanjut' => $this->tindak_lanjut,
+            'tindak_lanjut'  => $this->tindak_lanjut,
         ];
 
         if ($this->editingId) {
@@ -184,8 +184,8 @@ new class extends Component {
         }
 
         $this->reset([
-            'editingId', 'tahun_ajaran_id', 'uraian_masalah',
-            'penanganan', 'tindak_lanjut', 'siswa_id', 'uploadedFiles',
+            'editingId', 'tahun_ajaran_id', 'siswa_id', 'uploadedFiles',
+            'penanganan', 'uraian_masalah', 'tindak_lanjut',
         ]);
         $this->step = 1;
         $this->tanggal_layanan = date('Y-m-d');
@@ -320,7 +320,7 @@ new class extends Component {
                     </x-atoms.input-label>
                     <textarea id="uraian_masalah" wire:model="uraian_masalah" rows="3"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan topik/uraian masalah yang dibahas..."></textarea>
+                        placeholder="Tuliskan uraian masalah yang ditemukan..."></textarea>
                     @error('uraian_masalah') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
@@ -331,18 +331,16 @@ new class extends Component {
                     </x-atoms.input-label>
                     <textarea id="penanganan" wire:model="penanganan" rows="3"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan penanganan/tujuan layanan..."></textarea>
+                        placeholder="Tuliskan penanganan yang dilakukan..."></textarea>
                     @error('penanganan') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- TINDAK LANJUT --}}
                 <div class="mb-6">
-                    <x-atoms.input-label for="tindak_lanjut" size="sm">
-                        Tindak Lanjut
-                    </x-atoms.input-label>
+                    <x-atoms.input-label for="tindak_lanjut" size="sm">Tindak Lanjut</x-atoms.input-label>
                     <textarea id="tindak_lanjut" wire:model="tindak_lanjut" rows="2"
                         class="w-full border border-gray-200 rounded-md p-4 text-[14px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm"
-                        placeholder="Tuliskan hasil dan tindak lanjut (opsional)..."></textarea>
+                        placeholder="Tuliskan tindak lanjut (opsional)..."></textarea>
                     @error('tindak_lanjut') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
                 </div>
 

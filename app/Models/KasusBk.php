@@ -21,7 +21,7 @@ class KasusBk extends Model
         'prioritas',
         'tanggal_mulai',
         'tanggal_selesai',
-        'hasil_akhir',
+        'tindak_lanjut',
     ];
 
     protected $casts = [
@@ -141,13 +141,8 @@ class KasusBk extends Model
         $this->attributes['tanggal_mulai'] = $value;
     }
 
-    public function getHasilTindakLanjutAttribute()
+    public function bimbinganKelompok()
     {
-        return $this->hasil_akhir;
-    }
-
-    public function setHasilTindakLanjutAttribute($value)
-    {
-        $this->attributes['hasil_akhir'] = $value;
+        return $this->hasMany(BimbinganKelompok::class, 'kasus_id');
     }
 }

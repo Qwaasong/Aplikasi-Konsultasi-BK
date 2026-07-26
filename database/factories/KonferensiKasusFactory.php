@@ -17,9 +17,6 @@ class KonferensiKasusFactory extends Factory
             'kasus_id' => KasusBk::factory(),
             'guru_bk_id' => Pegawai::factory()->guruBk(),
             'tanggal_konferensi' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
-            'uraian_masalah' => $this->faker->sentence(),
-            'penanganan' => $this->faker->sentence(),
-            'tindak_lanjut' => $this->faker->optional()->paragraph(),
             'tempat_pertemuan' => $this->faker->optional()->word(),
         ];
     }

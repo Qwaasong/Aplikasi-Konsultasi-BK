@@ -15,9 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
             $table->date('tanggal_konferensi');
-            $table->string('uraian_masalah');
-            $table->string('penanganan');
-            $table->text('tindak_lanjut')->nullable();
             $table->timestamps();
         });
     }

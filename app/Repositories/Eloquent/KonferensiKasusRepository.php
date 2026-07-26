@@ -40,7 +40,7 @@ class KonferensiKasusRepository implements KonferensiKasusRepositoryInterface
     public function search(string $keyword, int $limit = 5): Collection
     {
         return KonferensiKasus::with('kasus.siswa.user')
-            ->where('uraian_masalah', 'like', "%{$keyword}%")
+            ->whereHas('kasus', fn($q) => $q->where('uraian_masalah', 'like', "%{$keyword}%"))
             ->take($limit)
             ->get();
     }

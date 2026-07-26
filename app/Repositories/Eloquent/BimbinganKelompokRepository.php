@@ -11,14 +11,14 @@ class BimbinganKelompokRepository implements BimbinganKelompokRepositoryInterfac
 {
     public function getAll(): Collection
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user'])
+        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
             ->latest('tanggal_layanan')
             ->get();
     }
 
     public function findById(int $id): ?BimbinganKelompok
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user'])
+        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
             ->find($id);
     }
 
@@ -39,14 +39,14 @@ class BimbinganKelompokRepository implements BimbinganKelompokRepositoryInterfac
 
     public function search(string $keyword, int $limit = 5): Collection
     {
-        return BimbinganKelompok::with('siswa.siswa.user')
-            ->where('uraian_masalah', 'like', "%{$keyword}%")
+        return BimbinganKelompok::with(['siswa.siswa.user', 'kasus.siswa.user'])
+            ->whereHas('kasus', fn($q) => $q->where('uraian_masalah', 'like', "%{$keyword}%"))
             ->take($limit)
             ->get();
     }
 
     public function query(): Builder
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user']);
+        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user']);
     }
 }

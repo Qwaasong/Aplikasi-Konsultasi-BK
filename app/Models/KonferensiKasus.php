@@ -16,9 +16,6 @@ class KonferensiKasus extends Model
         'kasus_id',
         'guru_bk_id',
         'tanggal_konferensi',
-        'uraian_masalah',
-        'penanganan',
-        'tindak_lanjut',
         'tempat_pertemuan',
     ];
 
@@ -39,5 +36,24 @@ class KonferensiKasus extends Model
     public function peserta(): HasMany
     {
         return $this->hasMany(KonferensiKasusPeserta::class, 'konferensi_kasus_id');
+    }
+
+    // ─────────────────────────────────────────
+    // DELEGATION ACCESSORS (data dari kasus_bk)
+    // ─────────────────────────────────────────
+
+    public function getPenangananAttribute()
+    {
+        return $this->kasus?->penanganan;
+    }
+
+    public function getUraianMasalahAttribute()
+    {
+        return $this->kasus?->uraian_masalah;
+    }
+
+    public function getTindakLanjutAttribute()
+    {
+        return $this->kasus?->tindak_lanjut;
     }
 }

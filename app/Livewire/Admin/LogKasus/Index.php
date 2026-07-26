@@ -63,4 +63,9 @@ class Index extends Component
         $this->selected = [];
         $this->selectAll = false;
     }
+
+    public function goToDetail($id)
+    {
+        $this->redirectRoute('admin.log-kasus.detail', ['id' => $id], navigate: true);
+    }
 }
