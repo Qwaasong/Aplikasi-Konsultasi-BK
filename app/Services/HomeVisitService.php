@@ -40,25 +40,19 @@ class HomeVisitService
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
 
+        // Selalu buat kasus BK baru
         if ($siswaId) {
-            $kasus = KasusBk::where('siswa_id', $siswaId)
-                ->where('status', 'Open')
-                ->latest()
-                ->first();
-
-            if (!$kasus) {
-                $kasus = KasusBk::create([
-                    'siswa_id'      => $siswaId,
-                    'guru_bk_id'    => $gurubkId,
-                    'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
-                    'penanganan'    => $data['penanganan'] ?? 'Kunjungan Rumah',
-                    'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
-                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
-                    'tanggal_mulai' => $data['tanggal_kunjungan'] ?? now()->toDateString(),
-                    'status'        => 'Open',
-                    'prioritas'     => 'Sedang',
-                ]);
-            }
+            $kasus = KasusBk::create([
+                'siswa_id'      => $siswaId,
+                'guru_bk_id'    => $gurubkId,
+                'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
+                'penanganan'    => $data['penanganan'] ?? 'Kunjungan Rumah',
+                'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
+                'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
+                'tanggal_mulai' => $data['tanggal_kunjungan'] ?? now()->toDateString(),
+                'status'        => 'Open',
+                'prioritas'     => 'Sedang',
+            ]);
 
             $data['kasus_id'] = $kasus->id;
         }
@@ -76,6 +70,15 @@ class HomeVisitService
         $record = $this->repo->findById($id);
 
         unset($data['siswa_id']);
+
+        // Simpan penanganan/uraian_masalah/tindak_lanjut ke kasus_bk
+        if ($record->kasus_id) {
+            KasusBk::where('id', $record->kasus_id)->update([
+                'penanganan'    => $data['penanganan'] ?? null,
+                'uraian_masalah' => $data['uraian_masalah'] ?? null,
+                'tindak_lanjut'  => $data['tindak_lanjut'] ?? null,
+            ]);
+        }
 
         // Hapus field yang tidak ada di tabel home_visits (sudah di kasus_bk)
         unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);

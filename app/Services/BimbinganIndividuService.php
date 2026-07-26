@@ -40,20 +40,19 @@ class BimbinganIndividuService
         unset($data['siswa_id']);
 
         if ($siswaId) {
-            $kasus = KasusBk::firstOrCreate(
-                ['siswa_id' => $siswaId],
-                [
-                    'guru_bk_id' => $pegawai->id,
-                    'tahun_ajaran_id' => $data['tahun_ajaran_id'],
-                    'kategori_id' => KategoriKasus::inRandomOrder()->value('id'),
-                    'penanganan' => $data['penanganan'] ?? 'Konseling Individu',
-                    'uraian_masalah' => $data['uraian_masalah'] ?? 'Konseling Individu',
-                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
-                    'status' => 'Open',
-                    'prioritas' => 'Sedang',
-                    'tanggal_mulai' => $data['tanggal_layanan'] ?? now()->format('Y-m-d'),
-                ]
-            );
+            // Selalu buat kasus BK baru
+            $kasus = KasusBk::create([
+                'siswa_id' => $siswaId,
+                'guru_bk_id' => $pegawai->id,
+                'tahun_ajaran_id' => $data['tahun_ajaran_id'],
+                'kategori_id' => KategoriKasus::inRandomOrder()->value('id'),
+                'penanganan' => $data['penanganan'] ?? 'Konseling Individu',
+                'uraian_masalah' => $data['uraian_masalah'] ?? 'Konseling Individu',
+                'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
+                'status' => 'Open',
+                'prioritas' => 'Sedang',
+                'tanggal_mulai' => $data['tanggal_layanan'] ?? now()->format('Y-m-d'),
+            ]);
             $data['kasus_id'] = $kasus->id;
         }
 
@@ -68,6 +67,18 @@ class BimbinganIndividuService
         $record = $this->repo->findById($id);
 
         unset($data['siswa_id']);
+
+        // Simpan penanganan/uraian_masalah/tindak_lanjut ke kasus_bk
+        if ($record->kasus_id) {
+            KasusBk::where('id', $record->kasus_id)->update([
+                'penanganan'    => $data['penanganan'] ?? null,
+                'uraian_masalah' => $data['uraian_masalah'] ?? null,
+                'tindak_lanjut'  => $data['tindak_lanjut'] ?? null,
+            ]);
+        }
+
+        // Hapus field yang tidak ada di tabel bimbingan_individus (sudah di kasus_bk)
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
         $this->repo->update($id, $data);
 
