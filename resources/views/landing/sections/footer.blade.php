@@ -36,8 +36,8 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('kehadiran') }}" class="footer-link">
-                        Kehadiran Siswa
+                    <a href="{{ route('layanan') }}" class="footer-link">
+                        Layanan BK
                     </a>
                 </li>
 
@@ -92,7 +92,7 @@
 
                 <li>
                     <a href="{{ route('register') }}" class="footer-link">
-                        Register
+                        Daftar
                     </a>
                 </li>
 

@@ -25,28 +25,18 @@ Volt::route('test', 'pages.test');
 // Landing Page
 Route::view('/', 'landing.index')->name('landing');
 
-// Kehadiran Siswa
-Route::view('/kehadiran', 'landing.kehadiran.index')
-    ->name('kehadiran');
+// Layanan BK
+Route::view('/layanan', 'landing.layanan.index')->name('layanan');
 
 // Asesmen
 Route::prefix('asesmen')->name('asesmen.')->group(function () {
 
-    Route::view('/akpd', 'landing.asesmen.akpd.index')
-        ->name('akpd');
-
-    Route::view('/gaya-belajar', 'landing.asesmen.gaya-belajar.index')
-        ->name('gaya-belajar');
-
-    Route::view('/dcm', 'landing.asesmen.dcm.index')
-        ->name('dcm');
-
-    Route::view('/sosiometri', 'landing.asesmen.sosiometri.index')
-        ->name('sosiometri');
-
-    Route::view('/tes-bakat-minat', 'landing.asesmen.tes-bakat-minat.index')
-        ->name('tes-bakat-minat');
-
+    Route::view('/akpd', 'landing.asesmen.akpd.index')->name('akpd');
+    Route::view('/gaya-belajar', 'landing.asesmen.gaya-belajar.index')->name('gaya-belajar');
+    Route::view('/dcm', 'landing.asesmen.dcm.index')->name('dcm');
+    Route::view('/sosiometri', 'landing.asesmen.sosiometri.index')->name('sosiometri');
+    Route::view('/tes-bakat-minat', 'landing.asesmen.tes-bakat-minat.index')->name('tes-bakat-minat');
+    
 });
 
 // ── Export Word ──────────────────────────────────────────────
@@ -62,8 +52,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
     Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');
     Volt::route('admin/user', 'pages.admin.user.index')->name('admin.user.index');
-    Volt::route('/admin/konsultasi/{id}/detail', 'pages.admin.konsultasi.detail')
-        ->name('admin.konsultasi.detail');
+    Volt::route('/admin/konsultasi/{id}/detail', 'pages.admin.konsultasi.detail')->name('admin.konsultasi.detail');
     Volt::route('admin/kasus-bk', 'pages.admin.kasus-bk.index')->name('admin.kasus-bk.index');
     Volt::route('admin/kasus-bk/{id}/detail', 'pages.admin.kasus-bk.detail')->name('admin.kasus-bk.detail');
 
