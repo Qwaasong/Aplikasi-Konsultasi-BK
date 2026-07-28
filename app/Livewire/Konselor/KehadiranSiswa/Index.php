@@ -20,6 +20,7 @@ class Index extends Component
 
     public array $records = [];
     public array $kelasOptions = [];
+    public array $tahunOptions = [];
 
     public function mount(): void
     {
@@ -82,6 +83,10 @@ class Index extends Component
                 'tahun' => $item->tahunAjaran?->tahun ?? '-',
             ];
         })->toArray();
+
+        $options = $service->getFilterOptions();
+        $this->kelasOptions = $options['kelasOptions'] ?? [];
+        $this->tahunOptions = $options['tahunOptions'] ?? [];
     }
 
     /**
