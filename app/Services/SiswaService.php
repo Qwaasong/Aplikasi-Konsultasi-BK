@@ -160,7 +160,7 @@ class SiswaService
         }
 
         if (!empty($filters['jenis_kelamin'])) {
-            $query->where('jenis_kelamin', $filters['jenis_kelamin']);
+            $query->whereHas('user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
         }
 
         return $query->latest()->get();

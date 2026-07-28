@@ -116,7 +116,7 @@ class BimbinganIndividuService
         }
 
         if (!empty($filters['jenis_kelamin'])) {
-            $query->whereHas('kasus.siswa', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+            $query->whereHas('kasus.siswa.user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
         }
 
         return $query->latest('tanggal_layanan')->get();

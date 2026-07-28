@@ -12,6 +12,7 @@ class Index extends Component
     public string $search = '';
     public string $filterKelas = '';
     public string $filterJurusan = '';
+    public string $filterJenisKelamin = '';
     public bool $showFilters = false;
     public array $selected = [];
     public bool $selectAll = false;
@@ -29,6 +30,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'kelas' => $this->filterKelas ?: null,
             'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
         ];
 
         $options = $service->getFilterOptions();
@@ -37,6 +39,7 @@ class Index extends Component
             'records' => $service->getFiltered($filters),
             'kelasOptions' => $options['kelasOptions'] ?? [],
             'jurusanOptions' => $options['jurusanOptions'] ?? [],
+            'jenisKelaminOptions' => $options['jenisKelaminOptions'] ?? [],
         ];
     }
 
@@ -66,6 +69,7 @@ class Index extends Component
         $this->search = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
+        $this->filterJenisKelamin = '';
         $this->selected = [];
         $this->selectAll = false;
     }

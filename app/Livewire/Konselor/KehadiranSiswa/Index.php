@@ -15,6 +15,8 @@ class Index extends Component
     public string $filterTahun = '';
     public bool $showFilters = false;
     public array $records = [];
+    public array $kelasOptions = [];
+    public array $tahunOptions = [];
 
     public function __construct()
     {
@@ -55,6 +57,10 @@ class Index extends Component
                 'tahun' => $item->tahunAjaran?->tahun ?? '-',
             ];
         })->toArray();
+
+        $options = $service->getFilterOptions();
+        $this->kelasOptions = $options['kelasOptions'] ?? [];
+        $this->tahunOptions = $options['tahunOptions'] ?? [];
     }
 
     public function updated()

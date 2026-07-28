@@ -30,7 +30,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             {{-- Filter 1: Jenis Layanan --}}
             <select wire:model.live="filterJenisLayanan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Layanan</option>
                 @foreach($layananOptions ?? [] as $k)
                     <option value="{{ $k }}">{{ $k }}</option>
@@ -39,7 +39,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             {{-- Filter 2: Kelas --}}
             <select wire:model.live="filterKelas"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Kelas</option>
                 @foreach($kelasOptions ?? [] as $k)
                     <option value="{{ $k }}">Kelas {{ $k }}</option>
@@ -48,7 +48,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             {{-- Filter 3: Jurusan --}}
             <select wire:model.live="filterJurusan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-32 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Jurusan</option>
                 @foreach($jurusanOptions ?? [] as $j)
                     <option value="{{ $j }}">{{ $j }}</option>
@@ -57,7 +57,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             {{-- Filter 4: Jenis Kelamin --}}
             <select wire:model.live="filterJenisKelamin"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua</option>
                 <option value="L">Laki-laki</option>
                 <option value="P">Perempuan</option>

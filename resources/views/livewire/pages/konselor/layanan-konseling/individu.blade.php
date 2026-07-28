@@ -29,21 +29,21 @@ new #[Layout('layouts.app')] class extends Individu {}; ?>
         <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600 shrink-0 transition-all">
             <span class="text-gray-500 text-xs font-medium">Filter Data:</span>
             <select wire:model.live="filterKelas"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Kelas</option>
                 @foreach($kelasOptions ?? [] as $k)
                     <option value="{{ $k }}">Kelas {{ $k }}</option>
                 @endforeach
             </select>
             <select wire:model.live="filterJurusan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-32 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Jurusan</option>
                 @foreach($jurusanOptions ?? [] as $j)
                     <option value="{{ $j }}">{{ $j }}</option>
                 @endforeach
             </select>
             <select wire:model.live="filterJenisKelamin"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-6 flex-shrink-0 bg-white cursor-pointer">
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua</option>
                 <option value="L">Laki-laki</option>
                 <option value="P">Perempuan</option>
@@ -72,7 +72,7 @@ new #[Layout('layouts.app')] class extends Individu {}; ?>
 
     {{-- Data Table --}}
     <x-organisms.data-table
-        :headers="['', 'Tanggal', 'Siswa', 'Kelas', 'Uraian Masalah', 'Aksi']"
+        :headers="['', 'Tanggal', 'Siswa', 'J. Kelamin', 'Kelas', 'Uraian Masalah', 'Aksi']"
         empty="Belum ada data layanan konseling individu.">
         @forelse($records as $record)
             <tr wire:key="bi-{{ $record->id }}" wire:click="goToDetail({{ $record->id }})"
@@ -90,6 +90,25 @@ new #[Layout('layouts.app')] class extends Individu {}; ?>
                 <td class="px-4 py-2 font-semibold align-middle">
                     <span class="text-gray-900">{{ $record->kasus?->siswa?->nama ?? $record->siswa?->nama ?? '-' }}</span>
                     <p class="text-[11px] text-gray-400">NIS {{ $record->kasus?->siswa?->nis ?? $record->siswa?->nis ?? '-' }}</p>
+                </td>
+
+                @php
+                    $jenisKelamin = $record->kasus?->siswa?->jenis_kelamin ?? $record->siswa?->jenis_kelamin ?? null;
+                @endphp
+                <td class="px-4 py-2 align-middle">
+                    @if($jenisKelamin === 'L')
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                            Laki-laki
+                        </span>
+                    @elseif($jenisKelamin === 'P')
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                            Perempuan
+                        </span>
+                    @else
+                        <span class="text-xs text-gray-400">-</span>
+                    @endif
                 </td>
 
                 <td class="px-4 py-2 text-sm text-gray-600 align-middle">

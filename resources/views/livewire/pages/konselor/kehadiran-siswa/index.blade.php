@@ -42,11 +42,11 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
         <select
             wire:model.live="filterKelas"
-            class="text-xs border rounded px-2 py-1 pr-6">
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
 
             <option value="">Semua Kelas</option>
 
-            @foreach(collect($records)->pluck('kelas')->unique()->sort() as $kelas)
+            @foreach($kelasOptions as $kelas)
                 <option value="{{ $kelas }}">
                     {{ $kelas }}
                 </option>
@@ -56,7 +56,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
         <select
             wire:model.live="filterStatus"
-            class="text-xs border rounded px-2 py-1 pr-6">
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
 
             <option value="">Semua Status</option>
             <option value="Hadir">Hadir</option>
@@ -68,11 +68,11 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
         <select
             wire:model.live="filterTahun"
-            class="text-xs border rounded px-2 py-1 pr-6">
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
 
             <option value="">Semua Tahun</option>
 
-            @foreach(collect($records)->pluck('tahun')->unique()->sort() as $tahun)
+            @foreach($tahunOptions as $tahun)
                 <option value="{{ $tahun }}">
                     {{ $tahun }}
                 </option>
