@@ -64,7 +64,7 @@
 
                 </ul>
 
-                <a href="{{ route('login') }}" class="assessment-button">
+                <a href="#" class="assessment-button">
                     Mulai Mengisi Sosiometri
                 </a>
 
