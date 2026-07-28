@@ -23,6 +23,8 @@
     {{-- CSS Landing --}}
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="{{ asset('asset/css/landing.css') }}">
+    
+    @stack('styles')
 </head>
 
 <body>
