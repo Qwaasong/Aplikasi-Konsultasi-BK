@@ -7,9 +7,10 @@
         'purple' => 'bg-white',
         'yellow' => 'bg-white',
         'green' => 'bg-white',
-        'teal' => 'bg-green-500',
-        'red' => 'bg-[#FF6B6B]',
-        'kuning' => 'bg-[#FFD93D]',
+        'blue'    => 'bg-[#0F6D78]',
+        'teal' => 'bg-[#3E7E42]',
+        'red'     => 'bg-[#B84A3A]',
+        'kuning'  => 'bg-[#C89B22]',
     ];
     $bgClass = $gradients[$color] ?? $gradients['emerald'];
 @endphp

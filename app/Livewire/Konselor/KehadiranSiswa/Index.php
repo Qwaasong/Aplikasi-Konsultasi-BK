@@ -3,43 +3,69 @@
 namespace App\Livewire\Konselor\KehadiranSiswa;
 
 use App\Services\KehadiranService;
-use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 class Index extends Component
 {
     public string $search = '';
+
     public string $filterKelas = '';
     public string $filterStatus = '';
     public string $filterTanggal = '';
     public string $filterTahun = '';
+
     public bool $showFilters = false;
+
+    public ?string $selectedKelas = null;
+
     public array $records = [];
     public array $kelasOptions = [];
     public array $tahunOptions = [];
 
-    public function __construct()
+    public function mount(): void
     {
-        parent::__construct();
+        $this->loadKelas();
     }
 
-    public function mount()
+    /**
+     * Mengambil daftar kelas
+     */
+    public function loadKelas(): void
     {
-        $this->loadData();
+        $service = app(KehadiranService::class);
+
+        $records = $service->getFiltered([
+            'search' => null,
+            'kelas' => null,
+            'status' => null,
+            'tanggal' => null,
+            'tahun' => null,
+        ]);
+
+        $this->kelasOptions = $records
+            ->map(fn ($item) => $item->siswa?->kelas_label)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
     }
 
-    public function create()
+    /**
+     * Mengambil data kehadiran berdasarkan kelas
+     */
+    public function loadData(): void
     {
-        $this->dispatch('create-kehadiran');
-    }
+        if (!$this->selectedKelas) {
+            $this->records = [];
+            return;
+        }
 
-    public function loadData()
-    {
         $service = app(KehadiranService::class);
 
         $filters = [
             'search' => $this->search ?: null,
-            'kelas' => $this->filterKelas ?: null,
+            'kelas' => $this->selectedKelas,
             'status' => $this->filterStatus ?: null,
             'tanggal' => $this->filterTanggal ?: null,
             'tahun' => $this->filterTahun ?: null,
@@ -63,32 +89,72 @@ class Index extends Component
         $this->tahunOptions = $options['tahunOptions'] ?? [];
     }
 
-    public function updated()
+    /**
+     * Membuka data kehadiran berdasarkan kelas
+     */
+    public function pilihKelas(string $kelas): void
     {
-        $this->loadData();
-    }
+        $this->selectedKelas = $kelas;
 
-    public function resetFilter()
-    {
         $this->search = '';
         $this->filterKelas = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
         $this->filterTahun = '';
+        $this->showFilters = false;
+
         $this->loadData();
     }
 
-    public function refreshData()
+    /**
+     * Kembali ke daftar kelas
+     */
+    public function kembaliKeKelas(): void
     {
+        $this->selectedKelas = null;
+
         $this->search = '';
         $this->filterKelas = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
         $this->filterTahun = '';
+
+        $this->records = [];
+        $this->showFilters = false;
+
+        $this->loadKelas();
+    }
+
+    public function create(): void
+    {
+        $this->dispatch('create-kehadiran');
+    }
+
+    public function resetFilter(): void
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+        $this->filterTanggal = '';
+        $this->filterTahun = '';
+
         $this->loadData();
     }
 
-    public function filterAction()
+    public function refreshData(): void
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+        $this->filterTanggal = '';
+        $this->filterTahun = '';
+
+        $this->loadKelas();
+
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
+    }
+
+    public function filterAction(): void
     {
         $this->showFilters = !$this->showFilters;
     }

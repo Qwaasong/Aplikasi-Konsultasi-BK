@@ -4,11 +4,23 @@
 ])
 
 @php
-$title = match(auth()->user()->role) {
+
+$title = 'Dashboard';
+
+if(auth()->check()){
+
+    $title = match(auth()->user()->role){
+
         'admin' => 'Halaman Admin',
+
         'guru_bk' => 'Halaman Konselor',
+
         default => 'Dashboard',
+
     };
+
+}
+
 @endphp
 
 <aside x-data="{
