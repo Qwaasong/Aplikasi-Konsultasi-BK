@@ -119,6 +119,10 @@ class HomeVisitService
             $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }
 
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('kasus.siswa.user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
         return $query->latest('tanggal_kunjungan')->get();
     }
 
@@ -129,6 +133,7 @@ class HomeVisitService
         return [
             'kelasOptions' => $all->pluck('kasus.siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
             'jurusanOptions' => $all->pluck('kasus.siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('kasus.siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
         ];
     }
 

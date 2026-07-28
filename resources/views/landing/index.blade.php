@@ -16,6 +16,8 @@
 
 @include('landing.sections.principles')
 
+@include('landing.sections.cta')
+
 @include('landing.sections.footer')
 
 @endsection

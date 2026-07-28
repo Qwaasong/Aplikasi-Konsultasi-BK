@@ -39,34 +39,20 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             <select
                 wire:model.live="filterKelas"
-                class="border rounded px-2 py-1 text-sm">
-
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Kelas</option>
-
                 @foreach($kelasOptions as $kelas)
-
-                    <option value="{{ $kelas }}">
-                        {{ $kelas }}
-                    </option>
-
+                    <option value="{{ $kelas }}">{{ $kelas }}</option>
                 @endforeach
-
             </select>
 
             <select
                 wire:model.live="filterJurusan"
-                class="border rounded px-2 py-1 text-sm">
-
+                class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-32 pr-8 flex-shrink-0 bg-white cursor-pointer">
                 <option value="">Semua Jurusan</option>
-
                 @foreach($jurusanOptions as $jurusan)
-
-                    <option value="{{ $jurusan }}">
-                        {{ $jurusan }}
-                    </option>
-
+                    <option value="{{ $jurusan }}">{{ $jurusan }}</option>
                 @endforeach
-
             </select>
 
         </div>

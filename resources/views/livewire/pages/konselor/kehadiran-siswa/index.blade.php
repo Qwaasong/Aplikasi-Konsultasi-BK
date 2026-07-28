@@ -59,14 +59,25 @@ new #[Layout('layouts.app')] class extends Index {};
                     Pilih kelas untuk melihat data kehadiran siswa.
                 </p>
 
+        <select
+            wire:model.live="filterKelas"
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
             </div>
 
 
+            @foreach($kelasOptions as $kelas)
+                <option value="{{ $kelas }}">
+                    {{ $kelas }}
+                </option>
+            @endforeach
             {{-- Card Kelas --}}
             @if(count($kelasOptions) > 0)
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
+        <select
+            wire:model.live="filterStatus"
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                     @foreach($kelasOptions as $kelas)
 
                         <button
@@ -79,12 +90,20 @@ new #[Layout('layouts.app')] class extends Index {};
 
                             <div class="flex items-center justify-between">
 
+        <select
+            wire:model.live="filterTahun"
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
                                 <div>
 
                                     <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
                                         Kelas
                                     </p>
 
+            @foreach($tahunOptions as $tahun)
+                <option value="{{ $tahun }}">
+                    {{ $tahun }}
+                </option>
+            @endforeach
                                     <h3 class="mt-2 text-lg font-semibold text-gray-800
                                                group-hover:text-brand-teal">
                                         {{ $kelas }}

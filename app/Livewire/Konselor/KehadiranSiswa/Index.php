@@ -26,6 +26,7 @@ class Index extends Component
 
     public array $records = [];
     public array $kelasOptions = [];
+    public array $tahunOptions = [];
 
     // ── IMPORT STATE ─────────────────────────
     public bool $showImportModal = false;
@@ -99,6 +100,10 @@ class Index extends Component
                 'tahun' => $item->tahunAjaran?->tahun ?? '-',
             ];
         })->toArray();
+
+        $options = $service->getFilterOptions();
+        $this->kelasOptions = $options['kelasOptions'] ?? [];
+        $this->tahunOptions = $options['tahunOptions'] ?? [];
     }
 
     /**

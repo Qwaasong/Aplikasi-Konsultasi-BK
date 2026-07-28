@@ -133,21 +133,21 @@
             <ul class="footer-list">
 
                 <li>
-                    <a href="#" class="footer-link">
+                    <a href="https://maps.app.goo.gl/P3u2q5SVZfp46LZB9" class="footer-link">
                         <i class="fa-solid fa-location-dot"></i>
                         Alamat
                     </a>
                 </li>
 
                 <li>
-                    <a href="tel:(0341)000000" class="footer-link">
+                    <a href="tel:(0341) 727998" class="footer-link">
                         <i class="fa-solid fa-phone"></i>
                         No. Telp
                     </a>
                 </li>
 
                 <li>
-                    <a href="mailto:bk@smkn9malang.sch.id" class="footer-link">
+                    <a href="mailto:humas@smkn9malang.sch.id" class="footer-link">
                         <i class="fa-solid fa-envelope"></i>
                         Email
                     </a>
