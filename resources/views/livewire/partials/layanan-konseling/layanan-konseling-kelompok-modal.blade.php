@@ -180,8 +180,10 @@ new class extends Component {
     }
 
     // ── SAVE ──────────────────────────────────────────────
-    public function save(BimbinganKelompokService $service)
-    {
+    public function save(
+        \App\Handlers\BimbinganKelompok\CreateBimbinganKelompokHandler $createHandler,
+        \App\Handlers\BimbinganKelompok\UpdateBimbinganKelompokHandler $updateHandler,
+    ) {
         $this->validate();
 
         // Validasi manual tiap item siswa_ids harus integer
@@ -200,12 +202,17 @@ new class extends Component {
             'tindak_lanjut'  => $this->tindak_lanjut,
         ];
 
-        if ($this->editingId) {
-            $service->update($this->editingId, $data, $this->siswa_ids);
-            session()->flash('success', 'Layanan Konseling Kelompok berhasil diperbarui!');
+        $result = $this->editingId
+            ? $updateHandler->handle($data, ['id' => $this->editingId, 'siswa_ids' => $this->siswa_ids])
+            : $createHandler->handle($data, ['siswa_ids' => $this->siswa_ids]);
+
+        if ($result->success) {
+            session()->flash('success', $result->message);
+            if ($result->eventClass) {
+                event(new $result->eventClass(...$result->eventPayload));
+            }
         } else {
-            $service->create($data, $this->siswa_ids);
-            session()->flash('success', 'Layanan Konseling Kelompok berhasil ditambahkan!');
+            session()->flash('error', $result->message);
         }
 
         $this->reset([

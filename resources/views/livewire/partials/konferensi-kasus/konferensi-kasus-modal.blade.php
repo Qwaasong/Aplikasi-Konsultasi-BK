@@ -215,10 +215,10 @@ new class extends Component {
     }
 
     // SAVE
-    public function save()
-    {
-        $service = app(KonferensiKasusService::class);
-
+    public function save(
+        \App\Handlers\KonferensiKasus\CreateKonferensiKasusHandler $createHandler,
+        \App\Handlers\KonferensiKasus\UpdateKonferensiKasusHandler $updateHandler,
+    ) {
         $data = [
             'kasus_id' => $this->kasus_id,
             'tanggal_konferensi' => $this->tanggal_konferensi,
@@ -230,28 +230,33 @@ new class extends Component {
             'peran_peserta' => $p['peran_peserta'],
         ], $this->peserta);
 
-        $lampiranService = app(LampiranService::class);
+        $lampiranService = app(\App\Services\LampiranService::class);
 
-        if ($this->editingId) {
-            $record = $service->update($this->editingId, $data, $pesertaData);
+        $result = $this->editingId
+            ? $updateHandler->handle($data, ['id' => $this->editingId, 'peserta_data' => $pesertaData])
+            : $createHandler->handle($data, ['peserta_data' => $pesertaData]);
 
-            if (!empty($this->deletedLampiran)) {
-                $lampiranService->deleteMultiple($this->deletedLampiran);
+        if ($result->success) {
+            $record = $result->data;
+
+            // Handle lampiran for update
+            if ($this->editingId) {
+                if (!empty($this->deletedLampiran)) {
+                    $lampiranService->deleteMultiple($this->deletedLampiran);
+                }
             }
 
+            // Simpan lampiran baru
             if (!empty($this->newFiles) && $record->kasus_id) {
                 $lampiranService->storeLampirans($record->kasus_id, $this->newFiles, 'konferensi');
             }
 
-            session()->flash('success', 'Konferensi kasus berhasil diperbarui!');
+            session()->flash('success', $result->message);
+            if ($result->eventClass) {
+                event(new $result->eventClass(...$result->eventPayload));
+            }
         } else {
-            $record = $service->create($data, $pesertaData);
-
-            if (!empty($this->newFiles) && $record->kasus_id) {
-                $lampiranService->storeLampirans($record->kasus_id, $this->newFiles, 'konferensi');
-            }
-
-            session()->flash('success', 'Konferensi kasus berhasil ditambahkan!');
+            session()->flash('error', $result->message);
         }
 
         $this->reset([

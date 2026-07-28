@@ -136,7 +136,7 @@ class HomeVisitService
     {
         $pegawai = app(PegawaiService::class)->getCurrentPegawai();
         if (!$pegawai) {
-            abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');
+            throw new \App\Exceptions\AuthorizationException('mengakses data pegawai/guru BK');
         }
         return $pegawai->id;
     }
