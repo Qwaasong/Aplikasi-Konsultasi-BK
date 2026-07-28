@@ -12,7 +12,8 @@ use Illuminate\Validation\ValidationException;
 class SiswaService
 {
     public function __construct(
-        protected SiswaRepositoryInterface $siswaRepository
+        protected SiswaRepositoryInterface $siswaRepository,
+        protected ImportExportService $importExportService,
     ) {}
 
     // ─────────────────────────────────────────
@@ -171,7 +172,7 @@ class SiswaService
     // ─────────────────────────────────────────
 
     /**
-     * Parse file Excel/CSV lalu lakukan bulk upsert.
+     * Parse file Excel/CSV lalu lakukan import.
      *
      * Format kolom yang diharapkan (urutan bebas, cek header):
      *   nis | nama | kelas | jenis_kelamin | jurusan | periode_ajaran
@@ -180,21 +181,14 @@ class SiswaService
      */
     public function importFromFile(UploadedFile $file): array
     {
-        $extension = strtolower($file->getClientOriginalExtension());
-
-        $rows = match ($extension) {
-            'csv'           => $this->parseCsv($file),
-            'xlsx', 'xls'   => $this->parseExcel($file),
-            default         => throw new \InvalidArgumentException(
-                'Format file tidak didukung. Gunakan CSV, XLS, atau XLSX.'
-            ),
-        };
+        $rows = $this->importExportService->parseUploadedFile($file);
 
         [$validRows, $errors] = $this->validateImportRows($rows);
 
         $imported = 0;
-        if (!empty($validRows)) {
-            $imported = $this->siswaRepository->bulkUpsert($validRows);
+        foreach ($validRows as $row) {
+            $this->importSingleRow($row);
+            $imported++;
         }
 
         return [
@@ -246,8 +240,142 @@ class SiswaService
     }
 
     // ─────────────────────────────────────────
+    // IMPORT/EXPORT ENHANCED
+    // ─────────────────────────────────────────
+
+    public function getTemplateHeaders(): array
+    {
+        return ['nis', 'nama', 'kelas', 'jenis_kelamin', 'jurusan', 'periode_ajaran'];
+    }
+
+    public function getTemplateSampleRows(): array
+    {
+        return [
+            [
+                'nis' => '1234567890',
+                'nama' => 'Budi Santoso',
+                'kelas' => '10',
+                'jenis_kelamin' => 'L',
+                'jurusan' => 'RPL',
+                'periode_ajaran' => '2025/2026',
+            ],
+        ];
+    }
+
+    public function exportRows(array $filters = []): array
+    {
+        $filters = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+
+        $siswaList = empty($filters)
+            ? $this->siswaRepository->getAll()
+            : $this->siswaRepository->getPaginated(
+                array_merge($filters, ['per_page' => 99999])
+              )->getCollection();
+
+        return $siswaList->map(fn ($siswa) => [
+            'nis' => $siswa->nis,
+            'nama' => $siswa->nama,
+            'kelas' => $siswa->kelas_label,
+            'jenis_kelamin' => $siswa->jenis_kelamin,
+            'jurusan' => $siswa->kelas?->jurusan?->nama_jurusan ?? '',
+            'periode_ajaran' => $siswa->periode_ajaran ?? '',
+        ])->toArray();
+    }
+
+    public function getExportCount(array $filters = []): int
+    {
+        $filters = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+
+        return empty($filters)
+            ? $this->siswaRepository->countSiswa()
+            : $this->siswaRepository->getPaginated(
+                array_merge($filters, ['per_page' => 1, 'page' => 1])
+              )->total();
+    }
+
+    // ─────────────────────────────────────────
     // PRIVATE HELPERS
     // ─────────────────────────────────────────
+
+    // ─────────────────────────────────────────
+    // PRIVATE HELPERS
+    // ─────────────────────────────────────────
+
+    private function importSingleRow(array $row): void
+    {
+        $existing = $this->siswaRepository->findByNis($row['nis']);
+
+        $kelasId = $this->resolveKelasId($row['kelas'], $row['jurusan']);
+
+        if ($existing) {
+            $this->update($existing->id, [
+                'nis' => $row['nis'],
+                'nama' => $row['nama'],
+                'kelas_id' => $kelasId,
+                'jenis_kelamin' => $row['jenis_kelamin'],
+                'alamat' => $row['alamat'] ?? '',
+            ]);
+            return;
+        }
+
+        // Check if user with same email or username already exists (orphan from failed previous import)
+        $email = $row['email'] ?? ($row['nis'] . '@sekolah.sch.id');
+        $username = 'siswa_' . $row['nis'];
+
+        $existingUser = \App\Models\User::where('email', $email)
+            ->orWhere('username', $username)
+            ->first();
+
+        if ($existingUser) {
+            // Link existing user to new DataSiswa record
+            $this->siswaRepository->create([
+                'user_id' => $existingUser->id,
+                'nis' => (int) $row['nis'],
+                'kelas_id' => $kelasId,
+                'alamat' => $row['alamat'] ?? '',
+            ]);
+            return;
+        }
+
+        $this->create([
+            'nis' => $row['nis'],
+            'nama' => $row['nama'],
+            'kelas' => $kelasId,
+            'jenis_kelamin' => $row['jenis_kelamin'],
+            'email' => $row['email'] ?? null,
+            'no_hp' => $row['no_hp'] ?? '-',
+            'alamat' => $row['alamat'] ?? '',
+        ]);
+    }
+
+    private function resolveKelasId(int $tingkat, string $jurusanCode): int
+    {
+        // Map Arabic numerals to Roman numerals for tingkat
+        $tingkatMap = [
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
+            'X' => 'X',
+            'XI' => 'XI',
+            'XII' => 'XII',
+        ];
+        $tingkatValue = $tingkatMap[$tingkat] ?? $tingkat;
+
+        // Try to find jurusan by code (numeric) or name
+        $jurusan = \App\Models\Jurusan::where('kode_jurusan', $jurusanCode)
+            ->orWhere('nama_jurusan', 'like', "%{$jurusanCode}%")
+            ->first();
+
+        $query = \App\Models\Kelas::where('tingkat', $tingkatValue);
+
+        if ($jurusan) {
+            $query->where('jurusan_id', $jurusan->id);
+        }
+
+        $kelas = $query->first();
+
+        return $kelas?->id ?? 0;
+    }
 
     private function ensureNisUnique(int|string $nis): void
     {
@@ -399,6 +527,9 @@ class SiswaService
                 'jenis_kelamin'  => $jenisKelamin,
                 'jurusan'        => strtoupper($normalized['jurusan']),
                 'periode_ajaran' => $normalized['periode_ajaran'],
+                'alamat'         => $normalized['alamat'] ?? '',
+                'email'          => $normalized['email'] ?? null,
+                'no_hp'          => $normalized['no_hp'] ?? '-',
             ];
         }
 

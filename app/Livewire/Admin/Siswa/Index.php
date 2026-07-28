@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Siswa;
 
 use App\Constants\GlobalMessages;
+use App\Services\ImportExportService;
 use App\Services\SiswaService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
@@ -211,6 +212,23 @@ class Index extends Component
         $filename = 'data-siswa-' . now()->format('Ymd-His') . '.csv';
         $this->showExportModal = false;
         return response()->streamDownload(fn () => print($csv), $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function exportExcel(SiswaService $service, ImportExportService $ies): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $filters = [
+            'kelas' => $this->exportKelas ?: null,
+            'jurusan' => $this->exportJurusan ?: null,
+            'periode_ajaran' => $this->exportPeriode ?: null,
+        ];
+        $rows = $service->exportRows($filters);
+        $this->showExportModal = false;
+        return $ies->streamExcelExport('data-siswa-' . now()->format('Ymd-His') . '.xlsx', $service->getTemplateHeaders(), $rows);
+    }
+
+    public function downloadTemplate(SiswaService $service, ImportExportService $ies): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        return $ies->streamExcelTemplate('template-siswa.xlsx', $service->getTemplateHeaders(), $service->getTemplateSampleRows());
     }
 
     public function resetFilters(): void

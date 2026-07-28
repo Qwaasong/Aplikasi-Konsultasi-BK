@@ -32,6 +32,12 @@
 
     </div>
 
+    @if(isset($actions) && $actions)
+        <div class="flex items-center gap-2 pr-4">
+            {{ $actions }}
+        </div>
+    @endif
+
     <div class="pr-6 text-sm text-gray-500">
         {{ $pagination ?? '' }}
     </div>

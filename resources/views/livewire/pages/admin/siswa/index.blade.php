@@ -14,13 +14,22 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
         <div class="flex items-center gap-2">
 
-            {{-- Export CSV --}}
+            {{-- Template Excel --}}
+            <button
+                wire:click="downloadTemplate"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600
+                       border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <x-atoms.icon variant="template" size="md" />
+                Template
+            </button>
+
+            {{-- Export --}}
             <button
                 wire:click="openExport"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600
                        border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="filter" size="md" />
-                Export CSV
+                <x-atoms.icon variant="download" size="md" />
+                Export
             </button>
 
             {{-- Import --}}
@@ -28,7 +37,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
                 wire:click="openImport"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600
                        border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="plus" size="md" />
+                <x-atoms.icon variant="upload" size="md" />
                 Import
             </button>
 
@@ -414,7 +423,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Import Data Siswa</h2>
                     <p class="text-xs text-gray-500 mt-0.5">
-                        Format: CSV, XLS, atau XLSX — maks 5 MB
+                        Format: CSV, XLS, atau XLSX — maks 5 MB. File Excel otomatis dikonversi ke CSV.
                     </p>
                 </div>
 
@@ -621,6 +630,20 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
                                 Download CSV
                             </span>
                             <span wire:loading wire:target="exportCsv">Menyiapkan...</span>
+                        </x-atoms.button>
+
+                        <x-atoms.button
+                            wire:click="exportExcel"
+                            :disabled="($exportPreviewCount ?? 0) === 0">
+                            <span wire:loading.remove wire:target="exportExcel">
+                                <svg class="w-4 h-4 mr-1 inline-block" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download Excel
+                            </span>
+                            <span wire:loading wire:target="exportExcel">Menyiapkan...</span>
                         </x-atoms.button>
                     </div>
                 </div>

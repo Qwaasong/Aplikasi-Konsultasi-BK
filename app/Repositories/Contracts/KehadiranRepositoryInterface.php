@@ -14,4 +14,5 @@ interface KehadiranRepositoryInterface
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;
     public function query(): Builder;
+    public function bulkUpsert(array $rows): int;
 }
