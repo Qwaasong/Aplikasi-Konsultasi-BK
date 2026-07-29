@@ -158,23 +158,5 @@ class FactorySeeder extends Seeder
         // ─────────────────────────────────────────────────────────
         $count = Peminatan::factory()->count(15)->create();
         $this->command->info("[Factory] +{$count->count()} Peminatan");
-
-        // ─────────────────────────────────────────────────────────
-        // 18. GAYA BELAJAR
-        // ─────────────────────────────────────────────────────────
-        $count = GayaBelajar::factory()->count(10)->create();
-        $this->command->info("[Factory] +{$count->count()} Gaya Belajar");
-
-        // ─────────────────────────────────────────────────────────
-        // 19. AKPD
-        // ─────────────────────────────────────────────────────────
-        $count = Akpd::factory()->count(10)->create();
-        $this->command->info("[Factory] +{$count->count()} AKPD");
-
-        // ─────────────────────────────────────────────────────────
-        // 20. DCM
-        // ─────────────────────────────────────────────────────────
-        $count = Dcm::factory()->count(10)->create();
-        $this->command->info("[Factory] +{$count->count()} DCM");
     }
 }
