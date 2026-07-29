@@ -17,6 +17,9 @@ use App\Models\KonsultasiLampiran;
 use App\Models\PelanggaranSiswa;
 use App\Models\Peminatan;
 use App\Models\PengunduranDiri;
+use App\Models\GayaBelajar;
+use App\Models\Akpd;
+use App\Models\Dcm;
 use App\Models\Sosiometri;
 use App\Models\SosiometriRespon;
 use Illuminate\Database\Seeder;
@@ -158,5 +161,23 @@ class FactorySeeder extends Seeder
         // ─────────────────────────────────────────────────────────
         $count = Peminatan::factory()->count(15)->create();
         $this->command->info("[Factory] +{$count->count()} Peminatan");
+
+        // ─────────────────────────────────────────────────────────
+        // 18. GAYA BELAJAR
+        // ─────────────────────────────────────────────────────────
+        $count = GayaBelajar::factory()->count(10)->create();
+        $this->command->info("[Factory] +{$count->count()} GayaBelajar");
+
+        // ─────────────────────────────────────────────────────────
+        // 19. AKPD
+        // ─────────────────────────────────────────────────────────
+        $count = Akpd::factory()->count(10)->create();
+        $this->command->info("[Factory] +{$count->count()} Akpd");
+
+        // ─────────────────────────────────────────────────────────
+        // 20. DCM
+        // ─────────────────────────────────────────────────────────
+        $count = Dcm::factory()->count(10)->create();
+        $this->command->info("[Factory] +{$count->count()} Dcm");
     }
 }

@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('konferensi_kasus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
+            $table->foreignId('guru_bk_id')->nullable()->constrained('pegawai')->nullOnDelete();
             $table->date('tanggal_konferensi');
+            $table->string('tempat_pertemuan')->nullable();
             $table->timestamps();
         });
     }

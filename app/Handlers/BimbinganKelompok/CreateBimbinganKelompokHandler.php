@@ -56,7 +56,7 @@ class CreateBimbinganKelompokHandler implements HandlerInterface
             $data['kasus_id'] = $kasus->id;
 
             // 3. Clean fields already stored in kasus_bk
-            unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
+            unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut'], $data['guru_bk_id'], $data['tahun_ajaran_id']);
 
             // 4. Create BimbinganKelompok record
             $record = $this->service->create($data, $siswaIds);

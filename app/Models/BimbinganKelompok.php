@@ -14,8 +14,6 @@ class BimbinganKelompok extends Model
     protected $table = 'bimbingan_kelompok';
 
     protected $fillable = [
-        'guru_bk_id',
-        'tahun_ajaran_id',
         'kasus_id',
         'tanggal_layanan',
     ];
@@ -23,16 +21,6 @@ class BimbinganKelompok extends Model
     protected $casts = [
         'tanggal_layanan' => 'date',
     ];
-
-    public function guruBk(): BelongsTo
-    {
-        return $this->belongsTo(Pegawai::class, 'guru_bk_id');
-    }
-
-    public function tahunAjaran(): BelongsTo
-    {
-        return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
-    }
 
     public function kasus(): BelongsTo
     {
@@ -61,5 +49,15 @@ class BimbinganKelompok extends Model
     public function getTindakLanjutAttribute()
     {
         return $this->kasus?->tindak_lanjut;
+    }
+
+    public function getGuruBkAttribute()
+    {
+        return $this->kasus?->guruBk;
+    }
+
+    public function getTahunAjaranAttribute()
+    {
+        return $this->kasus?->tahunAjaran;
     }
 }

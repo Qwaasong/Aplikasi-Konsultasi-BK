@@ -12,12 +12,9 @@ class PelanggaranSiswa extends Model
     protected $table = 'pelanggaran_siswa';
 
     protected $fillable = [
-        'siswa_id',
         'kasus_id',
         'tanggal_pernyataan',
-        'deskripsi',
         'sanksi',
-        'tindak_lanjut',
         'bukti_foto',
     ];
 
@@ -25,13 +22,27 @@ class PelanggaranSiswa extends Model
         'tanggal_pernyataan' => 'date',
     ];
 
-    public function siswa(): BelongsTo
-    {
-        return $this->belongsTo(DataSiswa::class, 'siswa_id');
-    }
-
     public function kasus(): BelongsTo
     {
         return $this->belongsTo(KasusBk::class, 'kasus_id');
+    }
+
+    // ─────────────────────────────────────────
+    // DELEGATION ACCESSORS (data dari kasus_bk)
+    // ─────────────────────────────────────────
+
+    public function getSiswaAttribute()
+    {
+        return $this->kasus?->siswa;
+    }
+
+    public function getDeskripsiAttribute()
+    {
+        return $this->kasus?->uraian_masalah;
+    }
+
+    public function getTindakLanjutAttribute()
+    {
+        return $this->kasus?->tindak_lanjut;
     }
 }

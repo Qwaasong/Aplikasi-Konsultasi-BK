@@ -53,6 +53,26 @@ class FlashMessages
     public const PENGUNDURAN_DIRI_UPDATED = 'Data pengunduran diri berhasil diperbarui!';
     public const PENGUNDURAN_DIRI_DELETED = 'Data pengunduran diri berhasil dihapus!';
 
+    // Sosiometri
+    public const SOSIOMETRI_CREATED = 'Data sosiometri berhasil ditambahkan!';
+    public const SOSIOMETRI_UPDATED = 'Data sosiometri berhasil diperbarui!';
+    public const SOSIOMETRI_DELETED = 'Data sosiometri berhasil dihapus!';
+
+    // AKPD
+    public const AKPD_CREATED = 'Data AKPD berhasil ditambahkan!';
+    public const AKPD_UPDATED = 'Data AKPD berhasil diperbarui!';
+    public const AKPD_DELETED = 'Data AKPD berhasil dihapus!';
+
+    // DCM
+    public const DCM_CREATED = 'Data DCM berhasil ditambahkan!';
+    public const DCM_UPDATED = 'Data DCM berhasil diperbarui!';
+    public const DCM_DELETED = 'Data DCM berhasil dihapus!';
+
+    // Gaya Belajar
+    public const GAYA_BELAJAR_CREATED = 'Data gaya belajar berhasil ditambahkan!';
+    public const GAYA_BELAJAR_UPDATED = 'Data gaya belajar berhasil diperbarui!';
+    public const GAYA_BELAJAR_DELETED = 'Data gaya belajar berhasil dihapus!';
+
     // General Error
     public const OPERATION_FAILED = 'Terjadi kesalahan, silakan coba lagi.';
     public const TRANSACTION_FAILED = 'Gagal memproses data, semua perubahan dibatalkan.';

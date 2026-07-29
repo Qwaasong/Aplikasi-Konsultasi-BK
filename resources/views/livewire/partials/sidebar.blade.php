@@ -118,47 +118,47 @@ state([
 
             $menus[] = [
                 'label' => 'Asesmen',
-                'url' => '#',
+                'url' => route('konselor.asesmen.index'),
                 'active' => request()->routeIs('konselor.asesmen.*'),
                 'variants' => 'assessment',
 
-                'children' => [
+                // 'children' => [
 
-                    [
-                        'label' => 'AKPD',
-                        'url' => route('konselor.asesmen.akpd.index'),
-                        'active' => request()->routeIs('konselor.asesmen.akpd.*'),
-                        'variants' => 'assignment',
-                    ],
+                //     [
+                //         'label' => 'AKPD',
+                //         'url' => route('konselor.asesmen.akpd.index'),
+                //         'active' => request()->routeIs('konselor.asesmen.akpd.*'),
+                //         'variants' => 'assignment',
+                //     ],
 
-                    [
-                        'label' => 'Gaya Belajar',
-                        'url' => route('konselor.asesmen.gaya-belajar.index'),
-                        'active' => request()->routeIs('konselor.asesmen.gaya-belajar.*'),
-                        'variants' => 'book',
-                    ],
+                //     [
+                //         'label' => 'Gaya Belajar',
+                //         'url' => route('konselor.asesmen.gaya-belajar.index'),
+                //         'active' => request()->routeIs('konselor.asesmen.gaya-belajar.*'),
+                //         'variants' => 'book',
+                //     ],
 
-                    [
-                        'label' => 'DCM',
-                        'url' => route('konselor.asesmen.dcm.index'),
-                        'active' => request()->routeIs('konselor.asesmen.dcm.*'),
-                        'variants' => 'fact_check',
-                    ],
+                //     [
+                //         'label' => 'DCM',
+                //         'url' => route('konselor.asesmen.dcm.index'),
+                //         'active' => request()->routeIs('konselor.asesmen.dcm.*'),
+                //         'variants' => 'fact_check',
+                //     ],
 
-                    [
-                        'label' => 'Sosiometri',
-                        'url' => route('konselor.asesmen.sosiometri.index'),
-                        'active' => request()->routeIs('konselor.asesmen.sosiometri.*'),
-                        'variants' => 'group',
-                    ],
+                //     [
+                //         'label' => 'Sosiometri',
+                //         'url' => route('konselor.asesmen.sosiometri.index'),
+                //         'active' => request()->routeIs('konselor.asesmen.sosiometri.*'),
+                //         'variants' => 'group',
+                //     ],
 
-                    [
-                        'label' => 'Tes Bakat Minat',
-                        'url' => route('konselor.asesmen.tes-bakat-minat.index'),
-                        'active' => request()->routeIs('konselor.asesmen.tes-bakat-minat.*'),
-                        'variants' => 'analytics',
-                    ],
-                ],
+                //     [
+                //         'label' => 'Tes Bakat Minat',
+                //         'url' => route('konselor.asesmen.tes-bakat-minat.index'),
+                //         'active' => request()->routeIs('konselor.asesmen.tes-bakat-minat.*'),
+                //         'variants' => 'analytics',
+                //     ],
+                // ],
             ];
         }
 

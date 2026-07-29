@@ -2,90 +2,133 @@
 
 namespace App\Livewire\Konselor\Asesmen;
 
+use App\Models\Kelas;
+use App\Models\DataSiswa;
 use Livewire\Volt\Component;
 
 class Index extends Component
 {
-    public function __construct()
+    public ?string $selectedKelas = null;
+
+    public array $kelasOptions = [];
+    public array $records = [];
+
+    public string $search = '';
+
+    public function mount(): void
     {
-        parent::__construct();
+        $this->loadKelas();
     }
 
-    public function with(): array
+    public function loadKelas(): void
     {
-        return [
-            'asesmens' => [
-                [
-                    'title' => 'AKPD',
-                    'subtitle' => 'Angket Kebutuhan Peserta Didik',
-                    'description' => 'Membantu Guru BK memahami kebutuhan peserta didik dalam aspek pribadi, sosial, belajar, dan karier sehingga layanan yang diberikan lebih tepat sasaran.',
-                    'details' => [
-                        'Membantu BK memahami kebutuhan siswa.',
-                        'Tidak ada jawaban benar atau salah.',
-                        'Estimasi waktu 10-15 menit.',
-                    ],
-                    'route' => route('konselor.asesmen.akpd.index'),
-                    'button' => 'Mulai Mengisi AKPD',
-                    'variants' => 'assignment',
-                    'color' => 'teal',
-                ],
-                [
-                    'title' => 'DCM',
-                    'subtitle' => 'Daftar Cek Masalah',
-                    'description' => 'Digunakan untuk mengetahui berbagai permasalahan yang dialami peserta didik sehingga Guru BK dapat memberikan layanan yang sesuai.',
-                    'details' => [
-                        'Jawablah sesuai kondisi sebenarnya.',
-                        'Jawaban bersifat rahasia.',
-                        'Estimasi waktu 10-15 menit.',
-                    ],
-                    'route' => route('konselor.asesmen.dcm.index'),
-                    'button' => 'Mulai Mengisi DCM',
-                    'variants' => 'fact_check',
-                    'color' => 'teal',
-                ],
-                [
-                    'title' => 'Sosiometri',
-                    'subtitle' => 'Hubungan Sosial Siswa',
-                    'description' => 'Membantu Guru BK memahami hubungan sosial antar peserta didik dalam satu kelas.',
-                    'details' => [
-                        'Jawablah dengan jujur.',
-                        'Tidak ada jawaban benar atau salah.',
-                        'Data hanya digunakan untuk layanan BK.',
-                    ],
-                    'route' => route('konselor.asesmen.sosiometri.index'),
-                    'button' => 'Mulai Sosiometri',
-                    'variants' => 'group',
-                    'color' => 'teal',
-                ],
-                [
-                    'title' => 'Gaya Belajar',
-                    'subtitle' => 'Identifikasi Gaya Belajar',
-                    'description' => 'Mengidentifikasi kecenderungan gaya belajar peserta didik agar proses pembelajaran menjadi lebih efektif.',
-                    'details' => [
-                        'Jawablah sesuai kebiasaan belajar.',
-                        'Tidak ada jawaban benar atau salah.',
-                        'Estimasi waktu 5-10 menit.',
-                    ],
-                    'route' => route('konselor.asesmen.gaya-belajar.index'),
-                    'button' => 'Mulai Tes Gaya Belajar',
-                    'variants' => 'book',
-                    'color' => 'teal',
-                ],
-                [
-                    'title' => 'Tes Bakat Minat',
-                    'subtitle' => 'Identifikasi Potensi Siswa',
-                    'description' => 'Membantu mengetahui bakat dan minat peserta didik sebagai dasar pemberian layanan karier.',
-                    'details' => [
-                        'Jawablah sesuai diri sendiri.',
-                        'Tidak ada jawaban benar atau salah.',
-                        'Hasil menjadi rekomendasi BK.',
-                    ],
-                    'route' => route('konselor.asesmen.tes-bakat-minat.index'),
-                    'button' => 'Mulai Tes Bakat Minat',
-                    'variants' => 'analytics',
-                    'color' => 'teal',
-                ],
-            ],
-        ];
+        $kelas = Kelas::with('jurusan')
+            ->orderBy('nama_kelas')
+            ->get();
+
+        $this->kelasOptions = $kelas
+            ->groupBy(function ($kelas) {
+                // XI RPL 1 -> XI RPL
+                // XI MM 1  -> XI MM
+                // XI TKJ 1 -> XI TKJ
+                return preg_replace(
+                    '/\s+\d+$/',
+                    '',
+                    trim($kelas->nama_kelas)
+                );
+            })
+            ->map(function ($kelasGroup, $namaKelas) {
+                return [
+                    'nama' => $namaKelas,
+
+                    'ids' => $kelasGroup
+                        ->pluck('id')
+                        ->values()
+                        ->toArray(),
+
+                    'jurusan' => $kelasGroup
+                        ->map(fn ($kelas) => $kelas->jurusan?->nama_jurusan)
+                        ->filter()
+                        ->unique()
+                        ->implode(', '),
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+
+    public function pilihKelas(string $namaKelas): void
+    {
+        $this->selectedKelas = $namaKelas;
+        $this->search = '';
+
+        $this->loadSiswa();
+    }
+
+    public function loadSiswa(): void
+    {
+        if (!$this->selectedKelas) {
+            $this->records = [];
+            return;
+        }
+
+        /*
+         * Ambil semua ID kelas yang memiliki nama dasar yang sama.
+         *
+         * Contoh:
+         * XI RPL
+         * XI RPL 1
+         *
+         * keduanya dianggap sebagai XI RPL.
+         */
+        $kelasIds = Kelas::query()
+            ->get()
+            ->filter(function ($kelas) {
+                $namaDasar = preg_replace(
+                    '/\s+\d+$/',
+                    '',
+                    trim($kelas->nama_kelas)
+                );
+
+                return $namaDasar === $this->selectedKelas;
+            })
+            ->pluck('id');
+
+        $this->records = DataSiswa::query()
+            ->whereIn('kelas_id', $kelasIds)
+            ->with('user')
+            ->when($this->search, function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where(
+                        'nama',
+                        'like',
+                        '%' . $this->search . '%'
+                    );
+                });
+            })
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($siswa) => [
+                'id' => $siswa->id,
+                'siswa_id' => $siswa->id,
+                'nama' => $siswa->nama
+                    ?? $siswa->user?->nama
+                    ?? '-',
+                'nis' => $siswa->nis ?? '-',
+                'kelas' => $siswa->kelas_label,
+            ])
+            ->toArray();
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->loadSiswa();
+    }
+
+    public function kembaliKeKelas(): void
+    {
+        $this->selectedKelas = null;
+        $this->records = [];
+        $this->search = '';
     }
 }
