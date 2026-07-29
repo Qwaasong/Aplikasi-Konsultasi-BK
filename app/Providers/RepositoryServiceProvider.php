@@ -75,6 +75,18 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\PeminatanRepositoryInterface::class,
             \App\Repositories\Eloquent\PeminatanRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\GayaBelajarRepositoryInterface::class,
+            \App\Repositories\Eloquent\GayaBelajarRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\AkpdRepositoryInterface::class,
+            \App\Repositories\Eloquent\AkpdRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\DcmRepositoryInterface::class,
+            \App\Repositories\Eloquent\DcmRepository::class
+        );
     }
 
     /**

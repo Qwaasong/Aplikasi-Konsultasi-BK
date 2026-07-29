@@ -84,6 +84,21 @@ class DataSiswa extends Model
         return $this->hasMany(Sosiometri::class, 'siswa_id');
     }
 
+    public function gayaBelajar()
+    {
+        return $this->hasMany(GayaBelajar::class, 'siswa_id');
+    }
+
+    public function akpd()
+    {
+        return $this->hasMany(Akpd::class, 'siswa_id');
+    }
+
+    public function dcm()
+    {
+        return $this->hasMany(Dcm::class, 'siswa_id');
+    }
+
     // ─────────────────────────────────────────
     // SCOPES
     // ─────────────────────────────────────────
