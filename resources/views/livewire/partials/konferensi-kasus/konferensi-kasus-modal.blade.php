@@ -131,9 +131,9 @@ new class extends Component {
     }
 
     // Peserta actions
-    public function addPesertaRow()
+    public function addPesertaRow(string $nama = '', string $peran = 'Lainnya')
     {
-        $this->peserta[] = ['nama_peserta' => '', 'peran_peserta' => 'Lainnya'];
+        $this->peserta[] = ['nama_peserta' => $nama, 'peran_peserta' => $peran];
     }
 
     public function removePesertaRow(int $index)
@@ -384,15 +384,19 @@ new class extends Component {
                             </div>
                         @endif
 
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4"
+                             x-data="{ nama: '', peran: 'Lainnya' }">
                             <div class="flex items-end gap-2">
                                 <div class="flex-1">
                                     <label class="block text-[12px] font-medium text-gray-500 mb-1">Nama Peserta</label>
-                                    <input type="text" x-data
+                                    <input type="text"
+                                        x-model="nama"
                                         x-ref="namaInput"
                                         x-on:keydown.enter.prevent="
-                                            $wire.addPesertaRow();
-                                            $nextTick(() => { if ($refs.namaInput) $refs.namaInput.value = ''; });
+                                            if (nama.trim() !== '') {
+                                                $wire.addPesertaRow(nama.trim(), peran);
+                                                nama = '';
+                                            }
                                         "
                                         placeholder="Nama peserta..."
                                         class="w-full border border-gray-200 rounded-md px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
@@ -400,26 +404,21 @@ new class extends Component {
                                 </div>
                                 <div class="w-40">
                                     <label class="block text-[12px] font-medium text-gray-500 mb-1">Peran</label>
-                                    <select x-ref="peranSelect"
+                                    <select x-model="peran"
                                         class="w-full border border-gray-200 rounded-md px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white">
                                         <option value="Guru BK">Guru BK</option>
                                         <option value="Wali Kelas">Wali Kelas</option>
                                         <option value="Kepala Sekolah">Kepala Sekolah</option>
                                         <option value="Orang Tua">Orang Tua</option>
                                         <option value="Siswa">Siswa</option>
-                                        <option value="Lainnya" selected>Lainnya</option>
+                                        <option value="Lainnya">Lainnya</option>
                                     </select>
                                 </div>
                                 <button type="button"
                                     x-on:click="
-                                        nama = $refs.namaInput.value;
-                                        peran = $refs.peranSelect.value;
                                         if (nama.trim() !== '') {
-                                            idx = $wire.peserta.length;
-                                            $wire.addPesertaRow();
-                                            $wire.set('peserta.' + idx + '.nama_peserta', nama.trim());
-                                            $wire.set('peserta.' + idx + '.peran_peserta', peran);
-                                            $refs.namaInput.value = '';
+                                            $wire.addPesertaRow(nama.trim(), peran);
+                                            nama = '';
                                         }
                                     "
                                     class="px-4 py-2 bg-teal-600 text-white rounded-md text-[13px] font-semibold hover:bg-teal-700 transition-colors shrink-0">

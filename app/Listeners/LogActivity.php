@@ -10,6 +10,10 @@ class LogActivity
 {
     public function handle(DomainEvent $event): void
     {
+        if (!class_exists(LogAktivitas::class)) {
+            return;
+        }
+
         try {
             LogAktivitas::create([
                 'user_id' => $event->userId,

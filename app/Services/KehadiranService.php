@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\DataSiswa;
 use App\Models\Kehadiran;
 use App\Models\TahunAjaran;
+use App\Models\User;
 use App\Repositories\Contracts\KehadiranRepositoryInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -111,6 +112,11 @@ class KehadiranService
         return $this->getFiltered($filters)->map(fn (Kehadiran $record) => [
             'nis' => $record->siswa?->nis ?? '',
             'nama' => $record->siswa->user->nama ?? '',
+            'email' => $record->siswa?->user?->email ?? '',
+            'no_hp' => $record->siswa?->user?->no_hp ?? '',
+            'jenis_kelamin' => $record->siswa?->jenis_kelamin ?? '',
+            'kelas' => $record->siswa?->kelas_label ?? '',
+            'jurusan' => $record->siswa?->jurusan_label ?? '',
             'tanggal_kehadiran' => optional($record->tanggal_kehadiran)->format('Y-m-d'),
             'status' => $record->status,
             'tahun_ajaran' => $record->tahunAjaran?->tahun ?? '',
@@ -125,7 +131,11 @@ class KehadiranService
 
     public function getTemplateHeaders(): array
     {
-        return ['nis', 'nama', 'tanggal_kehadiran', 'status', 'tahun_ajaran', 'semester'];
+        return [
+            'nis', 'nama', 'email', 'no_hp', 'jenis_kelamin',
+            'kelas', 'jurusan',
+            'tanggal_kehadiran', 'status', 'tahun_ajaran', 'semester',
+        ];
     }
 
     public function getTemplateSampleRows(): array
@@ -136,6 +146,11 @@ class KehadiranService
             [
                 'nis' => '1234567890',
                 'nama' => 'Budi Santoso',
+                'email' => '1234567890@sekolah.sch.id',
+                'no_hp' => '08123456789',
+                'jenis_kelamin' => 'L',
+                'kelas' => '10',
+                'jurusan' => 'RPL',
                 'tanggal_kehadiran' => now()->format('Y-m-d'),
                 'status' => 'Hadir',
                 'tahun_ajaran' => $activeYear?->tahun ?? '2025/2026',
@@ -165,10 +180,23 @@ class KehadiranService
                 continue;
             }
 
+            // Cari atau buat siswa
             $siswa = DataSiswa::where('nis', $nis)->first();
+            $nama = trim((string) ($row['nama'] ?? ''));
+
             if (!$siswa) {
-                $errors[] = "Baris {$lineNumber}: NIS {$nis} tidak ditemukan.";
-                continue;
+                if ($nama === '') {
+                    $errors[] = "Baris {$lineNumber}: NIS {$nis} tidak ditemukan. Isi kolom nama untuk membuat siswa baru.";
+                    continue;
+                }
+                $siswa = $this->ensureSiswaExists($row, $nis, $nama);
+                if (!$siswa) {
+                    $errors[] = "Baris {$lineNumber}: gagal membuat siswa dengan NIS {$nis}.";
+                    continue;
+                }
+            } elseif ($nama !== '') {
+                // Update data siswa jika ada data tambahan
+                $this->updateSiswa($siswa, $row);
             }
 
             $status = self::STATUS_MAP[$statusRaw] ?? null;
@@ -207,6 +235,96 @@ class KehadiranService
             'imported' => count($validRows),
             'errors' => $errors,
         ];
+    }
+
+    private function ensureSiswaExists(array $row, string $nis, string $nama): ?DataSiswa
+    {
+        $email = trim((string) ($row['email'] ?? '')) ?: ($nis . '@sekolah.sch.id');
+        $noHp = trim((string) ($row['no_hp'] ?? '')) ?: '-';
+        $jenisKelaminRaw = strtolower(trim((string) ($row['jenis_kelamin'] ?? '')));
+        $kelasRaw = trim((string) ($row['kelas'] ?? ''));
+        $jurusanRaw = trim((string) ($row['jurusan'] ?? ''));
+
+        $jenisKelamin = match ($jenisKelaminRaw) {
+            'l', 'lk', 'laki', 'laki-laki' => 'L',
+            'p', 'pr', 'perempuan', 'wanita', 'w' => 'P',
+            default => 'L',
+        };
+
+        $kelasId = 0;
+        if ($kelasRaw !== '') {
+            $tingkatMap = ['10' => 'X', '11' => 'XI', '12' => 'XII', 'X' => 'X', 'XI' => 'XI', 'XII' => 'XII'];
+            $tingkat = $tingkatMap[$kelasRaw] ?? $kelasRaw;
+
+            $jurusan = null;
+            if ($jurusanRaw !== '') {
+                $jurusan = \App\Models\Jurusan::where('kode_jurusan', $jurusanRaw)
+                    ->orWhere('nama_jurusan', 'like', "%{$jurusanRaw}%")
+                    ->first();
+            }
+
+            $query = \App\Models\Kelas::where('tingkat', $tingkat);
+            if ($jurusan) {
+                $query->where('jurusan_id', $jurusan->id);
+            }
+            $kelas = $query->first();
+            $kelasId = $kelas?->id ?? 0;
+        }
+
+        try {
+            $user = User::create([
+                'nama' => $nama,
+                'username' => 'siswa_' . $nis,
+                'email' => $email,
+                'jenis_kelamin' => $jenisKelamin,
+                'no_hp' => $noHp,
+                'foto' => '',
+                'password' => bcrypt('password'),
+                'role' => 'siswa',
+                'status' => 'aktif',
+            ]);
+
+            return DataSiswa::create([
+                'user_id' => $user->id,
+                'nis' => (int) $nis,
+                'kelas_id' => $kelasId,
+                'alamat' => trim((string) ($row['alamat'] ?? '')),
+            ]);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function updateSiswa(DataSiswa $siswa, array $row): void
+    {
+        if ($siswa->user) {
+            $userUpdate = [];
+            if (!empty($row['email'])) $userUpdate['email'] = trim($row['email']);
+            if (!empty($row['no_hp'])) $userUpdate['no_hp'] = trim($row['no_hp']);
+            if (!empty($userUpdate)) {
+                $siswa->user->update($userUpdate);
+            }
+        }
+
+        $siswaUpdate = [];
+        if (!empty($row['kelas']) && !empty($row['jurusan'])) {
+            $tingkatMap = ['10' => 'X', '11' => 'XI', '12' => 'XII'];
+            $tingkat = $tingkatMap[$row['kelas']] ?? $row['kelas'];
+            $jurusan = \App\Models\Jurusan::where('kode_jurusan', $row['jurusan'])
+                ->orWhere('nama_jurusan', 'like', "%{$row['jurusan']}%")
+                ->first();
+            if ($jurusan) {
+                $kelas = \App\Models\Kelas::where('tingkat', $tingkat)
+                    ->where('jurusan_id', $jurusan->id)
+                    ->first();
+                if ($kelas) {
+                    $siswaUpdate['kelas_id'] = $kelas->id;
+                }
+            }
+        }
+        if (!empty($siswaUpdate)) {
+            $siswa->update($siswaUpdate);
+        }
     }
 
     private function resolveTahunAjaran(string $tahun, string $semester): ?TahunAjaran

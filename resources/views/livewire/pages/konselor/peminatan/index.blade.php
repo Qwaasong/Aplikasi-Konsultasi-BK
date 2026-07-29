@@ -20,13 +20,6 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
         <x-slot:pagination>
             {{ count($records) }} data
         </x-slot:pagination>
-
-        <x-slot:actions>
-            <x-atoms.button
-                wire:click="$dispatch('create-peminatan')">
-                Tambah Peminatan Siswa
-            </x-atoms.button>
-        </x-slot:actions>
     </x-organisms.table-toolbar>
 
     @if($showFilters)

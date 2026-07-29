@@ -1,4 +1,4 @@
-nis,nama,kelas,jenis_kelamin,jurusan,periode_ajaran,alamat
-1234567890,Budi Santoso,10,L,RPL,2025/2026,Jl. Merdeka No. 1
-1234567891,Aisyah Putri,11,P,TKJ,2025/2026,Jl. Sudirman No. 2
-1234567892,Charlie Danu,12,L,RPL,2025/2026,Jl. Gatot Subroto No. 3
+nis,nama,email,no_hp,jenis_kelamin,status,kelas,jurusan,periode_ajaran,alamat,tempat_lahir,tgl_lahir,anak_ke,jml_saudara,asal_smp,agama,hobi,bakat,rencana_lulus,detail_rencana_lulus
+1234567890,Budi Santoso,budi@example.com,08123456789,L,aktif,10,RPL,2025/2026,Jl. Merdeka No. 1,Jakarta,2008-05-15,2,3,SMPN 1 Jakarta,Islam,Membaca,Olahraga,Kuliah,Teknik Informatika
+1234567891,Aisyah Putri,aisyah@example.com,08123456788,P,aktif,11,TKJ,2025/2026,Jl. Sudirman No. 2,Bandung,2007-08-20,1,2,SMPN 2 Bandung,Islam,Menari,Seni,Bekerja,Desain Grafis
+1234567892,Charlie Danu,charlie@example.com,08123456787,L,aktif,12,RPL,2025/2026,Jl. Gatot Subroto No. 3,Surabaya,2007-01-10,3,4,SMPK Santa Maria,Kristen,Olahraga,Musik,Kuliah,Teknik Informatika

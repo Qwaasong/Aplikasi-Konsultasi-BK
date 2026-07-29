@@ -8,6 +8,7 @@ use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
+use App\Models\TahunAjaran;
 use App\Services\HomeVisitService;
 use App\Services\PegawaiService;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,8 @@ class CreateHomeVisitHandler implements HandlerInterface
             }
 
             $data['guru_bk_id'] = $pegawai->id;
+            $data['tahun_ajaran_id'] ??= TahunAjaran::where('status_aktif', true)->value('id')
+                ?? TahunAjaran::latest()->value('id');
 
             // 2. Extract siswa_id for KasusBk creation
             $siswaId = $data['siswa_id'] ?? null;
@@ -43,6 +46,7 @@ class CreateHomeVisitHandler implements HandlerInterface
                 $kasus = KasusBk::create([
                     'siswa_id' => $siswaId,
                     'guru_bk_id' => $pegawai->id,
+                    'tahun_ajaran_id' => $data['tahun_ajaran_id'],
                     'kategori_id' => KategoriKasus::inRandomOrder()->value('id'),
                     'penanganan' => $data['penanganan'] ?? 'Kunjungan Rumah',
                     'uraian_masalah' => $data['uraian_masalah'] ?? '-',

@@ -92,6 +92,16 @@ class SiswaService
             'nis' => (int) $data['nis'],
             'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? 0),
             'alamat' => $data['alamat'] ?? '',
+            'tempat_lahir' => $data['tempat_lahir'] ?? null,
+            'tgl_lahir' => $data['tgl_lahir'] ?? null,
+            'anak_ke' => $data['anak_ke'] ?? null,
+            'jml_saudara' => $data['jml_saudara'] ?? null,
+            'asal_smp' => $data['asal_smp'] ?? null,
+            'agama' => $data['agama'] ?? null,
+            'hobi' => $data['hobi'] ?? null,
+            'bakat' => $data['bakat'] ?? null,
+            'rencana_lulus' => $data['rencana_lulus'] ?? null,
+            'detail_rencana_lulus' => $data['detail_rencana_lulus'] ?? null,
         ];
 
         return $this->siswaRepository->create($siswaData);
@@ -106,23 +116,37 @@ class SiswaService
         $existing = $this->siswaRepository->findById($id);
 
         // Cek NIS hanya jika berubah
-        if ((int) $data['nis'] !== (int) $existing->nis) {
+        if (isset($data['nis']) && (int) $data['nis'] !== (int) $existing->nis) {
             $this->ensureNisUnique($data['nis']);
         }
 
         // Update data user
         if ($existing->user) {
-            $existing->user->update([
-                'nama' => $data['nama'] ?? $existing->user->nama,
-                'jenis_kelamin' => $data['jenis_kelamin'] ?? $existing->user->jenis_kelamin,
-            ]);
+            $userUpdate = [];
+            if (isset($data['nama'])) $userUpdate['nama'] = $data['nama'];
+            if (isset($data['jenis_kelamin'])) $userUpdate['jenis_kelamin'] = $data['jenis_kelamin'];
+            if (isset($data['email'])) $userUpdate['email'] = $data['email'];
+            if (isset($data['no_hp'])) $userUpdate['no_hp'] = $data['no_hp'];
+            if (!empty($userUpdate)) {
+                $existing->user->update($userUpdate);
+            }
         }
 
         // Siapkan data untuk tabel data_siswa
         $siswaData = [
-            'nis' => (int) $data['nis'],
+            'nis' => (int) ($data['nis'] ?? $existing->nis),
             'kelas_id' => (int) ($data['kelas'] ?? $data['kelas_id'] ?? $existing->kelas_id),
             'alamat' => $data['alamat'] ?? $existing->alamat ?? '',
+            'tempat_lahir' => $data['tempat_lahir'] ?? $existing->tempat_lahir,
+            'tgl_lahir' => $data['tgl_lahir'] ?? $existing->tgl_lahir,
+            'anak_ke' => $data['anak_ke'] ?? $existing->anak_ke,
+            'jml_saudara' => $data['jml_saudara'] ?? $existing->jml_saudara,
+            'asal_smp' => $data['asal_smp'] ?? $existing->asal_smp,
+            'agama' => $data['agama'] ?? $existing->agama,
+            'hobi' => $data['hobi'] ?? $existing->hobi,
+            'bakat' => $data['bakat'] ?? $existing->bakat,
+            'rencana_lulus' => $data['rencana_lulus'] ?? $existing->rencana_lulus,
+            'detail_rencana_lulus' => $data['detail_rencana_lulus'] ?? $existing->detail_rencana_lulus,
         ];
 
         return $this->siswaRepository->update($id, $siswaData);
@@ -245,7 +269,18 @@ class SiswaService
 
     public function getTemplateHeaders(): array
     {
-        return ['nis', 'nama', 'kelas', 'jenis_kelamin', 'jurusan', 'periode_ajaran'];
+        return [
+            'nis', 'nama', 'email', 'no_hp', 'jenis_kelamin', 'status',
+            'kelas', 'jurusan', 'periode_ajaran', 'alamat',
+            'tempat_lahir', 'tgl_lahir', 'anak_ke', 'jml_saudara',
+            'asal_smp', 'agama', 'hobi', 'bakat',
+            'rencana_lulus', 'detail_rencana_lulus',
+            'nama_ayah', 'nama_ibu', 'pendidikan_ayah', 'pendidikan_ibu',
+            'pekerjaan_ayah', 'pekerjaan_ibu', 'telp_ortu', 'status_rumah',
+            'dinding_rumah', 'lantai_rumah', 'jml_kamar', 'punya_kamar_sendiri',
+            'jml_tv', 'kendaraan_mobil', 'kendaraan_motor',
+            'biaya_sekolah_dari', 'kendaraan_ke_sekolah',
+        ];
     }
 
     public function getTemplateSampleRows(): array
@@ -254,10 +289,41 @@ class SiswaService
             [
                 'nis' => '1234567890',
                 'nama' => 'Budi Santoso',
-                'kelas' => '10',
+                'email' => '1234567890@sekolah.sch.id',
+                'no_hp' => '08123456789',
                 'jenis_kelamin' => 'L',
+                'status' => 'aktif',
+                'kelas' => '10',
                 'jurusan' => 'RPL',
                 'periode_ajaran' => '2025/2026',
+                'alamat' => 'Jl. Merdeka No. 1',
+                'tempat_lahir' => 'Jakarta',
+                'tgl_lahir' => '2008-05-15',
+                'anak_ke' => '2',
+                'jml_saudara' => '3',
+                'asal_smp' => 'SMPN 1 Jakarta',
+                'agama' => 'Islam',
+                'hobi' => 'Membaca',
+                'bakat' => 'Olahraga',
+                'rencana_lulus' => 'Kuliah',
+                'detail_rencana_lulus' => 'Teknik Informatika',
+                'nama_ayah' => 'Ahmad',
+                'nama_ibu' => 'Siti',
+                'pendidikan_ayah' => 'S1',
+                'pendidikan_ibu' => 'SMA',
+                'pekerjaan_ayah' => 'PNS',
+                'pekerjaan_ibu' => 'IRT',
+                'telp_ortu' => '021123456',
+                'status_rumah' => 'Milik Sendiri',
+                'dinding_rumah' => 'Tembok',
+                'lantai_rumah' => 'Keramik',
+                'jml_kamar' => '3',
+                'punya_kamar_sendiri' => 'true',
+                'jml_tv' => '2',
+                'kendaraan_mobil' => '1',
+                'kendaraan_motor' => '2',
+                'biaya_sekolah_dari' => 'Orang Tua',
+                'kendaraan_ke_sekolah' => 'Motor',
             ],
         ];
     }
@@ -272,14 +338,49 @@ class SiswaService
                 array_merge($filters, ['per_page' => 99999])
               )->getCollection();
 
-        return $siswaList->map(fn ($siswa) => [
-            'nis' => $siswa->nis,
-            'nama' => $siswa->nama,
-            'kelas' => $siswa->kelas_label,
-            'jenis_kelamin' => $siswa->jenis_kelamin,
-            'jurusan' => $siswa->kelas?->jurusan?->nama_jurusan ?? '',
-            'periode_ajaran' => $siswa->periode_ajaran ?? '',
-        ])->toArray();
+        return $siswaList->map(function ($siswa) {
+            $k = $siswa->keluarga;
+
+            return [
+                'nis' => $siswa->nis,
+                'nama' => $siswa->nama,
+                'email' => $siswa->user?->email ?? '',
+                'no_hp' => $siswa->user?->no_hp ?? '',
+                'jenis_kelamin' => $siswa->jenis_kelamin,
+                'status' => $siswa->user?->status ?? 'aktif',
+                'kelas' => $siswa->kelas_label,
+                'jurusan' => $siswa->kelas?->jurusan?->nama_jurusan ?? '',
+                'periode_ajaran' => $siswa->periode_ajaran ?? '',
+                'alamat' => $siswa->alamat ?? '',
+                'tempat_lahir' => $siswa->tempat_lahir ?? '',
+                'tgl_lahir' => optional($siswa->tgl_lahir)->format('Y-m-d'),
+                'anak_ke' => $siswa->anak_ke,
+                'jml_saudara' => $siswa->jml_saudara,
+                'asal_smp' => $siswa->asal_smp ?? '',
+                'agama' => $siswa->agama ?? '',
+                'hobi' => $siswa->hobi ?? '',
+                'bakat' => $siswa->bakat ?? '',
+                'rencana_lulus' => $siswa->rencana_lulus ?? '',
+                'detail_rencana_lulus' => $siswa->detail_rencana_lulus ?? '',
+                'nama_ayah' => $k?->nama_ayah ?? '',
+                'nama_ibu' => $k?->nama_ibu ?? '',
+                'pendidikan_ayah' => $k?->pendidikan_ayah ?? '',
+                'pendidikan_ibu' => $k?->pendidikan_ibu ?? '',
+                'pekerjaan_ayah' => $k?->pekerjaan_ayah ?? '',
+                'pekerjaan_ibu' => $k?->pekerjaan_ibu ?? '',
+                'telp_ortu' => $k?->telp_ortu ?? '',
+                'status_rumah' => $k?->status_rumah ?? '',
+                'dinding_rumah' => $k?->dinding_rumah ?? '',
+                'lantai_rumah' => $k?->lantai_rumah ?? '',
+                'jml_kamar' => $k?->jml_kamar,
+                'punya_kamar_sendiri' => $k?->punya_kamar_sendiri ?? '',
+                'jml_tv' => $k?->jml_tv,
+                'kendaraan_mobil' => $k?->kendaraan_mobil,
+                'kendaraan_motor' => $k?->kendaraan_motor,
+                'biaya_sekolah_dari' => $k?->biaya_sekolah_dari ?? '',
+                'kendaraan_ke_sekolah' => $k?->kendaraan_ke_sekolah ?? '',
+            ];
+        })->toArray();
     }
 
     public function getExportCount(array $filters = []): int
@@ -306,19 +407,15 @@ class SiswaService
         $existing = $this->siswaRepository->findByNis($row['nis']);
 
         $kelasId = $this->resolveKelasId($row['kelas'], $row['jurusan']);
+        $row['kelas'] = $kelasId;
+        $row['kelas_id'] = $kelasId;
 
         if ($existing) {
-            $this->update($existing->id, [
-                'nis' => $row['nis'],
-                'nama' => $row['nama'],
-                'kelas_id' => $kelasId,
-                'jenis_kelamin' => $row['jenis_kelamin'],
-                'alamat' => $row['alamat'] ?? '',
-            ]);
+            $siswa = $this->update($existing->id, $row);
+            $this->importKomulatif($siswa->id, $row);
             return;
         }
 
-        // Check if user with same email or username already exists (orphan from failed previous import)
         $email = $row['email'] ?? ($row['nis'] . '@sekolah.sch.id');
         $username = 'siswa_' . $row['nis'];
 
@@ -327,17 +424,27 @@ class SiswaService
             ->first();
 
         if ($existingUser) {
-            // Link existing user to new DataSiswa record
-            $this->siswaRepository->create([
+            $siswa = $this->siswaRepository->create([
                 'user_id' => $existingUser->id,
                 'nis' => (int) $row['nis'],
                 'kelas_id' => $kelasId,
                 'alamat' => $row['alamat'] ?? '',
+                'tempat_lahir' => $row['tempat_lahir'] ?? null,
+                'tgl_lahir' => $row['tgl_lahir'] ?? null,
+                'anak_ke' => $row['anak_ke'] ?? null,
+                'jml_saudara' => $row['jml_saudara'] ?? null,
+                'asal_smp' => $row['asal_smp'] ?? null,
+                'agama' => $row['agama'] ?? null,
+                'hobi' => $row['hobi'] ?? null,
+                'bakat' => $row['bakat'] ?? null,
+                'rencana_lulus' => $row['rencana_lulus'] ?? null,
+                'detail_rencana_lulus' => $row['detail_rencana_lulus'] ?? null,
             ]);
+            $this->importKomulatif($siswa->id, $row);
             return;
         }
 
-        $this->create([
+        $siswa = $this->create([
             'nis' => $row['nis'],
             'nama' => $row['nama'],
             'kelas' => $kelasId,
@@ -345,7 +452,45 @@ class SiswaService
             'email' => $row['email'] ?? null,
             'no_hp' => $row['no_hp'] ?? '-',
             'alamat' => $row['alamat'] ?? '',
+            'tempat_lahir' => $row['tempat_lahir'] ?? null,
+            'tgl_lahir' => $row['tgl_lahir'] ?? null,
+            'anak_ke' => $row['anak_ke'] ?? null,
+            'jml_saudara' => $row['jml_saudara'] ?? null,
+            'asal_smp' => $row['asal_smp'] ?? null,
+            'agama' => $row['agama'] ?? null,
+            'hobi' => $row['hobi'] ?? null,
+            'bakat' => $row['bakat'] ?? null,
+            'rencana_lulus' => $row['rencana_lulus'] ?? null,
+            'detail_rencana_lulus' => $row['detail_rencana_lulus'] ?? null,
         ]);
+        $this->importKomulatif($siswa->id, $row);
+    }
+
+    private function importKomulatif(int $siswaId, array $row): void
+    {
+        $fields = [
+            'nama_ayah', 'nama_ibu', 'pendidikan_ayah', 'pendidikan_ibu',
+            'pekerjaan_ayah', 'pekerjaan_ibu', 'telp_ortu', 'status_rumah',
+            'dinding_rumah', 'lantai_rumah', 'jml_kamar', 'punya_kamar_sendiri',
+            'jml_tv', 'kendaraan_mobil', 'kendaraan_motor',
+            'biaya_sekolah_dari', 'kendaraan_ke_sekolah',
+        ];
+
+        $hasData = false;
+        $data = ['siswa_id' => $siswaId];
+        foreach ($fields as $f) {
+            if (isset($row[$f]) && $row[$f] !== '') {
+                $data[$f] = $row[$f];
+                $hasData = true;
+            }
+        }
+
+        if ($hasData) {
+            \App\Models\KeluargaSiswa::updateOrCreate(
+                ['siswa_id' => $siswaId],
+                $data
+            );
+        }
     }
 
     private function resolveKelasId(int $tingkat, string $jurusanCode): int
@@ -530,6 +675,16 @@ class SiswaService
                 'alamat'         => $normalized['alamat'] ?? '',
                 'email'          => $normalized['email'] ?? null,
                 'no_hp'          => $normalized['no_hp'] ?? '-',
+                'tempat_lahir'   => $normalized['tempat_lahir'] ?? null,
+                'tgl_lahir'      => $normalized['tgl_lahir'] ?? null,
+                'anak_ke'        => $normalized['anak_ke'] ?? null,
+                'jml_saudara'    => $normalized['jml_saudara'] ?? null,
+                'asal_smp'       => $normalized['asal_smp'] ?? null,
+                'agama'          => $normalized['agama'] ?? null,
+                'hobi'           => $normalized['hobi'] ?? null,
+                'bakat'          => $normalized['bakat'] ?? null,
+                'rencana_lulus'  => $normalized['rencana_lulus'] ?? null,
+                'detail_rencana_lulus' => $normalized['detail_rencana_lulus'] ?? null,
             ];
         }
 
