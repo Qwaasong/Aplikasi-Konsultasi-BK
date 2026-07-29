@@ -12,8 +12,8 @@ class BimbinganIndividuRepository implements BimbinganIndividuRepositoryInterfac
     public function getAll(): Collection
     {
         return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
+            'kasus.guruBk.user',
+            'kasus.tahunAjaran',
             'kasus.siswa.user',
             'kasus.siswa.kelas.jurusan',
         ])->latest('tanggal_layanan')->get();
@@ -22,8 +22,8 @@ class BimbinganIndividuRepository implements BimbinganIndividuRepositoryInterfac
     public function findById(int $id): ?BimbinganIndividu
     {
         return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
+            'kasus.guruBk.user',
+            'kasus.tahunAjaran',
             'kasus.siswa.user',
             'kasus.siswa.kelas.jurusan',
         ])->findOrFail($id);
@@ -55,8 +55,8 @@ class BimbinganIndividuRepository implements BimbinganIndividuRepositoryInterfac
     public function query(): Builder
     {
         return BimbinganIndividu::with([
-            'guruBk.user',
-            'tahunAjaran',
+            'kasus.guruBk.user',
+            'kasus.tahunAjaran',
             'kasus.siswa.user',
             'kasus.siswa.kelas.jurusan',
         ]);

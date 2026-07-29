@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('bimbingan_individus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kasus_id')->constrained('kasus_bk')->cascadeOnDelete();
-            $table->foreignId('guru_bk_id')->constrained('pegawai')->cascadeOnDelete();
-            $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
             $table->date('tanggal_layanan');
             $table->timestamps();
         });

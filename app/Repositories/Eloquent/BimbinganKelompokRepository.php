@@ -11,14 +11,14 @@ class BimbinganKelompokRepository implements BimbinganKelompokRepositoryInterfac
 {
     public function getAll(): Collection
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
+        return BimbinganKelompok::with(['kasus.guruBk.user', 'kasus.tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
             ->latest('tanggal_layanan')
             ->get();
     }
 
     public function findById(int $id): ?BimbinganKelompok
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
+        return BimbinganKelompok::with(['kasus.guruBk.user', 'kasus.tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user'])
             ->find($id);
     }
 
@@ -47,6 +47,6 @@ class BimbinganKelompokRepository implements BimbinganKelompokRepositoryInterfac
 
     public function query(): Builder
     {
-        return BimbinganKelompok::with(['guruBk.user', 'tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user']);
+        return BimbinganKelompok::with(['kasus.guruBk.user', 'kasus.tahunAjaran', 'siswa.siswa.user', 'kasus.siswa.user']);
     }
 }

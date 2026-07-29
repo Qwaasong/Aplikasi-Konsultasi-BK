@@ -49,7 +49,7 @@ class BimbinganKelompokService
         $data['kasus_id'] = $kasus->id;
 
         // Hapus field yang tidak ada di tabel bimbingan_kelompok (sudah di kasus_bk)
-        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
+        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut'], $data['guru_bk_id'], $data['tahun_ajaran_id']);
 
         $record = $this->repo->create($data);
 
