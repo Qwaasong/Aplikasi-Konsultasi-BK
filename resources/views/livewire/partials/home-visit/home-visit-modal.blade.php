@@ -178,8 +178,10 @@ new class extends Component {
     }
 
     // ── SAVE ────────────────────────────────────────
-    public function save()
-    {
+    public function save(
+        \App\Handlers\HomeVisit\CreateHomeVisitHandler $createHandler,
+        \App\Handlers\HomeVisit\UpdateHomeVisitHandler $updateHandler,
+    ) {
         $this->validate();
 
         $data = [
@@ -191,15 +193,21 @@ new class extends Component {
             'status'            => $this->status,
         ];
 
-        $service = app(HomeVisitService::class);
-        $lampiranService = app(LampiranService::class);
+        $lampiranService = app(\App\Services\LampiranService::class);
 
-        if ($this->editingId) {
-            $record = $service->update($this->editingId, $data);
+        $result = $this->editingId
+            ? $updateHandler->handle($data, ['id' => $this->editingId])
+            : $createHandler->handle($data);
 
-            // Hapus lampiran yang ditandai
-            if (!empty($this->deletedLampiran)) {
-                $lampiranService->deleteMultiple($this->deletedLampiran);
+        if ($result->success) {
+            $record = $result->data;
+
+            // Handle lampiran for update
+            if ($this->editingId) {
+                // Hapus lampiran yang ditandai
+                if (!empty($this->deletedLampiran)) {
+                    $lampiranService->deleteMultiple($this->deletedLampiran);
+                }
             }
 
             // Simpan lampiran baru
@@ -207,16 +215,12 @@ new class extends Component {
                 $lampiranService->storeLampirans($record->kasus_id, $this->uploadedFiles, 'kunjungan');
             }
 
-            session()->flash('success', 'Kunjungan Rumah berhasil diperbarui!');
-        } else {
-            $record = $service->create($data);
-
-            // Simpan lampiran
-            if (!empty($this->uploadedFiles) && $record->kasus_id) {
-                $lampiranService->storeLampirans($record->kasus_id, $this->uploadedFiles, 'kunjungan');
+            session()->flash('success', $result->message);
+            if ($result->eventClass) {
+                event(new $result->eventClass(...$result->eventPayload));
             }
-
-            session()->flash('success', 'Kunjungan Rumah berhasil ditambahkan!');
+        } else {
+            session()->flash('error', $result->message);
         }
 
         $this->reset([

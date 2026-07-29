@@ -41,4 +41,26 @@ class KehadiranRepository implements KehadiranRepositoryInterface
     {
         return Kehadiran::with(['siswa.user', 'siswa.kelas.jurusan', 'tahunAjaran']);
     }
+
+    public function bulkUpsert(array $rows): int
+    {
+        if (empty($rows)) {
+            return 0;
+        }
+
+        foreach ($rows as $row) {
+            Kehadiran::updateOrCreate(
+                [
+                    'siswa_id' => $row['siswa_id'],
+                    'tanggal_kehadiran' => $row['tanggal_kehadiran'],
+                    'tahun_ajaran_id' => $row['tahun_ajaran_id'],
+                ],
+                [
+                    'status' => $row['status'],
+                ]
+            );
+        }
+
+        return count($rows);
+    }
 }

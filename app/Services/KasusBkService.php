@@ -267,7 +267,7 @@ class KasusBkService
         $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         if (!$pegawai) {
-            abort(403, 'Akun ini tidak terdaftar sebagai pegawai/guru BK.');
+            throw new \App\Exceptions\AuthorizationException('mengakses data pegawai/guru BK');
         }
 
         return $pegawai->id;
@@ -280,7 +280,7 @@ class KasusBkService
     {
         $pegawaiId = $this->resolveGurubkId();
         if ($kasus->guru_bk_id !== $pegawaiId) {
-            abort(403, 'Anda tidak memiliki akses ke data kasus ini.');
+            throw new \App\Exceptions\AuthorizationException('mengakses data kasus ini');
         }
     }
 

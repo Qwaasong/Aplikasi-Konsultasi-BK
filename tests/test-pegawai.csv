@@ -1,0 +1,4 @@
+nip,nama,email,no_hp,jenis_kelamin,jabatan,role,status
+1987654321,Siti Aminah,siti@example.com,08123456789,P,Guru BK,guru_bk,aktif
+1987654322,Ahmad Ridwan,ahmad@example.com,08123456788,L,Wali Kelas,guru,aktif
+1987654323,Dewi Lestari,dewi@example.com,08123456787,P,Staff TU,admin,aktif

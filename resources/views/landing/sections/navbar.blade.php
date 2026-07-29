@@ -32,8 +32,8 @@
             </li>
 
             <li>
-                <a href="{{ route('kehadiran') }}" class="navbar-link">
-                    Kehadiran Siswa
+                <a href="{{ route('layanan') }}" class="navbar-link">
+                    Layanan BK
                 </a>
             </li>
 
