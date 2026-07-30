@@ -15,7 +15,7 @@ new #[Layout('layouts.app')] class extends Index {};
         HEADER
     ====================================================== --}}
 
-    <x-organisms.header action="createTesBakatMinat">
+    <x-organisms.header action="createPeminatan">
 
         <x-slot:search>
 
@@ -490,7 +490,7 @@ new #[Layout('layouts.app')] class extends Index {};
 
 
     @include(
-        'livewire.partials.asesmen.tes-bakat-minat.tes-bakat-minat-modal',
+        'livewire.partials.asesmen.tes-bakat-minat.tes-modal',
         [
             'editingId'=>$editingId
         ]
