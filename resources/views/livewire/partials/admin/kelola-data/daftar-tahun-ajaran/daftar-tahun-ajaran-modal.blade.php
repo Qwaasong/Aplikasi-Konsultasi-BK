@@ -2,7 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
-use App\Services\TahunAjaranService;
+use App\Services\l\A\TahunAjaranService;
 
 new class extends Component
 {

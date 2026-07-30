@@ -3,8 +3,8 @@
 namespace App\Livewire\Konselor\KasusBk;
 
 use App\Livewire\Base\KasusBkIndexBase;
-use App\Services\KasusBkService;
-use App\Services\PegawaiService;
+use App\Services\e\KasusBkService;
+use App\Services\e\PegawaiService;
 
 class Index extends KasusBkIndexBase
 {

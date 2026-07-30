@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\KelolaUser\Pegawai;
 
 use App\Services\ImportExportService;
-use App\Services\PegawaiService;
+use App\Services\e\PegawaiService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;

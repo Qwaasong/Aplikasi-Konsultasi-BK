@@ -5,8 +5,8 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Services\SiswaService;
-use App\Services\KasusBkService;
+use App\Services\i\SiswaService;
+use App\Services\e\KasusBkService;
 use App\Models\KategoriKasus;
 
 new class extends Component {

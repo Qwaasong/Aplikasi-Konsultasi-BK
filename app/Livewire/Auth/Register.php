@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Auth;
 
-use App\Services\UserService;
+use App\Services\s\UserService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 use Livewire\Volt\Component;

@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KelolaUser\Siswa;
 
-use App\Services\SiswaService;
+use App\Services\i\SiswaService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 

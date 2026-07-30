@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Admin;
 
-use App\Services\KasusBkService;
-use App\Services\SiswaService;
-use App\Services\UserService;
+use App\Services\e\KasusBkService;
+use App\Services\i\SiswaService;
+use App\Services\s\UserService;
 use Livewire\Volt\Component;
 
 class Dashboard extends Component

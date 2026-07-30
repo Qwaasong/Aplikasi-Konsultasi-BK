@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\AlihTanganKasus;
 
-use App\Services\AlihTanganKasusService;
+use App\Services\l\AlihTanganKasusService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

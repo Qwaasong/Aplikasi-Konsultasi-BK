@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\KonferensiKasus;
 
-use App\Services\KonferensiKasusService;
+use App\Services\e\KonferensiKasusService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

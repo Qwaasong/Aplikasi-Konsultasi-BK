@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KasusBk;
 
-use App\Services\KasusBkService;
+use App\Services\e\KasusBkService;
 use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 

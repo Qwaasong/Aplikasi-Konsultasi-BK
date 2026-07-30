@@ -4,7 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
-use App\Services\AlihTanganKasusService;
+use App\Services\l\AlihTanganKasusService;
 
 new class extends Component {
 

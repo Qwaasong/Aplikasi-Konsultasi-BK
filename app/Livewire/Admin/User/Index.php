@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\User;
 
 use App\Constants\GlobalMessages;
-use App\Services\UserService;
+use App\Services\s\UserService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;

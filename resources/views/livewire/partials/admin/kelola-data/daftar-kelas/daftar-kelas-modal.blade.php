@@ -2,10 +2,10 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
-use App\Services\KelasService;
-use App\Services\JurusanService;
-use App\Services\SekolahService;
-use App\Services\PegawaiService;
+use App\Services\e\KelasService;
+use App\Services\u\JurusanService;
+use App\Services\i\SekolahService;
+use App\Services\e\PegawaiService;
 
 new class extends Component
 {

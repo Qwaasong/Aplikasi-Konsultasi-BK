@@ -7,7 +7,7 @@ use App\Events\KasusBk\KasusBkUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\KasusBkService;
+use App\Services\e\KasusBkService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateKasusBkHandler implements HandlerInterface

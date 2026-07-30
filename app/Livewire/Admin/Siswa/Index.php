@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Siswa;
 
 use App\Constants\GlobalMessages;
 use App\Services\ImportExportService;
-use App\Services\SiswaService;
+use App\Services\i\SiswaService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;

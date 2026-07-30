@@ -4,7 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
-use App\Services\KonferensiKasusService;
+use App\Services\e\KonferensiKasusService;
 use App\Services\LampiranService;
 
 new class extends Component {

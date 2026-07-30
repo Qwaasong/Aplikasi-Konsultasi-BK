@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\PengunduranDiri;
 
-use App\Services\PengunduranDiriService;
+use App\Services\e\PengunduranDiriService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

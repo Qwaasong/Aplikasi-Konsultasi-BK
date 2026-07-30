@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KelolaData\DaftarJurusan;
 
-use App\Services\JurusanService;
+use App\Services\u\JurusanService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
