@@ -7,7 +7,7 @@ use App\Events\KonferensiKasus\KonferensiKasusUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\e\KonferensiKasusService;
+use App\Services\Bk\KonferensiKasusService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateKonferensiKasusHandler implements HandlerInterface

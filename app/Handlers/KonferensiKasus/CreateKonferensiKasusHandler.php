@@ -7,8 +7,8 @@ use App\Events\KonferensiKasus\KonferensiKasusCreated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KonferensiKasusPeserta;
-use App\Services\e\KonferensiKasusService;
-use App\Services\e\PegawaiService;
+use App\Services\Bk\KonferensiKasusService;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Facades\DB;
 
 class CreateKonferensiKasusHandler implements HandlerInterface

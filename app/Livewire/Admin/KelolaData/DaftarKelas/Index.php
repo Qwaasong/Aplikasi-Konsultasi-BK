@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KelolaData\DaftarKelas;
 
-use App\Services\e\KelasService;
+use App\Services\Bk\KelasService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 

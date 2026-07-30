@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Bk;
 
 use App\Models\AlihtanganKasus;
 use Illuminate\Database\Eloquent\Builder;

@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\LayananKonseling;
 
-use App\Services\e\K\BimbinganKelompokService;
+use App\Services\Bk\K\BimbinganKelompokService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

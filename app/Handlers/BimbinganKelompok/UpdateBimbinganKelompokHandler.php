@@ -7,7 +7,7 @@ use App\Events\BimbinganKelompok\BimbinganKelompokUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\e\K\BimbinganKelompokService;
+use App\Services\Bimbingan\BimbinganKelompokService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateBimbinganKelompokHandler implements HandlerInterface

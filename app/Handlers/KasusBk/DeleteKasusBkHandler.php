@@ -7,7 +7,7 @@ use App\Events\KasusBk\KasusBkDeleted;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\e\KasusBkService;
+use App\Services\Bk\KasusBkService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteKasusBkHandler implements HandlerInterface

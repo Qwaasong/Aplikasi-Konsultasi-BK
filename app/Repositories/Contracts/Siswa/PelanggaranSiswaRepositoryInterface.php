@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Siswa;
 
 use App\Models\PelanggaranSiswa;
 use Illuminate\Support\Collection;

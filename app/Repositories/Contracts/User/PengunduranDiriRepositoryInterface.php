@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\User;
 
 use App\Models\PengunduranDiri;
 use Illuminate\Database\Eloquent\Builder;

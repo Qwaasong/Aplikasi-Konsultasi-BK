@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Admin\Dashboard;
+use App\Livewire\Konselor\Dashboard;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Dashboard {}; ?>

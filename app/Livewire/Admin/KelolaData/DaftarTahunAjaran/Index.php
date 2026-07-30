@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KelolaData\DaftarTahunAjaran;
 
-use App\Services\l\A\TahunAjaranService;
+use App\Services\Bk\A\TahunAjaranService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 

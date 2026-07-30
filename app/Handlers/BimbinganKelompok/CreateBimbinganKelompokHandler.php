@@ -10,8 +10,8 @@ use App\Models\BimbinganKelompokSiswa;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
-use App\Services\e\K\BimbinganKelompokService;
-use App\Services\e\PegawaiService;
+use App\Services\Bimbingan\BimbinganKelompokService;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 

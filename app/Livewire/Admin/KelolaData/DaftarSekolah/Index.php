@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\KelolaData\DaftarSekolah;
 
-use App\Services\i\SekolahService;
+use App\Services\MasterData\SekolahService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 

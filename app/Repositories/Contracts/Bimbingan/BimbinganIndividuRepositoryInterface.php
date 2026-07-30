@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Bimbingan;
 
 use App\Models\BimbinganIndividu;
 use Illuminate\Database\Eloquent\Builder;

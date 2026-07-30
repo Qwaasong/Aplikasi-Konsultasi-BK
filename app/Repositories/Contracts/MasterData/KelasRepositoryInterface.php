@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\MasterData;
 
 use App\Models\Kelas;
 use Illuminate\Support\Collection;

@@ -7,7 +7,7 @@ use App\Events\BimbinganIndividu\BimbinganIndividuUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\e\K\BimbinganIndividuService;
+use App\Services\Bimbingan\BimbinganIndividuService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateBimbinganIndividuHandler implements HandlerInterface
