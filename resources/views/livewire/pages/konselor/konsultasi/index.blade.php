@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Konselor\Konsultasi\Index;
+use App\Livewire\Konselor\Bk\Konsultasi\Index;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Index {}; ?>

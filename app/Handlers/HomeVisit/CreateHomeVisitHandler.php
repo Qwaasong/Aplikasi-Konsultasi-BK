@@ -9,8 +9,8 @@ use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
-use App\Services\HomeVisitService;
-use App\Services\PegawaiService;
+use App\Services\Bk\HomeVisitService;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 

@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Admin\LogKasus\Detail;
+use App\Livewire\Admin\Bk\LogKasus\Detail;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Detail {}; ?>

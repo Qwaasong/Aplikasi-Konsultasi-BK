@@ -84,13 +84,26 @@
 
         <div class="navbar-actions">
 
-            <a href="{{ route('login') }}" class="login-button btn-outline">
-                Login
-            </a>
+            @guest
+                <a href="{{ route('login') }}" class="login-button btn-outline">
+                    Login
+                </a>
 
-            <a href="{{ route('register') }}" class="login-button btn-primary">
-                Daftar
-            </a>
+                <a href="{{ route('register') }}" class="login-button btn-primary">
+                    Daftar
+                </a>
+            @else
+                @php
+                    $route = match(auth()->user()->role) {
+                        'admin' => 'admin.dashboard',
+                        'guru_bk' => 'konselor.dashboard',
+                        default => 'landing',
+                    };
+                @endphp
+                <a href="{{ route($route) }}" class="login-button btn-primary">
+                    Dashboard
+                </a>
+            @endguest
 
         </div>
 
