@@ -11,17 +11,18 @@ class AkpdFactory extends Factory
 
     public function definition(): array
     {
-        $aspek = ['Rendah', 'Sedang', 'Tinggi'];
-
-        return [
+        $jawaban = ['Ya', 'Tidak'];
+        $data = [
             'siswa_id' => DataSiswa::factory(),
             'tanggal' => $this->faker->date(),
-            'pribadi' => $this->faker->randomElement($aspek),
-            'sosial' => $this->faker->randomElement($aspek),
-            'belajar' => $this->faker->randomElement($aspek),
-            'karir' => $this->faker->randomElement($aspek),
-            'kesimpulan' => $this->faker->optional()->sentence(),
-            'catatan' => $this->faker->optional()->sentence(),
+            'tahun_pelajaran' => '2025/2026',
         ];
+
+        for ($i = 1; $i <= 50; $i++) {
+            $col = 'q' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+            $data[$col] = $this->faker->randomElement($jawaban);
+        }
+
+        return $data;
     }
 }

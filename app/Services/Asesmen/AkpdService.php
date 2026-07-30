@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\AkpdRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\AkpdRepositoryInterface;
 use App\Models\Akpd;
 use Illuminate\Support\Collection;
 
@@ -58,7 +58,7 @@ class AkpdService
             $keyword = $filters['search'];
             $query->where(function ($q) use ($keyword) {
                 $q->whereHas('siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
-                    ->orWhere('kesimpulan', 'like', "%{$keyword}%");
+                    ->orWhere('tahun_pelajaran', 'like', "%{$keyword}%");
             });
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Asesmen;
 
 use App\Models\Akpd;
 use Illuminate\Database\Eloquent\Builder;
