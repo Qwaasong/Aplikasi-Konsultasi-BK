@@ -5,7 +5,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Models\DataSiswa;
-use App\Services\i\SiswaService;
+use App\Services\Siswa\SiswaService;
 use App\Services\o\HomeVisitService;
 use App\Services\LampiranService;
 

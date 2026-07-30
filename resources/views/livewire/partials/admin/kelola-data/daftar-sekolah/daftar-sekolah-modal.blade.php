@@ -3,7 +3,7 @@
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
-use App\Services\i\SekolahService;
+use App\Services\MasterData\SekolahService;
 
 new class extends Component
 {

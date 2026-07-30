@@ -5,8 +5,8 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Services\i\SiswaService;
-use App\Services\e\PeminatanService;
+use App\Services\Siswa\SiswaService;
+use App\Services\Asesmen\PeminatanService;
 
 new class extends Component {
     use WithFileUploads;

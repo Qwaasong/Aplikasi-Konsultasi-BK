@@ -4,8 +4,8 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Services\i\SiswaService;
-use App\Services\e\KehadiranService;
+use App\Services\Siswa\SiswaService;
+use App\Services\Siswa\KehadiranService;
 use App\Models\TahunAjaran;
 
 new class extends Component {

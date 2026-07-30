@@ -2,8 +2,8 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
-use App\Services\u\JurusanService;
-use App\Services\i\SekolahService;
+use App\Services\MasterData\JurusanService;
+use App\Services\MasterData\SekolahService;
 
 new class extends Component
 {

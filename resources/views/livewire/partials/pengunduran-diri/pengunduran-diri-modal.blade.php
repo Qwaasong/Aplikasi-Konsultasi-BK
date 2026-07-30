@@ -4,8 +4,8 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
-use App\Services\i\SiswaService;
-use App\Services\e\PengunduranDiriService;
+use App\Services\Siswa\SiswaService;
+use App\Services\Bk\PengunduranDiriService;
 
 new class extends Component {
 

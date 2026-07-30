@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Services\e\PegawaiService;
+use App\Services\User\PegawaiService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

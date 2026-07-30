@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\i\SiswaService;
+use App\Services\Siswa\SiswaService;
 use function Livewire\Volt\{state, computed};
 use Livewire\WithPagination;
 
