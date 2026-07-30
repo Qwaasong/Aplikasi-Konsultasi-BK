@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bimbingan;
 
 use App\Models\BimbinganIndividu;
-use App\Repositories\Contracts\k\BimbinganIndividuRepositoryInterface;
+use App\Repositories\Contracts\Bimbingan\BimbinganIndividuRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

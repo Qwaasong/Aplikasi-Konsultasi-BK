@@ -4,7 +4,7 @@ namespace App\Services\Bk;
 
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
-use App\Repositories\Contracts\k\Bk\HomeVisitRepositoryInterface;
+use App\Repositories\Contracts\Bk\HomeVisitRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class HomeVisitService

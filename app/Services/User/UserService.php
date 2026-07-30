@@ -4,7 +4,7 @@ namespace App\Services\User;
 
 use App\Models\Pegawai;
 use App\Models\User;
-use App\Repositories\Contracts\i\S\User\UserRepositoryInterface;
+use App\Repositories\Contracts\User\UserRepositoryInterface;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;

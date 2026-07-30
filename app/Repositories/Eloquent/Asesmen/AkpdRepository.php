@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Asesmen;
 
 use App\Models\Akpd;
-use App\Repositories\Contracts\l\AkpdRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\AkpdRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

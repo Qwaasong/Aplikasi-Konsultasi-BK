@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bk;
 
 use App\Models\KonferensiKasus;
-use App\Repositories\Contracts\e\KonferensiKasusRepositoryInterface;
+use App\Repositories\Contracts\Bk\KonferensiKasusRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

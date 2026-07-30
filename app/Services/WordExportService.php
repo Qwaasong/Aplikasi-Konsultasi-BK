@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\KasusBk;
-use App\Repositories\Contracts\e\KasusBkRepositoryInterface;
+use App\Repositories\Contracts\Bk\KasusBkRepositoryInterface;
 
 class WordExportService
 {

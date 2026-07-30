@@ -2,7 +2,7 @@
 
 namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\l\Asesmen\AkpdRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\AkpdRepositoryInterface;
 use App\Models\Akpd;
 use Illuminate\Support\Collection;
 

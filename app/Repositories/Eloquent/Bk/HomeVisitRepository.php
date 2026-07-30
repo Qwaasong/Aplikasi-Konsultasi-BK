@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bk;
 
 use App\Models\HomeVisit;
-use App\Repositories\Contracts\o\HomeVisitRepositoryInterface;
+use App\Repositories\Contracts\Bk\HomeVisitRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

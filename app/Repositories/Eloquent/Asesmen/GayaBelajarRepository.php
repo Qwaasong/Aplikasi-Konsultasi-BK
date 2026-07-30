@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Asesmen;
 
 use App\Models\GayaBelajar;
-use App\Repositories\Contracts\a\GayaBelajarRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\GayaBelajarRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

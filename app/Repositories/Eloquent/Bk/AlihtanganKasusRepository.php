@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bk;
 
 use App\Models\AlihtanganKasus;
-use App\Repositories\Contracts\l\AlihtanganKasusRepositoryInterface;
+use App\Repositories\Contracts\Bk\AlihtanganKasusRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

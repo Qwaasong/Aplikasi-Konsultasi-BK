@@ -2,7 +2,7 @@
 
 namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\l\Asesmen\DcmRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\DcmRepositoryInterface;
 use App\Models\Dcm;
 use Illuminate\Support\Collection;
 

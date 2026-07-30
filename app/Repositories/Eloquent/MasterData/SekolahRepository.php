@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\MasterData;
 
 use App\Models\Sekolah;
-use App\Repositories\Contracts\i\SekolahRepositoryInterface;
+use App\Repositories\Contracts\MasterData\SekolahRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class SekolahRepository implements SekolahRepositoryInterface

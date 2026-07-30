@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Asesmen;
 
 use App\Models\Sosiometri;
-use App\Repositories\Contracts\i\SosiometriRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\SosiometriRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class SosiometriRepository implements SosiometriRepositoryInterface

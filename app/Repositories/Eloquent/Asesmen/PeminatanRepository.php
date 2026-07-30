@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Asesmen;
 
 use App\Models\Peminatan;
-use App\Repositories\Contracts\e\PeminatanRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\PeminatanRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

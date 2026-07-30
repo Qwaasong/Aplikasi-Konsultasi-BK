@@ -7,7 +7,8 @@ use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\KonferensiKasus;
-use App\Repositories\Contracts\k\Bk\AlihtanganKasusRepositoryInterface;
+use App\Repositories\Contracts\Bk\AlihtanganKasusRepositoryInterface;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Collection;
 
 class AlihTanganKasusService

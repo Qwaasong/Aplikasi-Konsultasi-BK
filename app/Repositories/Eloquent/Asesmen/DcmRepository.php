@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Asesmen;
 
 use App\Models\Dcm;
-use App\Repositories\Contracts\c\DcmRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\DcmRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

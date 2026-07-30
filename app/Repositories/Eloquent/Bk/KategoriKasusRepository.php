@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bk;
 
 use App\Models\KategoriKasus;
-use App\Repositories\Contracts\e\KategoriKasusRepositoryInterface;
+use App\Repositories\Contracts\Bk\KategoriKasusRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KategoriKasusRepository implements KategoriKasusRepositoryInterface

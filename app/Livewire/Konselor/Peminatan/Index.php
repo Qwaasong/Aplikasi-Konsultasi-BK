@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\Peminatan;
 
-use App\Services\Bk\PeminatanService;
+use App\Services\Asesmen\PeminatanService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 

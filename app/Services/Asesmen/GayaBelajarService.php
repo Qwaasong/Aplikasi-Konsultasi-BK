@@ -2,7 +2,7 @@
 
 namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\l\Asesmen\GayaBelajarRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\GayaBelajarRepositoryInterface;
 use App\Models\GayaBelajar;
 use Illuminate\Support\Collection;
 

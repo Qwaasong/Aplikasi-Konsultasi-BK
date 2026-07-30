@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Siswa;
 
 use App\Models\Kehadiran;
-use App\Repositories\Contracts\e\KehadiranRepositoryInterface;
+use App\Repositories\Contracts\Siswa\KehadiranRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

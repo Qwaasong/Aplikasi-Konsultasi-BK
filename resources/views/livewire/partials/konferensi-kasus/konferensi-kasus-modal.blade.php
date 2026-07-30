@@ -101,7 +101,7 @@ new class extends Component {
     #[Computed]
     public function kasusOptions()
     {
-        $options = app(\App\Services\KonferensiKasusService::class)->getKasusOptions();
+        $options = app(\App\Services\Bk\KonferensiKasusService::class)->getKasusOptions();
         if (empty($this->searchKasus)) return $options;
         $needle = strtolower($this->searchKasus);
         return $options->filter(fn($k) =>

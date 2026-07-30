@@ -3,7 +3,7 @@
 namespace App\Livewire\Konselor;
 
 use App\Services\Bk\KasusBkService;
-use App\Services\Bk\PegawaiService;
+use App\Services\User\PegawaiService;
 use Livewire\Volt\Component;
 
 class Dashboard extends Component

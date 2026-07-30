@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\User;
 
 use App\Models\PengunduranDiri;
-use App\Repositories\Contracts\e\PengunduranDiriRepositoryInterface;
+use App\Repositories\Contracts\User\PengunduranDiriRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

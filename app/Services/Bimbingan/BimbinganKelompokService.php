@@ -6,7 +6,7 @@ use App\Models\BimbinganKelompokSiswa;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\k\Bimbingan\BimbinganKelompokRepositoryInterface;
+use App\Repositories\Contracts\Bimbingan\BimbinganKelompokRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class BimbinganKelompokService

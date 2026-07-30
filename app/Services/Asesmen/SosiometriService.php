@@ -2,7 +2,7 @@
 
 namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\l\Asesmen\SosiometriRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\SosiometriRepositoryInterface;
 use App\Models\Sosiometri;
 use Illuminate\Support\Collection;
 

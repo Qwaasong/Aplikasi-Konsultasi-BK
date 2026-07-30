@@ -5,7 +5,7 @@ namespace App\Services\Bk;
 use App\Models\KasusBk;
 use App\Models\KonsultasiLampiran;
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\k\Bk\KasusBkRepositoryInterface;
+use App\Repositories\Contracts\Bk\KasusBkRepositoryInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 

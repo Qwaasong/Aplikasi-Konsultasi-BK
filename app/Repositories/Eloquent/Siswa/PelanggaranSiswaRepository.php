@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Siswa;
 
 use App\Models\PelanggaranSiswa;
-use App\Repositories\Contracts\e\PelanggaranSiswaRepositoryInterface;
+use App\Repositories\Contracts\Siswa\PelanggaranSiswaRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class PelanggaranSiswaRepository implements PelanggaranSiswaRepositoryInterface

@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\MasterData;
 
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\l\A\TahunAjaranRepositoryInterface;
+use App\Repositories\Contracts\MasterData\TahunAjaranRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class TahunAjaranRepository implements TahunAjaranRepositoryInterface

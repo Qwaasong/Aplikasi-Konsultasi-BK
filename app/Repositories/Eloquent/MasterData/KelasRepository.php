@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\MasterData;
 
 use App\Models\Kelas;
-use App\Repositories\Contracts\e\KelasRepositoryInterface;
+use App\Repositories\Contracts\MasterData\KelasRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KelasRepository implements KelasRepositoryInterface

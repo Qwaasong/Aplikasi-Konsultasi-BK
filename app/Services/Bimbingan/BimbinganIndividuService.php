@@ -5,7 +5,7 @@ namespace App\Services\Bimbingan;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\k\Bimbingan\BimbinganIndividuRepositoryInterface;
+use App\Repositories\Contracts\Bimbingan\BimbinganIndividuRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 

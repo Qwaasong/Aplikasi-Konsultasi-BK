@@ -2,7 +2,7 @@
 
 namespace App\Services\Asesmen;
 
-use App\Repositories\Contracts\l\Asesmen\PeminatanRepositoryInterface;
+use App\Repositories\Contracts\Asesmen\PeminatanRepositoryInterface;
 use Illuminate\Support\Collection;
 use App\Models\Peminatan;
 

@@ -6,7 +6,7 @@ use App\Models\DataSiswa;
 use App\Models\Kelas;
 use App\Models\Jurusan;
 use App\Models\TahunAjaran;
-use App\Repositories\Contracts\i\SiswaRepositoryInterface;
+use App\Repositories\Contracts\Siswa\SiswaRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

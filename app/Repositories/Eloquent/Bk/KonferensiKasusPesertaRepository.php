@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bk;
 
 use App\Models\KonferensiKasusPeserta;
-use App\Repositories\Contracts\e\KonferensiKasusPesertaRepositoryInterface;
+use App\Repositories\Contracts\Bk\KonferensiKasusPesertaRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KonferensiKasusPesertaRepository implements KonferensiKasusPesertaRepositoryInterface

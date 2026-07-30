@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\MasterData;
 
 use App\Models\Jurusan;
-use App\Repositories\Contracts\u\JurusanRepositoryInterface;
+use App\Repositories\Contracts\MasterData\JurusanRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class JurusanRepository implements JurusanRepositoryInterface

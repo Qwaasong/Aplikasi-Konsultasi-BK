@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Siswa;
 
 use App\Models\KeluargaSiswa;
-use App\Repositories\Contracts\e\KeluargaSiswaRepositoryInterface;
+use App\Repositories\Contracts\Siswa\KeluargaSiswaRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KeluargaSiswaRepository implements KeluargaSiswaRepositoryInterface

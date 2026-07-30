@@ -5,7 +5,8 @@ namespace App\Services\Bk;
 use App\Models\KonferensiKasusPeserta;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
-use App\Repositories\Contracts\k\Bk\KonferensiKasusRepositoryInterface;
+use App\Services\User\PegawaiService;
+use App\Repositories\Contracts\Bk\KonferensiKasusRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class KonferensiKasusService

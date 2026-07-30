@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\User;
 
 use App\Models\Pegawai;
-use App\Repositories\Contracts\e\PegawaiRepositoryInterface;
+use App\Repositories\Contracts\User\PegawaiRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class PegawaiRepository implements PegawaiRepositoryInterface

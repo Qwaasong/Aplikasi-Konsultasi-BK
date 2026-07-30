@@ -3,7 +3,7 @@
 namespace App\Services\Bk;
 
 use App\Models\PengunduranDiri;
-use App\Repositories\Contracts\i\S\User\PengunduranDiriRepositoryInterface;
+use App\Repositories\Contracts\User\PengunduranDiriRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class PengunduranDiriService

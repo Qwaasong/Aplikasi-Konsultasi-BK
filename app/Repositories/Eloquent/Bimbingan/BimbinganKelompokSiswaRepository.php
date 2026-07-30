@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent\Bimbingan;
 
 use App\Models\BimbinganKelompokSiswa;
-use App\Repositories\Contracts\k\BimbinganKelompokSiswaRepositoryInterface;
+use App\Repositories\Contracts\Bimbingan\BimbinganKelompokSiswaRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class BimbinganKelompokSiswaRepository implements BimbinganKelompokSiswaRepositoryInterface
