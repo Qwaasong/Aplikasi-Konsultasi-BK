@@ -44,9 +44,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 <tr
     wire:key="tahun-{{ $record->id }}"
     class="group border-b border-gray-100 transition-all duration-200
-        {{ in_array($record->id,$selected) }}
-            ? 'bg-teal-50/50'
-            : 'bg-white' }}">
+        {{ in_array($record->id,$selected) ? "bg-teal-50/50" : "bg-white" }}">
 
     <td class="w-16 text-center">
 

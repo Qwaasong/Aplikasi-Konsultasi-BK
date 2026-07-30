@@ -7,7 +7,7 @@ use App\Events\HomeVisit\HomeVisitUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
 use App\Models\KasusBk;
-use App\Services\HomeVisitService;
+use App\Services\Bk\HomeVisitService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateHomeVisitHandler implements HandlerInterface

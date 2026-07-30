@@ -50,8 +50,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // route lama
     Volt::route('admin/dashboard', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('admin/konsultasi', 'pages.admin.konsultasi.index')->name('admin.konsultasi.index');
-    Volt::route('admin/siswa', 'pages.admin.siswa.index')->name('admin.siswa.index');
-    Volt::route('admin/user', 'pages.admin.user.index')->name('admin.user.index');
+    Volt::route('admin/siswa', 'pages.admin.kelola-user.siswa.index')->name('admin.siswa.index');
+    Volt::route('admin/user', 'pages.admin.kelola-user.user.index')->name('admin.user.index');
     Volt::route('/admin/konsultasi/{id}/detail', 'pages.admin.konsultasi.detail')->name('admin.konsultasi.detail');
     Volt::route('admin/kasus-bk', 'pages.admin.kasus-bk.index')->name('admin.kasus-bk.index');
     Volt::route('admin/kasus-bk/{id}/detail', 'pages.admin.kasus-bk.detail')->name('admin.kasus-bk.detail');
@@ -94,6 +94,10 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
     Volt::route('konselor/peminatan/{id}/detail', 'pages.konselor.peminatan.detail')->name('konselor.peminatan.detail');
     
+
+    // Kasus BK
+    Volt::route('konselor/kasus-bk', 'pages.konselor.kasus-bk.index')->name('konselor.kasus-bk.index');
+    Volt::route('konselor/kasus-bk/{id}/detail', 'pages.konselor.kasus-bk.detail')->name('konselor.kasus-bk.detail');
     // Asesmen
     Volt::route('konselor/asesmen', 'pages.konselor.asesmen.index')->name('konselor.asesmen.index');
     // Volt::route('konselor/asesmen/akpd', 'pages.konselor.asesmen.akpd.index')->name('konselor.asesmen.akpd.index');

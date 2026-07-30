@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Konselor\KasusBk\Detail;
+use App\Livewire\Konselor\Bk\KasusBk\Detail;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Detail {}; ?>
@@ -97,15 +97,15 @@ new #[Layout('layouts.app')] class extends Detail {}; ?>
                     <div class="px-3 py-2 border-b border-gray-100">
                         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Export ke Word</p>
                     </div>
-                    <a href="{{ route('kasus-bk.export', ['id' => $record->id, 'template' => 'form-penanganan-siswa']) }}"
+                    <a href="{{ route('konsultasi.export', ['id' => $record->id, 'template' => 'form-penanganan-siswa']) }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                         Form Penanganan Siswa
                     </a>
-                    <a href="{{ route('kasus-bk.export', ['id' => $record->id, 'template' => 'komulatif-record']) }}"
+                    <a href="{{ route('konsultasi.export', ['id' => $record->id, 'template' => 'komulatif-record']) }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                         Komulatif Record
                     </a>
-                    <a href="{{ route('kasus-bk.export', ['id' => $record->id, 'template' => 'lembar-sosiometri']) }}"
+                    <a href="{{ route('konsultasi.export', ['id' => $record->id, 'template' => 'lembar-sosiometri']) }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                         Lembar Sosiometri
                     </a>

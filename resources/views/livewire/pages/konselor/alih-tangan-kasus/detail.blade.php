@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Konselor\AlihTanganKasus\Detail;
+use App\Livewire\Konselor\Bk\AlihTanganKasus\Detail;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Detail {}; ?>
