@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Sosiometri;
+use Illuminate\Database\Eloquent\Builder;
 use App\Repositories\Contracts\SosiometriRepositoryInterface;
 use Illuminate\Support\Collection;
 
@@ -25,7 +26,7 @@ class SosiometriRepository implements SosiometriRepositoryInterface
 
     public function getBySiswa(int $siswaId): ?Sosiometri
     {
-        return Sosiometri::where('pemilih_siswa_id', $siswaId)->first();
+        return Sosiometri::where('siswa_id', $siswaId)->first();
     }
 
     public function create(array $data): Sosiometri
@@ -44,5 +45,10 @@ class SosiometriRepository implements SosiometriRepositoryInterface
     public function delete(int $id): bool
     {
         return Sosiometri::findOrFail($id)->delete();
+    }
+
+    public function query(): Builder
+    {
+        return Sosiometri::query();
     }
 }
