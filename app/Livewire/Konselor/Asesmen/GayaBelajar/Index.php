@@ -3,7 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\GayaBelajar;
 
 use App\Models\DataSiswa;
-use App\Services\GayaBelajarService;
+use App\Services\Asesmen\GayaBelajarService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

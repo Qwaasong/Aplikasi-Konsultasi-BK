@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\Asesmen\Akpd;
 
-use App\Services\AkpdService;
+use App\Services\Asesmen\AkpdService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

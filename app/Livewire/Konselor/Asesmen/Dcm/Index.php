@@ -3,7 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\Dcm;
 
 use App\Models\DataSiswa;
-use App\Services\DcmService;
+use App\Services\Asesmen\DcmService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;

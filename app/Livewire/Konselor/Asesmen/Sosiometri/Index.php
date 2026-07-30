@@ -3,7 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\Sosiometri;
 
 use App\Models\DataSiswa;
-use App\Services\SosiometriService;
+use App\Services\Asesmen\SosiometriService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

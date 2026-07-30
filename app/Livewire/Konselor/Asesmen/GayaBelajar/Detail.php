@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\Asesmen\GayaBelajar;
 
-use App\Services\GayaBelajarService;
+use App\Services\Asesmen\GayaBelajarService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

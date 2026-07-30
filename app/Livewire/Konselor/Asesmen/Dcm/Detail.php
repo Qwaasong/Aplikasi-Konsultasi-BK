@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Konselor\Asesmen\Dcm;
 
-use App\Services\DcmService;
+use App\Services\Asesmen\DcmService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;

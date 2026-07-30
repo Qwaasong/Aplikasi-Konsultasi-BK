@@ -3,7 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\TesBakatMinat;
 
 use App\Models\DataSiswa;
-use App\Services\PeminatanService;
+use App\Services\Asesmen\PeminatanService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
