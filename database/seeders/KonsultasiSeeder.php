@@ -20,8 +20,17 @@ class KonsultasiSeeder extends Seeder
             return;
         }
 
-        $konselorUser = User::where('role', 'guru_bk')->first();
-        $pegawai = \App\Models\Pegawai::where('user_id', $konselorUser->id)->first();
+        $konselorUser = User::where('email', 'budi@sekolah.sch.id')->first();
+
+        if (! $konselorUser) {
+            $this->command->warn('Konselor (budi@sekolah.sch.id) belum ada, seeder konsultasi dilewati.');
+            return;
+        }
+
+        $pegawai = \App\Models\Pegawai::firstOrCreate(
+            ['nip' => '1987654321'],
+            ['user_id' => $konselorUser->id, 'jabatan' => 'Guru BK']
+        );
         $tahunAjaran = TahunAjaran::first();
         $kategoris = KategoriKasus::pluck('id', 'nama_kategori');
         $siswaIds = DataSiswa::pluck('id');

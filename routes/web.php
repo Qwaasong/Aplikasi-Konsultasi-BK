@@ -101,6 +101,7 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     // Asesmen
     Volt::route('konselor/asesmen', 'pages.konselor.asesmen.index')->name('konselor.asesmen.index');
     Volt::route('konselor/asesmen/akpd', 'pages.konselor.asesmen.akpd.index')->name('konselor.asesmen.akpd.index');
+    Volt::route('konselor/asesmen/akpd/{id}/detail', 'pages.konselor.asesmen.akpd.detail')->name('konselor.asesmen.akpd.detail');
     Volt::route('konselor/asesmen/gaya-belajar', 'pages.konselor.asesmen.gaya-belajar.index')->name('konselor.asesmen.gaya-belajar.index');
     Volt::route('konselor/asesmen/gaya-belajar/{id}/detail', 'pages.konselor.asesmen.gaya-belajar.detail')->name('konselor.asesmen.gaya-belajar.detail');
     Volt::route('konselor/asesmen/dcm', 'pages.konselor.asesmen.dcm.index')->name('konselor.asesmen.dcm.index');

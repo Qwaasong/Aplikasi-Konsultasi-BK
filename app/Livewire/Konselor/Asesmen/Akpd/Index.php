@@ -34,6 +34,8 @@ class Index extends Component
     public string $filterKelas = '';
     public string $filterJurusan = '';
 
+    public ?string $selectedTingkat = null;
+
     public array $kelasOptions = [];
     public array $jurusanOptions = [];
 
@@ -73,7 +75,37 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'tingkat' => $this->selectedTingkat,
         ]);
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->loadData();
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->selectedTingkat = null;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->records = collect();
+    }
+
+    public function goToDetail(int $id)
+    {
+        return redirect()->route('konselor.asesmen.akpd.detail', $id);
     }
 
     public function loadFilterOptions(): void
