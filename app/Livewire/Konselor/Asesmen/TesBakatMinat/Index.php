@@ -3,7 +3,8 @@
 namespace App\Livewire\Konselor\Asesmen\TesBakatMinat;
 
 use App\Models\DataSiswa;
-use App\Services\Asesmen\PeminatanService;
+use App\Models\Jurusan;
+use App\Services\PeminatanService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
@@ -18,7 +19,6 @@ class Index extends Component
     */
 
     public Collection $records;
-
     public array $students = [];
 
 
@@ -29,7 +29,6 @@ class Index extends Component
     */
 
     public bool $showFilters = false;
-
     public array $selected = [];
 
 
@@ -51,7 +50,6 @@ class Index extends Component
     */
 
     public string $search = '';
-
     public string $searchSiswa = '';
 
 
@@ -62,11 +60,8 @@ class Index extends Component
     */
 
     public string $filterKelas = '';
-
     public string $filterJurusan = '';
-
     public array $kelasOptions = [];
-
     public array $jurusanOptions = [];
 
 
@@ -77,17 +72,11 @@ class Index extends Component
     */
 
     public $siswa_id = '';
-
     public $tanggal = '';
-
     public $pilihan1 = '';
-
     public $pilihan2 = '';
-
     public $pilihan3 = '';
-
     public $hasil = '';
-
     public $catatan = '';
     public $files = [];
     public $newFiles = [];
@@ -115,10 +104,11 @@ class Index extends Component
         ->values()
         ->all();
 
-
-
+        $this->jurusanOptions = Jurusan::query()
+        ->orderBy('nama_jurusan')
+        ->pluck('nama_jurusan')
+        ->toArray();
         $this->loadData();
-
         $this->loadFilterOptions();
 
     }
@@ -138,21 +128,14 @@ class Index extends Component
             PeminatanService::class
         );
 
-
         $this->records = $service->getFiltered([
-
             'search' => $this->search,
-
             'kelas' => $this->filterKelas,
-
             'jurusan' => $this->filterJurusan,
 
         ]);
 
     }
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -162,18 +145,13 @@ class Index extends Component
 
     public function loadFilterOptions(): void
     {
-
         $service = app(
             PeminatanService::class
         );
-
-
         $options = $service->getFilterOptions();
-
 
         $this->kelasOptions =
             $options['kelasOptions'] ?? [];
-
 
         $this->jurusanOptions =
             $options['jurusanOptions'] ?? [];
@@ -190,64 +168,42 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
 
-
     public function selectStudent(int $id): void
     {
-
         $this->siswa_id = $id;
-
         $this->showStudentModal = false;
-
         $this->searchSiswa = '';
 
     }
 
-
-
     public function openStudentModal(): void
     {
-
         $this->showStudentModal = true;
-
     }
-
-
 
     public function closeStudentModal(): void
     {
-
         $this->showStudentModal = false;
-
     }
-
-
-
 
     public function getInitials(?string $name): string
     {
 
         if(!$name){
-
             return 'S';
-
         }
-
 
         $words = explode(
             ' ',
             trim($name)
         );
 
-
         if(count($words)>=2){
-
             return strtoupper(
                 substr($words[0],0,1).
                 substr($words[1],0,1)
             );
-
         }
-
 
         return strtoupper(
             substr($name,0,2)
@@ -255,43 +211,27 @@ class Index extends Component
 
     }
 
-
-
-
     /*
     |--------------------------------------------------------------------------
     | CREATE
     |--------------------------------------------------------------------------
     */
 
-
     #[On('create-peminatan')]
 
     public function createPeminatan(): void
     {
-
         $this->resetValidation();
-
-
         $this->resetForm();
-
-
         $this->editingId = null;
-
-
         $this->tanggal =
             now()->format('Y-m-d');
-
 
         $this->dispatch(
             'open-modal',
             'form-peminatan'
         );
-
     }
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -301,24 +241,18 @@ class Index extends Component
 
 
     #[On('edit-peminatan')]
-
     public function loadPeminatan(
         int $id
     ): void
     {
-
         $service = app(
             PeminatanService::class
         );
 
-
         $this->resetValidation();
-
 
         $record =
             $service->findById($id);
-
-
 
         $this->editingId = $id;
 
@@ -326,43 +260,30 @@ class Index extends Component
         $this->siswa_id =
             $record->siswa_id;
 
-
         $this->tanggal =
             optional($record->tanggal)
             ->format('Y-m-d');
 
-
         $this->pilihan1 =
             $record->pilihan1;
-
 
         $this->pilihan2 =
             $record->pilihan2;
 
-
         $this->pilihan3 =
             $record->pilihan3;
-
 
         $this->hasil =
             $record->hasil;
 
-
         $this->catatan =
             $record->catatan;
-
-
 
         $this->dispatch(
             'open-modal',
             'form-peminatan'
         );
-
     }
-
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -370,12 +291,10 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
 
-
     public function save(
         PeminatanService $service
     ): void
     {
-
         $this->validate([
 
             'siswa_id'
@@ -401,27 +320,17 @@ class Index extends Component
 
         ]);
 
-
-
         $data = [
 
             'siswa_id'=>$this->siswa_id,
-
             'tanggal'=>$this->tanggal,
-
             'pilihan1'=>$this->pilihan1,
-
             'pilihan2'=>$this->pilihan2,
-
             'pilihan3'=>$this->pilihan3,
-
             'hasil'=>$this->hasil,
-
             'catatan'=>$this->catatan,
 
         ];
-
-
 
         if($this->editingId){
 
@@ -439,10 +348,7 @@ class Index extends Component
 
 
         }else{
-
-
             $service->create($data);
-
 
             session()->flash(
                 'success',
@@ -451,11 +357,7 @@ class Index extends Component
 
         }
 
-
-
         $this->resetForm();
-
-
 
         $this->dispatch(
             'close-modal',
@@ -468,10 +370,6 @@ class Index extends Component
         );
 
     }
-
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -600,6 +498,11 @@ class Index extends Component
 
         $this->loadFilterOptions();
 
+    }
+
+    public function goToDetail($id)
+    {
+        return redirect()->route('konselor.asesmen.tes-bakat-minat.detail',$id);
     }
 
 }
