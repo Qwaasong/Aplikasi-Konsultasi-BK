@@ -24,11 +24,13 @@ class Index extends Component
         $service = app(SekolahService::class);
 
         $filters = [
-            'search' => $this->search ?: null,
+            'search'       => $this->search ?: null,
+            'nama_sekolah' => $this->filterSekolah ?: null,
         ];
 
         return [
-            'records' => $service->getFiltered($filters),
+            'records'        => $service->getFiltered($filters),
+            'sekolahOptions' => $service->getSekolahOptions(),
         ];
     }
 
@@ -67,6 +69,16 @@ class Index extends Component
     public function filterAction()
     {
         $this->showFilters = !$this->showFilters;
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->selected = [];
+    }
+
+    public function updatedFilterSekolah(): void
+    {
+        $this->selected = [];
     }
 
     public function resetFilters()

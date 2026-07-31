@@ -36,7 +36,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             <option value="">Semua Sekolah</option>
 
-            @foreach($records->pluck('nama_sekolah')->unique()->sort() as $namaSekolah)
+            @foreach($sekolahOptions as $namaSekolah)
                 <option value="{{ $namaSekolah }}">
                     {{ $namaSekolah }}
                 </option>

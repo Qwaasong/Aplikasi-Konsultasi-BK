@@ -269,7 +269,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
                         Semua Tahun
                     </option>
 
-                    @foreach(collect($records)->pluck('tahun')->unique()->sort() as $tahun)
+                    @foreach($tahunOptions as $tahun)
 
                         <option value="{{ $tahun }}">
                             {{ $tahun }}

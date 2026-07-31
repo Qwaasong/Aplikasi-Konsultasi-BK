@@ -101,7 +101,7 @@ class Index extends Component
             ];
         })->toArray();
 
-        $options = $service->getFilterOptions();
+        $options = $service->getFilterOptions($this->selectedKelas);
         $this->kelasOptions = $options['kelasOptions'] ?? [];
         $this->tahunOptions = $options['tahunOptions'] ?? [];
     }
@@ -174,6 +174,27 @@ class Index extends Component
     public function filterAction(): void
     {
         $this->showFilters = !$this->showFilters;
+    }
+
+    public function updatedFilterStatus(): void
+    {
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
+    }
+
+    public function updatedFilterTahun(): void
+    {
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
+    }
+
+    public function updatedSearch(): void
+    {
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
     }
 
     // ── IMPORT ───────────────────────────────
