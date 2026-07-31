@@ -104,6 +104,7 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/asesmen/sosiometri', 'pages.konselor.asesmen.sosiometri.index')->name('konselor.asesmen.sosiometri.index');
     Volt::route('konselor/asesmen/sosiometri/form', 'pages.konselor.asesmen.sosiometri.form')->name('konselor.asesmen.sosiometri.form');
     Volt::route('konselor/asesmen/tes-bakat-minat', 'pages.konselor.asesmen.tes-bakat-minat.index')->name('konselor.asesmen.tes-bakat-minat.index');
+    Volt::route('konselor/asesmen/tes-bakat-minat/{id}/detail', 'pages.konselor.asesmen.tes-bakat-minat.detail')->name('konselor.asesmen.tes-bakat-minat.detail');
 });
 
 require __DIR__ . '/auth.php';
