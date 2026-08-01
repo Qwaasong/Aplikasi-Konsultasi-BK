@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts\Asesmen;
 
 use App\Models\Sosiometri;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 interface SosiometriRepositoryInterface
@@ -14,4 +15,5 @@ interface SosiometriRepositoryInterface
     public function create(array $data): Sosiometri;
     public function update(int $id, array $data): Sosiometri;
     public function delete(int $id): bool;
+    public function query(): Builder;
 }

@@ -66,6 +66,10 @@ class DcmService
             $query->whereHas('siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
         }
 
+        if (!empty($filters['tingkat'])) {
+            $query->whereHas('siswa.kelas', fn($q) => $q->where('tingkat', $filters['tingkat']));
+        }
+
         if (!empty($filters['jurusan'])) {
             $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }

@@ -11,7 +11,7 @@ class SosiometriRepository implements SosiometriRepositoryInterface
 {
     public function getAll(): Collection
     {
-        return Sosiometri::latest()->get();
+        return Sosiometri::with(['siswa.user', 'siswa.kelas.jurusan'])->latest()->get();
     }
 
     public function countSosiometri(): int
@@ -21,7 +21,7 @@ class SosiometriRepository implements SosiometriRepositoryInterface
 
     public function findById(int $id): Sosiometri
     {
-        return Sosiometri::findOrFail($id);
+        return Sosiometri::with(['siswa.user', 'siswa.kelas.jurusan', 'respons.siswaDipilih'])->findOrFail($id);
     }
 
     public function getBySiswa(int $siswaId): ?Sosiometri
@@ -49,6 +49,6 @@ class SosiometriRepository implements SosiometriRepositoryInterface
 
     public function query(): Builder
     {
-        return Sosiometri::query();
+        return Sosiometri::with(['siswa.user', 'siswa.kelas.jurusan'])->latest();
     }
 }
