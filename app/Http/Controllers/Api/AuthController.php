@@ -76,9 +76,15 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $token = $request->user()->token();
-        $token->revoke();
-        
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        $accessToken = $user->token();
+
+        if ($accessToken instanceof \Laravel\Passport\AccessToken) {
+            $accessToken->revoke();
+        }
+
         return response()->json([
             'status'  => true,
             'message' => 'Logout berhasil!',
