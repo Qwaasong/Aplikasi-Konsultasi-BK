@@ -178,150 +178,151 @@
 
 
                     {{-- =================================================
-                        ASPEK AKPD
+                        TAHUN PELAJARAN
                     ================================================== --}}
                     <div class="mb-6">
 
-                        {{-- PRIBADI --}}
-                        <div class="mb-5">
+                        <x-atoms.input-label for="tahun_pelajaran" size="sm">
+                            Tahun Pelajaran
+                        </x-atoms.input-label>
 
-                            <x-atoms.input-label for="pribadi" size="sm">
-                                Pribadi
-                            </x-atoms.input-label>
+                        <x-atoms.text-input
+                            id="tahun_pelajaran"
+                            type="text"
+                            wire:model="tahun_pelajaran"
+                            placeholder="contoh: 2025/2026"
+                            size="md"
+                        />
 
-                            <textarea
-                                id="pribadi"
-                                wire:model="pribadi"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tuliskan hasil asesmen pada aspek pribadi."
-                            ></textarea>
+                        @error('tahun_pelajaran')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
+                        @enderror
 
-                            @error('pribadi')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
+                    </div>
+
+
+                    {{-- =================================================
+                        DAFTAR PERNYATAAN AKPD (per aspek)
+                    ================================================== --}}
+                    <div class="mb-6">
+
+                        <x-atoms.input-label size="sm">
+                            Daftar Pernyataan AKPD
+                        </x-atoms.input-label>
+
+                        <p class="text-[11px] text-gray-400 mt-1.5 mb-3">
+                            Pilih "Ya" jika pernyataan sesuai dengan kondisi siswa.
+                        </p>
+
+                        @php
+                            $aspekList = array_keys(\App\Models\Akpd::ASPECT_RANGES);
+                            $currentAspect = $aspekList[$aspekStep - 1] ?? 'Pribadi';
+                            [$rangeStart, $rangeEnd] = \App\Models\Akpd::ASPECT_RANGES[$currentAspect];
+                        @endphp
+
+                        <div class="border border-gray-200 rounded-md p-4">
+
+                            {{-- Header aspek --}}
+                            <div class="flex items-center justify-between mb-4">
+
+                                <div>
+
+                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                                        Aspek {{ $aspekStep }} dari 5
+                                    </p>
+
+                                    <h4 class="text-[14px] font-bold text-gray-900 mt-0.5">
+                                        {{ $currentAspect }}
+                                    </h4>
+
+                                </div>
+
+                                <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-bold border border-teal-100">
+                                    Ya {{ collect(range($rangeStart, $rangeEnd))->filter(fn($n) => ($this->jawaban[$n] ?? null) === 'Ya')->count() }}/{{ $rangeEnd - $rangeStart + 1 }}
                                 </span>
-                            @enderror
 
-                        </div>
+                            </div>
 
+                            {{-- Daftar pertanyaan aspek ini --}}
+                            <div
+                                class="space-y-2.5 max-h-[45vh] overflow-y-auto modal-scroll"
+                                style="scrollbar-width: thin;"
+                            >
 
-                        {{-- SOSIAL --}}
-                        <div class="mb-5">
+                                @foreach(range($rangeStart, $rangeEnd) as $no)
 
-                            <x-atoms.input-label for="sosial" size="sm">
-                                Sosial
-                            </x-atoms.input-label>
+                                    <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2.5">
 
-                            <textarea
-                                id="sosial"
-                                wire:model="sosial"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tuliskan hasil asesmen pada aspek sosial."
-                            ></textarea>
+                                        <span class="text-[13px] text-gray-700 leading-5">
+                                            <span class="font-bold text-gray-900 mr-1">
+                                                {{ $no }}.
+                                            </span>
+                                            {{ \App\Models\Akpd::QUESTIONS[$no] ?? '' }}
+                                        </span>
 
-                            @error('sosial')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
+                                        <div class="flex gap-1.5 shrink-0">
+
+                                            <button
+                                                type="button"
+                                                wire:click="$set('jawaban.{{ $no }}', 'Ya')"
+                                                class="px-2.5 py-1 rounded-md text-xs font-bold border transition {{ ($this->jawaban[$no] ?? null) === 'Ya' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-gray-600 border-gray-200 hover:border-teal-300' }}"
+                                            >
+                                                Ya
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                wire:click="$set('jawaban.{{ $no }}', 'Tidak')"
+                                                class="px-2.5 py-1 rounded-md text-xs font-bold border transition {{ ($this->jawaban[$no] ?? null) === 'Tidak' ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-200 hover:border-red-300' }}"
+                                            >
+                                                Tidak
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                            {{-- Navigasi aspek --}}
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+
+                                <button
+                                    type="button"
+                                    wire:click="previousAspect"
+                                    @disabled($aspekStep <= 1)
+                                    class="px-3 py-1.5 rounded-md text-xs font-bold border {{ $aspekStep <= 1 ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-primary' }}"
+                                >
+                                    &larr; Aspek Sebelumnya
+                                </button>
+
+                                <span class="text-[11px] text-gray-400">
+                                    {{ $currentAspect }}
                                 </span>
-                            @enderror
 
-                        </div>
+                                @if($aspekStep < 5)
 
+                                    <button
+                                        type="button"
+                                        wire:click="nextAspect"
+                                        class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-primary border border-gray-200 hover:border-primary"
+                                    >
+                                        Aspek Berikutnya &rarr;
+                                    </button>
 
-                        {{-- BELAJAR --}}
-                        <div class="mb-5">
+                                @else
 
-                            <x-atoms.input-label for="belajar" size="sm">
-                                Belajar
-                            </x-atoms.input-label>
+                                    <span class="text-[11px] text-gray-400">
+                                        Aspek terakhir
+                                    </span>
 
-                            <textarea
-                                id="belajar"
-                                wire:model="belajar"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tuliskan hasil asesmen pada aspek belajar."
-                            ></textarea>
+                                @endif
 
-                            @error('belajar')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- KARIR --}}
-                        <div class="mb-5">
-
-                            <x-atoms.input-label for="karir" size="sm">
-                                Karir
-                            </x-atoms.input-label>
-
-                            <textarea
-                                id="karir"
-                                wire:model="karir"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tuliskan hasil asesmen pada aspek karir."
-                            ></textarea>
-
-                            @error('karir')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- KESIMPULAN --}}
-                        <div class="mb-5">
-
-                            <x-atoms.input-label for="kesimpulan" size="sm">
-                                Kesimpulan
-                            </x-atoms.input-label>
-
-                            <textarea
-                                id="kesimpulan"
-                                wire:model="kesimpulan"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tuliskan kesimpulan hasil asesmen."
-                            ></textarea>
-
-                            @error('kesimpulan')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- CATATAN --}}
-                        <div class="mb-5">
-
-                            <x-atoms.input-label for="catatan" size="sm">
-                                Catatan
-                            </x-atoms.input-label>
-
-                            <textarea
-                                id="catatan"
-                                wire:model="catatan"
-                                rows="4"
-                                class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed"
-                                placeholder="Tambahkan catatan jika diperlukan."
-                            ></textarea>
-
-                            @error('catatan')
-                                <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
+                            </div>
 
                         </div>
 

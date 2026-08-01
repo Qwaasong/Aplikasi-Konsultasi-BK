@@ -34,6 +34,8 @@ class Index extends Component
     public string $filterKelas = '';
     public string $filterJurusan = '';
 
+    public ?string $selectedTingkat = null;
+
     public array $kelasOptions = [];
     public array $jurusanOptions = [];
 
@@ -45,6 +47,8 @@ class Index extends Component
     public $kinestetik = '';
     public $hasil = '';
     public $catatan = '';
+    public $faktor_penghambat = '';
+    public $faktor_pendukung = '';
 
     public array $files = [];
     public array $existingFiles = [];
@@ -74,7 +78,32 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'tingkat' => $this->selectedTingkat,
         ]);
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->loadData();
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->selectedTingkat = null;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->records = collect();
     }
 
     public function loadFilterOptions(): void
@@ -97,6 +126,8 @@ class Index extends Component
             'kinestetik' => 'required|integer|min:0|max:100',
             'hasil' => 'nullable|string',
             'catatan' => 'nullable|string',
+            'faktor_penghambat' => 'nullable|string',
+            'faktor_pendukung' => 'nullable|string',
         ]);
 
         $this->step = 2;
@@ -105,6 +136,40 @@ class Index extends Component
     public function previousStep(): void
     {
         $this->step = 1;
+    }
+
+    public function updatedVisual(): void
+    {
+        $this->computeHasil();
+    }
+
+    public function updatedAuditori(): void
+    {
+        $this->computeHasil();
+    }
+
+    public function updatedKinestetik(): void
+    {
+        $this->computeHasil();
+    }
+
+    /**
+     * Isi hasil otomatis dari skor tertinggi (bisa di-override manual).
+     */
+    protected function computeHasil(): void
+    {
+        $scores = [
+            'visual'     => (int) $this->visual,
+            'auditori'   => (int) $this->auditori,
+            'kinestetik' => (int) $this->kinestetik,
+        ];
+
+        if (max($scores) <= 0) {
+            $this->hasil = '';
+            return;
+        }
+
+        $this->hasil = array_search(max($scores), $scores, true);
     }
 
     public function selectStudent(int $id): void
@@ -154,6 +219,8 @@ class Index extends Component
             'kinestetik',
             'hasil',
             'catatan',
+            'faktor_penghambat',
+            'faktor_pendukung',
             'files',
             'existingFiles',
             'newFiles',
@@ -186,6 +253,8 @@ class Index extends Component
         $this->kinestetik = $record->kinestetik;
         $this->hasil = $record->hasil;
         $this->catatan = $record->catatan;
+        $this->faktor_penghambat = $record->faktor_penghambat;
+        $this->faktor_pendukung = $record->faktor_pendukung;
 
         $this->step = 1;
 
@@ -243,9 +312,16 @@ class Index extends Component
             'kinestetik' => 'required|integer|min:0|max:100',
             'hasil' => 'nullable|string',
             'catatan' => 'nullable|string',
+            'faktor_penghambat' => 'nullable|string',
+            'faktor_pendukung' => 'nullable|string',
             'files' => 'array|max:5',
             'files.*' => 'file|max:12288|mimes:pdf,jpg,jpeg,png,docx',
         ]);
+
+        // Auto-fill hasil bila belum diisi manual
+        if (!$this->hasil) {
+            $this->computeHasil();
+        }
 
         $data = [
             'siswa_id'   => $this->siswa_id,
@@ -255,6 +331,8 @@ class Index extends Component
             'kinestetik' => $this->kinestetik,
             'hasil'      => $this->hasil,
             'catatan'    => $this->catatan,
+            'faktor_penghambat' => $this->faktor_penghambat,
+            'faktor_pendukung' => $this->faktor_pendukung,
         ];
 
         if ($this->editingId) {
@@ -283,6 +361,8 @@ class Index extends Component
             'kinestetik',
             'hasil',
             'catatan',
+            'faktor_penghambat',
+            'faktor_pendukung',
             'files',
             'existingFiles',
             'newFiles',

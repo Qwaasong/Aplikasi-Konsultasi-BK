@@ -366,6 +366,90 @@
 
                         </div>
 
+
+                        {{-- =================================================
+                            FAKTOR PENGHAMBAT
+                        ================================================== --}}
+                        <div>
+
+                            <x-atoms.input-label
+                                for="faktor_penghambat"
+                                size="sm">
+
+                                Faktor Penghambat Belajar
+
+                            </x-atoms.input-label>
+
+                            <textarea
+                                id="faktor_penghambat"
+                                wire:model="faktor_penghambat"
+                                rows="4"
+                                class="w-full border border-gray-200 rounded-md
+                                    p-4 text-[14px]
+                                    text-gray-900
+                                    placeholder:text-gray-400
+                                    focus:outline-none
+                                    focus:border-primary
+                                    focus:ring-1
+                                    focus:ring-primary
+                                    resize-none shadow-sm
+                                    leading-relaxed"
+
+                                placeholder="Faktor apa sajakah yang menghambat belajar Anda?"
+                            ></textarea>
+
+                            @error('faktor_penghambat')
+
+                                <span class="text-red-500 text-[13px] font-medium mt-2 block">
+                                    {{ $message }}
+                                </span>
+
+                            @enderror
+
+                        </div>
+
+
+                        {{-- =================================================
+                            FAKTOR PENDUKUNG
+                        ================================================== --}}
+                        <div>
+
+                            <x-atoms.input-label
+                                for="faktor_pendukung"
+                                size="sm">
+
+                                Faktor Pendukung Belajar
+
+                            </x-atoms.input-label>
+
+                            <textarea
+                                id="faktor_pendukung"
+                                wire:model="faktor_pendukung"
+                                rows="4"
+                                class="w-full border border-gray-200 rounded-md
+                                    p-4 text-[14px]
+                                    text-gray-900
+                                    placeholder:text-gray-400
+                                    focus:outline-none
+                                    focus:border-primary
+                                    focus:ring-1
+                                    focus:ring-primary
+                                    resize-none shadow-sm
+                                    leading-relaxed"
+
+                                placeholder="Faktor apa sajakah yang mendukung belajar Anda?"
+                            ></textarea>
+
+                            @error('faktor_pendukung')
+
+                                <span class="text-red-500 text-[13px] font-medium mt-2 block">
+                                    {{ $message }}
+                                </span>
+
+                            @enderror
+
+                        </div>
+
                     </div>
 
                 </div>

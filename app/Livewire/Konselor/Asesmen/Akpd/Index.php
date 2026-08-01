@@ -41,13 +41,11 @@ class Index extends Component
 
     public $siswa_id = '';
     public $tanggal = '';
+    public string $tahun_pelajaran = '';
 
-    public $pribadi = '';
-    public $sosial = '';
-    public $belajar = '';
-    public $karir = '';
-    public $kesimpulan = '';
-    public $catatan = '';
+    public array $jawaban = [];
+
+    public int $aspekStep = 1;
 
     public array $files = [];
     public array $existingFiles = [];
@@ -123,20 +121,30 @@ class Index extends Component
         $this->validate([
             'siswa_id' => 'required|integer',
             'tanggal' => 'required|date',
-            'pribadi' => 'nullable|string',
-            'sosial' => 'nullable|string',
-            'belajar' => 'nullable|string',
-            'karir' => 'nullable|string',
-            'kesimpulan' => 'nullable|string',
-            'catatan' => 'nullable|string',
+            'tahun_pelajaran' => 'nullable|string|max:20',
         ]);
 
         $this->step = 2;
+        $this->aspekStep = 1;
     }
 
     public function previousStep(): void
     {
         $this->step = 1;
+    }
+
+    public function nextAspect(): void
+    {
+        if ($this->aspekStep < 5) {
+            $this->aspekStep++;
+        }
+    }
+
+    public function previousAspect(): void
+    {
+        if ($this->aspekStep > 1) {
+            $this->aspekStep--;
+        }
     }
 
     public function selectStudent(int $id): void
@@ -181,12 +189,9 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'pribadi',
-            'sosial',
-            'belajar',
-            'karir',
-            'kesimpulan',
-            'catatan',
+            'tahun_pelajaran',
+            'jawaban',
+            'aspekStep',
             'files',
             'existingFiles',
             'newFiles',
@@ -195,6 +200,7 @@ class Index extends Component
         $this->editingId = null;
         $this->tanggal = now()->format('Y-m-d');
         $this->step = 1;
+        $this->aspekStep = 1;
         $this->showStudentModal = false;
 
         $this->dispatch('open-modal', 'form-akpd');
@@ -214,15 +220,17 @@ class Index extends Component
         $this->siswa_id = $record->siswa_id;
 
         $this->tanggal = optional($record->tanggal)->format('Y-m-d');
+        $this->tahun_pelajaran = $record->tahun_pelajaran;
 
-        $this->pribadi = $record->pribadi;
-        $this->sosial = $record->sosial;
-        $this->belajar = $record->belajar;
-        $this->karir = $record->karir;
-        $this->kesimpulan = $record->kesimpulan;
-        $this->catatan = $record->catatan;
+        // Map q01..q50 -> jawaban[1..50]
+        $this->jawaban = [];
+        foreach (range(1, 50) as $no) {
+            $key = 'q' . str_pad((string) $no, 2, '0', STR_PAD_LEFT);
+            $this->jawaban[$no] = $record->{$key} ?? null;
+        }
 
         $this->step = 1;
+        $this->aspekStep = 1;
 
         $this->dispatch('open-modal', 'form-akpd');
     }
@@ -275,12 +283,8 @@ class Index extends Component
         $this->validate([
             'siswa_id' => 'required|integer',
             'tanggal' => 'required|date',
-            'pribadi' => 'nullable|string',
-            'sosial' => 'nullable|string',
-            'belajar' => 'nullable|string',
-            'karir' => 'nullable|string',
-            'kesimpulan' => 'nullable|string',
-            'catatan' => 'nullable|string',
+            'tahun_pelajaran' => 'nullable|string|max:20',
+            'jawaban' => 'nullable|array',
             'files' => 'array|max:5',
             'files.*' => 'file|max:12288|mimes:pdf,jpg,jpeg,png,docx',
         ]);
@@ -288,13 +292,16 @@ class Index extends Component
         $data = [
             'siswa_id' => $this->siswa_id,
             'tanggal' => $this->tanggal,
-            'pribadi' => $this->pribadi,
-            'sosial' => $this->sosial,
-            'belajar' => $this->belajar,
-            'karir' => $this->karir,
-            'kesimpulan' => $this->kesimpulan,
-            'catatan' => $this->catatan,
+            'tahun_pelajaran' => $this->tahun_pelajaran,
         ];
+
+        // Map jawaban[1..50] -> q01..q50
+        foreach (range(1, 50) as $no) {
+            $key = 'q' . str_pad((string) $no, 2, '0', STR_PAD_LEFT);
+            $data[$key] = in_array($this->jawaban[$no] ?? null, ['Ya', 'Tidak'], true)
+                ? $this->jawaban[$no]
+                : null;
+        }
 
         if ($this->editingId) {
 
@@ -317,12 +324,9 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'pribadi',
-            'sosial',
-            'belajar',
-            'karir',
-            'kesimpulan',
-            'catatan',
+            'tahun_pelajaran',
+            'jawaban',
+            'aspekStep',
             'files',
             'existingFiles',
             'newFiles',

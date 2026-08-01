@@ -38,6 +38,8 @@ class Index extends Component
 
     public bool $showStudentModal = false;
 
+    public ?string $pickerFor = null;
+
     public ?int $editingId = null;
 
     /*
@@ -60,6 +62,8 @@ class Index extends Component
 
     public string $filterJurusan = '';
 
+    public ?string $selectedTingkat = null;
+
     public array $kelasOptions = [];
 
     public array $jurusanOptions = [];
@@ -77,6 +81,8 @@ class Index extends Component
     public $instruksi = '';
 
     public $jumlah_pilihan = 3;
+
+    public array $pertanyaanJawaban = [];
 
     public int $step = 1;
 
@@ -118,7 +124,37 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'tingkat' => $this->selectedTingkat,
         ]);
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->loadData();
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->selectedTingkat = null;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->records = collect();
+    }
+
+    public function goToDetail(int $id)
+    {
+        return redirect()->route('konselor.asesmen.sosiometri.detail', $id);
     }
 
     /*
@@ -136,6 +172,44 @@ class Index extends Component
         $this->kelasOptions = $options['kelasOptions'] ?? [];
 
         $this->jurusanOptions = $options['jurusanOptions'] ?? [];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER EVENT
+    |--------------------------------------------------------------------------
+    */
+
+    public function updatedSearch(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterKelas(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterJurusan(): void
+    {
+        $this->loadData();
+    }
+
+    public function filterAction(): void
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search', 'filterKelas', 'filterJurusan']);
+        $this->loadData();
+    }
+
+    #[On('refreshTable')]
+    public function refreshTable(): void
+    {
+        $this->loadData();
     }
 
         public function nextStep(): void
@@ -160,16 +234,52 @@ class Index extends Component
         $this->siswa_id = $id;
         $this->showStudentModal = false;
         $this->searchSiswa = '';
+        $this->pickerFor = null;
     }
 
     public function openStudentModal(): void
     {
+        $this->pickerFor = null;
+        $this->searchSiswa = '';
+        $this->showStudentModal = true;
+    }
+
+    public function openQuestionPicker(string $key): void
+    {
+        if (!array_key_exists($key, \App\Models\Sosiometri::PERTANYAAN)) {
+            return;
+        }
+
+        $this->pickerFor = $key;
+        $this->searchSiswa = '';
         $this->showStudentModal = true;
     }
 
     public function closeStudentModal(): void
     {
         $this->showStudentModal = false;
+        $this->pickerFor = null;
+    }
+
+    public function toggleQuestionStudent(string $key, int $id): void
+    {
+        if (!array_key_exists($key, \App\Models\Sosiometri::PERTANYAAN)) {
+            return;
+        }
+
+        $ids = $this->pertanyaanJawaban[$key] ?? [];
+
+        if (in_array($id, $ids, true)) {
+            $this->pertanyaanJawaban[$key] = array_values(array_diff($ids, [$id]));
+            return;
+        }
+
+        if (count($ids) >= (int) $this->jumlah_pilihan) {
+            return;
+        }
+
+        $ids[] = $id;
+        $this->pertanyaanJawaban[$key] = $ids;
     }
 
     public function getInitials(?string $name): string
@@ -208,10 +318,6 @@ class Index extends Component
 
 
         $this->editingId = null;
-
-
-        $this->tanggal = now()
-            ->format('Y-m-d');
 
 
         $this->dispatch(
@@ -263,7 +369,19 @@ class Index extends Component
             $record->jumlah_pilihan;
 
 
-        $this->step = 1;
+        $this->pertanyaanJawaban = [];
+
+        foreach (\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan) {
+            $this->pertanyaanJawaban[$key] = $record->respons
+                ->where('pertanyaan', $key)
+                ->map(fn ($r) => $r->siswa_dipilih_id)
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+
+        $this->step = 2;
 
 
         $this->dispatch(
@@ -289,6 +407,7 @@ class Index extends Component
             'judul' => 'required|string|max:255',
             'instruksi' => 'nullable|string',
             'jumlah_pilihan' => 'required|integer|min:1|max:10',
+            'pertanyaanJawaban' => 'nullable|array',
         ]);
 
 
@@ -303,14 +422,13 @@ class Index extends Component
             'instruksi' =>
                 $this->instruksi,
 
-            'jumlah_pilihan' =>
-                $this->jumlah_pilihan,
+            'jumlah_pilihan' => (int) $this->jumlah_pilihan,
 
         ];
 
         if($this->editingId){
 
-            $service->update(
+            $sosiometri = $service->update(
                 $this->editingId,
                 $data
             );
@@ -325,7 +443,7 @@ class Index extends Component
         }else{
 
 
-            $service->create($data);
+            $sosiometri = $service->create($data);
 
 
             session()->flash(
@@ -334,6 +452,8 @@ class Index extends Component
             );
 
         }
+
+        $this->saveRespons($sosiometri);
 
         $this->resetForm();
 
@@ -353,6 +473,41 @@ class Index extends Component
 
 
 
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE
+    |--------------------------------------------------------------------------
+    */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE RESPONS
+    |--------------------------------------------------------------------------
+    */
+
+    protected function saveRespons(\App\Models\Sosiometri $sosiometri): void
+    {
+        $sosiometri->respons()->delete();
+
+        $limit = max(1, (int) $this->jumlah_pilihan);
+
+        foreach (\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan) {
+            $ids = array_slice($this->pertanyaanJawaban[$key] ?? [], 0, $limit);
+
+            foreach (array_values($ids) as $urutan => $siswaDipilihId) {
+                $sosiometri->respons()->create([
+                    'siswa_dipilih_id' => (int) $siswaDipilihId,
+                    'siswa_pemilih_id' => (int) $this->siswa_id,
+                    'urutan' => $urutan + 1,
+                    'alasan' => '',
+                    'pertanyaan' => $key,
+                ]);
+            }
+        }
+    }
 
 
     /*
@@ -401,7 +556,12 @@ class Index extends Component
             'siswa_id',
             'judul',
             'instruksi',
+            'pertanyaanJawaban',
+            'pickerFor',
         ]);
+
+
+        $this->showStudentModal = false;
 
 
         $this->jumlah_pilihan = 3;

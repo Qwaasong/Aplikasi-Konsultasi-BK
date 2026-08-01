@@ -592,7 +592,7 @@
 
                             <h3 class="text-[15px] font-bold text-gray-900">
 
-                                Ringkasan Sosiometri
+                                Pertanyaan Sosiometri
 
                             </h3>
 
@@ -600,7 +600,7 @@
 
                             <p class="text-xs text-gray-500 mt-1">
 
-                                Pastikan data instrumen sudah benar sebelum disimpan.
+                                Pilih teman dari daftar siswa, maksimal {{ $jumlah_pilihan }} pilihan per pertanyaan.
 
                             </p>
 
@@ -645,6 +645,45 @@
 
 
                             </div>
+
+                            @foreach(\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan)
+
+                                @php
+                                    $selectedIds = $pertanyaanJawaban[$key] ?? [];
+                                    $selectedNames = collect($students)->whereIn('id', $selectedIds)->pluck('nama')->all();
+                                @endphp
+
+                                <div class="px-5 py-4">
+
+                                    <x-atoms.input-label for="pertanyaanJawaban-{{ $key }}" size="sm">
+
+                                        {{ $key }}. {{ $pertanyaan }}
+
+                                    </x-atoms.input-label>
+
+                                    <div class="flex flex-wrap gap-2 mt-3">
+                                        @forelse($selectedNames as $name)
+                                            <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-100 text-xs font-medium">
+                                                {{ $name }}
+                                            </span>
+                                        @empty
+                                            <span class="text-xs text-gray-400">
+                                                Belum ada pilihan.
+                                            </span>
+                                        @endforelse
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        wire:click="openQuestionPicker('{{ $key }}')"
+                                        class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors"
+                                    >
+                                        Pilih Siswa ({{ count($selectedIds) }}/{{ $jumlah_pilihan }})
+                                    </button>
+
+                                </div>
+
+                            @endforeach
 
 
 
@@ -865,6 +904,218 @@
 
         </div>
 
+
+        {{-- =========================================================
+            MODAL PILIH SISWA
+        ========================================================== --}}
+
+        <div
+            x-data="{ showStudentMenu: @entangle('showStudentModal') }"
+            x-show="showStudentMenu"
+            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;"
+        >
+
+            <div
+                class="bg-white w-full max-w-[500px] rounded-xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden"
+                @click.away="showStudentMenu = false"
+            >
+
+                {{-- HEADER --}}
+                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+
+                    <h2 class="text-[20px] font-bold text-gray-900 leading-tight">
+                        {{ $pickerFor ? 'Pilih Teman' : 'Pilih Siswa' }}
+                    </h2>
+
+                    <p class="text-[13px] text-gray-500 mt-0.5">
+                        Cari siswa berdasarkan nama atau NIS
+                    </p>
+
+                </div>
+
+
+                {{-- BODY --}}
+                <div
+                    class="px-6 py-5 overflow-y-auto modal-scroll grow"
+                    style="scrollbar-width: thin;"
+                >
+
+                    {{-- SEARCH --}}
+                    <div class="relative mb-5">
+
+                        <input
+                            type="text"
+                            wire:model.live="searchSiswa"
+                            placeholder="Cari Nama atau NIS"
+                            class="w-full border border-gray-200 rounded-md pl-4 pr-3 py-2 text-[13px] text-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        >
+
+                    </div>
+
+
+                    {{-- LIST SISWA --}}
+                    @php
+                        $filteredStudents = collect($students)->filter(function ($student) {
+                            $keyword = strtolower(trim($this->searchSiswa));
+
+                            if ($keyword === '') {
+                                return true;
+                            }
+
+                            return str_contains(
+                                strtolower($student->nama ?? ''),
+                                $keyword
+                            ) || str_contains(
+                                strtolower($student->nis ?? ''),
+                                $keyword
+                            );
+                        });
+                    @endphp
+
+                    <div class="flex flex-col gap-3">
+
+                        @forelse($filteredStudents as $siswa)
+
+                            @if($pickerFor === null)
+
+                                <div
+                                    wire:click="selectStudent({{ $siswa->id }})"
+                                    class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa->id ? 'border-primary bg-bg-light' : '' }}"
+                                >
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="w-10 h-10 bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[13px] shrink-0">
+                                            {{ $this->getInitials($siswa->nama ?? '') }}
+                                        </div>
+
+                                        <div>
+
+                                            <h4 class="text-[14px] font-bold text-gray-900">
+                                                {{ $siswa->nama ?? '-' }}
+                                            </h4>
+
+                                            <p class="text-[12px] text-gray-500 mt-1">
+                                                NIS: {{ $siswa->nis ?? '-' }}
+
+                                                <span class="ml-2">
+                                                    Kelas: {{ $siswa->kelas_label ?? '-' }}
+                                                </span>
+
+                                                @if($siswa->jurusan_label)
+                                                    <span class="ml-1">
+                                                        {{ $siswa->jurusan_label }}
+                                                    </span>
+                                                @endif
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @else
+
+                                @php
+                                    $picked = in_array($siswa->id, $pertanyaanJawaban[$pickerFor] ?? [], true);
+                                @endphp
+
+                                <div
+                                    wire:click="toggleQuestionStudent('{{ $pickerFor }}', {{ $siswa->id }})"
+                                    class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $picked ? 'border-primary bg-bg-light' : '' }}"
+                                >
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="shrink-0 w-5 h-5 rounded flex items-center justify-center {{ $picked ? 'bg-teal-600 text-white' : 'border border-gray-300' }}">
+                                            @if($picked)
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                                </svg>
+                                            @endif
+                                        </div>
+
+                                        <div class="w-10 h-10 bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[13px] shrink-0">
+                                            {{ $this->getInitials($siswa->nama ?? '') }}
+                                        </div>
+
+                                        <div>
+
+                                            <h4 class="text-[14px] font-bold text-gray-900">
+                                                {{ $siswa->nama ?? '-' }}
+                                            </h4>
+
+                                            <p class="text-[12px] text-gray-500 mt-1">
+                                                NIS: {{ $siswa->nis ?? '-' }}
+
+                                                <span class="ml-2">
+                                                    Kelas: {{ $siswa->kelas_label ?? '-' }}
+                                                </span>
+
+                                                @if($siswa->jurusan_label)
+                                                    <span class="ml-1">
+                                                        {{ $siswa->jurusan_label }}
+                                                    </span>
+                                                @endif
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @endif
+
+                        @empty
+
+                            <div class="p-6 text-center text-gray-500 text-sm">
+                                Tidak ada siswa ditemukan.
+                            </div>
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
+
+                {{-- FOOTER MODAL SISWA --}}
+                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-3">
+
+                    <button
+                        type="button"
+                        wire:click="closeStudentModal"
+                        class="px-5 py-2 bg-white border border-gray-200 rounded-md text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+                    >
+                        Batal
+                    </button>
+
+                    @if($pickerFor)
+                        <button
+                            type="button"
+                            wire:click="closeStudentModal"
+                            class="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-md text-[13px] font-bold transition-colors shadow-sm"
+                        >
+                            Selesai
+                        </button>
+                    @endif
+
+                </div>
+
+            </div>
+
+        </div>
 
     </x-shared.modal>
 

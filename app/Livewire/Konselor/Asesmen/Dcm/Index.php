@@ -3,6 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\Dcm;
 
 use App\Models\DataSiswa;
+use App\Models\Dcm;
 use App\Services\Asesmen\DcmService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
@@ -28,9 +29,10 @@ class Index extends Component
 
     public string $search = '';
     public string $searchSiswa = '';
-    public string $masalah_teridentifikasi_text = '';
     public string $filterKelas = '';
     public string $filterJurusan = '';
+
+    public ?string $selectedTingkat = null;
 
     public array $kelasOptions = [];
     public array $jurusanOptions = [];
@@ -38,7 +40,7 @@ class Index extends Component
     public $siswa_id = '';
     public $tanggal = '';
 
-    public array $masalah_teridentifikasi = [];
+    public array $jawaban = [];
 
     public $kesimpulan = '';
     public $catatan = '';
@@ -78,7 +80,32 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'tingkat' => $this->selectedTingkat,
         ]);
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->loadData();
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->selectedTingkat = null;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->records = collect();
     }
 
     public function loadFilterOptions(): void
@@ -98,10 +125,9 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'masalah_teridentifikasi',
+            'jawaban',
             'kesimpulan',
             'catatan',
-            'masalah_teridentifikasi_text',
         ]);
 
         $this->step = 1;
@@ -130,10 +156,7 @@ class Index extends Component
         $this->siswa_id = $record->siswa_id;
         $this->tanggal = optional($record->tanggal)->format('Y-m-d');
 
-        $this->masalah_teridentifikasi =
-            $record->masalah_teridentifikasi ?? [];
-
-        $this->masalah_teridentifikasi_text = implode("\n", $this->masalah_teridentifikasi);
+        $this->jawaban = $record->jawaban ?? [];
         $this->kesimpulan = $record->kesimpulan;
         $this->catatan = $record->catatan;
         $this->step = 1;
@@ -175,28 +198,25 @@ class Index extends Component
         $this->validate([
             'siswa_id' => 'required|integer',
             'tanggal' => 'required|date',
-            'masalah_teridentifikasi' => 'nullable|array',
+            'jawaban' => 'nullable|array',
             'kesimpulan' => 'nullable|string',
             'catatan' => 'nullable|string',
         ]);
 
+        $jawaban = $this->jawaban;
+
+        // Buat ringkasan masalah dari jawaban yang dicentang.
+        $dcm = new Dcm();
+        $dcm->jawaban = $jawaban;
+
         $data = [
             'siswa_id' => $this->siswa_id,
             'tanggal' => $this->tanggal,
-            'masalah_teridentifikasi' =>
-                $this->masalah_teridentifikasi,
+            'jawaban' => $jawaban,
+            'masalah_teridentifikasi' => $dcm->masalahSummary(),
             'kesimpulan' => $this->kesimpulan,
             'catatan' => $this->catatan,
         ];
-
-        $data['masalah_teridentifikasi'] = array_values(
-            array_filter(
-                array_map(
-                    'trim',
-                    preg_split('/\r\n|\r|\n/', $this->masalah_teridentifikasi_text)
-                )
-            )
-        );
 
         if ($this->editingId) {
             $service->update($this->editingId, $data);
@@ -216,8 +236,7 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'masalah_teridentifikasi',
-            'masalah_teridentifikasi_text',
+            'jawaban',
             'kesimpulan',
             'catatan',
         ]);

@@ -177,30 +177,63 @@
 
 
                     {{-- =================================================
-                        MASALAH TERIDENTIFIKASI
+                        DAFTAR CEK MASALAH (DCM)
                     ================================================== --}}
                     <div class="mb-6">
 
-                        <x-atoms.input-label for="masalah_teridentifikasi" size="sm">
-                            Masalah Teridentifikasi
+                        <x-atoms.input-label size="sm">
+                            Daftar Cek Masalah
                         </x-atoms.input-label>
 
-                        <textarea
-                            id="masalah_teridentifikasi"
-                            wire:model="masalah_teridentifikasi_text"
-                            rows="6"
-                            class="w-full border border-gray-200 rounded-md p-4 text-[14.5px]
-                            text-gray-900 placeholder:text-gray-400 focus:outline-none
-                            focus:border-primary focus:ring-1 focus:ring-primary
-                            resize-none shadow-sm leading-relaxed"
-                            placeholder="Tuliskan masalah yang teridentifikasi. Pisahkan setiap masalah dengan baris baru."
-                        ></textarea>
-
-                        <p class="text-[11px] text-gray-400 mt-1.5">
-                            Tulis satu masalah pada setiap baris.
+                        <p class="text-[11px] text-gray-400 mt-1.5 mb-3">
+                            Centang masalah yang sesuai dengan kondisi siswa. Pilihan bisa lebih dari satu.
                         </p>
 
-                        @error('masalah_teridentifikasi_text')
+                        <div
+                            class="border border-gray-200 rounded-md p-4 space-y-6 max-h-[50vh] overflow-y-auto modal-scroll"
+                            style="scrollbar-width: thin;"
+                        >
+
+                            @foreach(\App\Models\Dcm::SECTIONS as $section => $title)
+
+                                <div>
+
+                                    <p class="text-[13px] font-bold text-gray-800 mb-2">
+                                        {{ $section }}. {{ $title }}
+                                    </p>
+
+                                    <div class="space-y-1.5">
+
+                                        @foreach(\App\Models\Dcm::QUESTION_GROUPS[$section] as $kode => $pertanyaan)
+
+                                            <label class="flex items-start gap-2.5 cursor-pointer">
+
+                                                <input
+                                                    type="checkbox"
+                                                    value="{{ $kode }}"
+                                                    wire:model="jawaban.{{ $section }}"
+                                                    class="mt-0.5 w-4 h-4 rounded border-gray-300
+                                                           text-primary focus:ring-primary
+                                                           accent-primary cursor-pointer"
+                                                >
+
+                                                <span class="text-[13px] text-gray-700 leading-5">
+                                                    {{ $kode }} - {{ $pertanyaan }}
+                                                </span>
+
+                                            </label>
+
+                                        @endforeach
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                        @error('jawaban')
                             <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                                 {{ $message }}
                             </span>

@@ -14,8 +14,8 @@
 
                 <p class="text-xs text-gray-500 mt-0.5">
                     {{ $editingId
-                        ? 'Perbarui data Asesmen Kebutuhan Peserta Didik'
-                        : 'Catat Asesmen Kebutuhan Peserta Didik baru'
+                        ? 'Perbarui hasil tes bakat minat siswa'
+                        : 'Catat tes bakat minat siswa baru'
                     }}
                 </p>
 
@@ -252,15 +252,132 @@
 
                     </div>
 
+                    {{-- =================================================
+                        DAFTAR PERNYATAAN BAKAT MINAT (8 KECERDASAN)
+                    ================================================== --}}
+                    <div class="mb-6">
+
+                        <x-atoms.input-label size="sm">
+                            Pernyataan Bakat Minat (8 Kecerdasan)
+                        </x-atoms.input-label>
+
+                        <p class="text-[11px] text-gray-400 mt-1.5 mb-3">
+                            Centang pernyataan yang sesuai dengan siswa. Skor dan kecerdasan dominan dihitung otomatis.
+                        </p>
+
+                        <div
+                            class="border border-gray-200 rounded-md p-4 space-y-6 max-h-[50vh] overflow-y-auto modal-scroll"
+                            style="scrollbar-width: thin;"
+                        >
+
+                            @foreach(\App\Models\Peminatan::SECTIONS as $section)
+
+                                <div>
+
+                                    <p class="text-[13px] font-bold text-gray-800 mb-2">
+                                        {{ $section }}
+                                    </p>
+
+                                    <div class="space-y-1.5">
+
+                                        @foreach(\App\Models\Peminatan::QUESTION_GROUPS[$section] as $kode => $pertanyaan)
+
+                                            <label class="flex items-start gap-2.5 cursor-pointer">
+
+                                                <input
+                                                    type="checkbox"
+                                                    value="{{ $kode }}"
+                                                    wire:model.live="jawaban.{{ $section }}"
+                                                    class="mt-0.5 w-4 h-4 rounded border-gray-300
+                                                           text-primary focus:ring-primary
+                                                           accent-primary cursor-pointer"
+                                                >
+
+                                                <span class="text-[13px] text-gray-700 leading-5">
+                                                    {{ $kode }} - {{ $pertanyaan }}
+                                                </span>
+
+                                            </label>
+
+                                        @endforeach
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                        @error('jawaban')
+                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
+                                {{ $message }}
+                            </span>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- =================================================
+                        RINGKASAN SKOR KECERDASAN
+                    ================================================== --}}
+                    <div class="mb-6">
+
+                        <div class="rounded-xl border border-teal-100 bg-teal-50/50 p-4">
+
+                            <p class="text-[13px] font-bold text-gray-800 mb-3">
+                                Ringkasan Skor Kecerdasan
+                            </p>
+
+                            <div class="space-y-1">
+
+                                @foreach($this->skorKecerdasan as $item)
+
+                                    <div class="flex justify-between items-center py-0.5">
+
+                                        <span class="text-[13px] text-gray-600">
+                                            {{ $item['section'] }}
+                                        </span>
+
+                                        <span class="text-[13px] font-bold text-primary">
+                                            {{ $item['skor'] }}/{{ $item['total'] }}
+                                        </span>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-teal-100 text-center">
+
+                                <p class="text-[11px] uppercase tracking-wider text-gray-500">
+                                    Kecerdasan Dominan
+                                </p>
+
+                                <h3 class="mt-1 text-xl font-extrabold text-primary">
+                                    {{ $this->dominantKecerdasan ?: '-' }}
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================================
+                        HASIL
+                    ================================================== --}}
                     <div class="mb-6">
 
                         <x-atoms.input-label for="hasil" size="sm">
-                            Hasil Tes Bakat Minat
+                            Hasil Tes Bakat Minat (manual, opsional)
                         </x-atoms.input-label>
 
                         <textarea
                             wire:model="hasil"
-                            rows="6"
+                            rows="3"
                             class="w-full border border-gray-200 rounded-md p-4 text-[14px]
                             focus:border-primary focus:ring-1 focus:ring-primary resize-none">
 

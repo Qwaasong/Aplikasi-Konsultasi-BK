@@ -106,7 +106,7 @@ new #[Layout('layouts.app')] class extends Detail {};
 
             <div>
 
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-100">
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
 
                     Tes Bakat Minat
 
@@ -304,6 +304,120 @@ new #[Layout('layouts.app')] class extends Detail {};
                 </div>
 
             </div>
+
+        </div>
+
+
+        {{-- Rincian 8 Kecerdasan --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-5">
+
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="2"
+                         stroke="currentColor"
+                         class="w-5 h-5">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0Z"/>
+
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h3 class="font-bold text-gray-900">
+                        Rincian 8 Kecerdasan
+                    </h3>
+
+                    <p class="text-xs text-gray-400">
+                        Pernyataan yang dipilih siswa pada tes bakat minat
+                    </p>
+
+                </div>
+
+            </div>
+
+            @forelse($this->questionGroups as $group)
+
+                <div class="mb-6 last:mb-0">
+
+                    <div class="flex items-center justify-between mb-3">
+
+                        <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">
+                            {{ $group['section'] }}
+                        </h4>
+
+                        <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                            {{ $group['checked_count'] }}/{{ $group['total'] }}
+                        </span>
+
+                    </div>
+
+                    <div class="space-y-2">
+
+                        @foreach($group['items'] as $item)
+
+                            <div class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2">
+
+                                @if($item['checked'])
+
+                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded bg-indigo-600 text-white flex items-center justify-center">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke-width="3"
+                                             stroke="currentColor"
+                                             class="w-3.5 h-3.5">
+
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+
+                                        </svg>
+
+                                    </span>
+
+                                @else
+
+                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded border border-gray-300 bg-white"></span>
+
+                                @endif
+
+                                <span class="text-sm text-gray-700 leading-6">
+
+                                    <span class="font-bold text-gray-900 mr-1">
+                                        {{ $item['kode'] }}.
+                                    </span>
+
+                                    {{ $item['pertanyaan'] }}
+
+                                </span>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
+            @empty
+
+                <div class="border border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
+
+                    <p class="text-sm text-gray-400">
+                        Belum ada pernyataan yang dipilih.
+                    </p>
+
+                </div>
+
+            @endforelse
 
         </div>
 

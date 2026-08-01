@@ -432,6 +432,89 @@ new #[Layout('layouts.app')] class extends Detail {};
             </div>
 
 
+            {{-- ================= PERTANYAAN GAYA BELAJAR ================= --}}
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+
+                <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-6">
+
+                    <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+
+                        </svg>
+
+                    </div>
+
+                    <h3 class="font-bold text-gray-900 text-[15px]">
+
+                        Pertanyaan Gaya Belajar
+
+                    </h3>
+
+                </div>
+
+                @foreach($this->questionGroups as $group)
+
+                    <div class="mb-6 last:mb-0">
+
+                        <div class="flex items-center justify-between mb-3">
+
+                            <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">
+
+                                {{ $group['name'] }}
+
+                            </h4>
+
+                            <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+
+                                Skor {{ $group['score'] }}
+
+                            </span>
+
+                        </div>
+
+                        <div class="space-y-2">
+
+                            @foreach($group['questions'] as $i => $pertanyaan)
+
+                                <div class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2">
+
+                                    <span class="shrink-0 w-5 h-5 mt-0.5 rounded border border-gray-300 bg-white"></span>
+
+                                    <span class="text-sm text-gray-700 leading-6">
+
+                                        <span class="font-bold text-gray-900 mr-1">
+
+                                            {{ $i + 1 }}.
+
+                                        </span>
+
+                                        {{ $pertanyaan }}
+
+                                    </span>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+
             {{-- ================= CATATAN ================= --}}
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
 
@@ -468,6 +551,94 @@ new #[Layout('layouts.app')] class extends Detail {};
                         class="text-sm leading-7 text-gray-700 whitespace-pre-line text-justify">
 
                         {{ $record->catatan ?: 'Belum ada catatan yang ditambahkan.' }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {{-- ================= FAKTOR PENGHAMBAT ================= --}}
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+
+                <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4">
+
+                    <div class="p-2 rounded-xl bg-red-50 text-red-600">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+
+                        </svg>
+
+                    </div>
+
+                    <h3 class="font-bold text-gray-900 text-[15px]">
+
+                        Faktor Penghambat Belajar
+
+                    </h3>
+
+                </div>
+
+                <div class="rounded-xl bg-gray-50 border border-gray-100 p-5">
+
+                    <p
+                        class="text-sm leading-7 text-gray-700 whitespace-pre-line text-justify">
+
+                        {{ $record->faktor_penghambat ?: 'Belum ada data.' }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {{-- ================= FAKTOR PENDUKUNG ================= --}}
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+
+                <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4">
+
+                    <div class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+                        </svg>
+
+                    </div>
+
+                    <h3 class="font-bold text-gray-900 text-[15px]">
+
+                        Faktor Pendukung Belajar
+
+                    </h3>
+
+                </div>
+
+                <div class="rounded-xl bg-gray-50 border border-gray-100 p-5">
+
+                    <p
+                        class="text-sm leading-7 text-gray-700 whitespace-pre-line text-justify">
+
+                        {{ $record->faktor_pendukung ?: 'Belum ada data.' }}
 
                     </p>
 

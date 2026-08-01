@@ -237,6 +237,111 @@ new #[Layout('layouts.app')] class extends Detail {};
 
             </div>
 
+
+            {{-- ================= DAFTAR CEK MASALAH ================= --}}
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+
+                <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-6">
+
+                    <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+                        </svg>
+
+                    </div>
+
+                    <h3 class="font-bold text-gray-900 text-[15px]">
+
+                        Daftar Cek Masalah
+
+                    </h3>
+
+                </div>
+
+                @foreach($this->questionGroups as $group)
+
+                    <div class="mb-6 last:mb-0">
+
+                        <div class="flex items-center justify-between mb-3">
+
+                            <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">
+
+                                {{ $group['section'] }}. {{ $group['title'] }}
+
+                            </h4>
+
+                            <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+
+                                {{ $group['checked_count'] }}/{{ $group['total'] }}
+
+                            </span>
+
+                        </div>
+
+                        <div class="space-y-2">
+
+                            @foreach($group['items'] as $item)
+
+                                <div class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2">
+
+                                    @if($item['checked'])
+
+                                        <span class="shrink-0 mt-0.5 w-5 h-5 rounded bg-indigo-600 text-white flex items-center justify-center">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke-width="3"
+                                                 stroke="currentColor"
+                                                 class="w-3.5 h-3.5">
+
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+
+                                            </svg>
+
+                                        </span>
+
+                                    @else
+
+                                        <span class="shrink-0 mt-0.5 w-5 h-5 rounded border border-gray-300 bg-white"></span>
+
+                                    @endif
+
+                                    <span class="text-sm text-gray-700 leading-6">
+
+                                        <span class="font-bold text-gray-900 mr-1">
+
+                                            {{ $item['kode'] }}.
+
+                                        </span>
+
+                                        {{ $item['pertanyaan'] }}
+
+                                    </span>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+
             {{-- ================= MASALAH TERIDENTIFIKASI ================= --}}
 
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">

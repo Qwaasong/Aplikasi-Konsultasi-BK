@@ -28,6 +28,12 @@ class Detail extends Component
     }
 
     #[Computed]
+    public function questionGroups(): array
+    {
+        return $this->record->questionGroups();
+    }
+
+    #[Computed]
     public function searchResults()
     {
         if (strlen($this->search) < 2) {

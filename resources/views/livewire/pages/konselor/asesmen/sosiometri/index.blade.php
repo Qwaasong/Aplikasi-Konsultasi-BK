@@ -23,6 +23,146 @@ new #[Layout('layouts.app')] class extends Index {};
     </x-organisms.header>
 
 
+    {{-- Pilih Tingkat --}}
+    @if(!$selectedTingkat)
+
+        <div class="px-6 sm:px-8 py-6">
+
+            {{-- Judul --}}
+            <div class="mb-5">
+
+                <h2 class="text-base font-semibold text-gray-800">
+                    Pilih Tingkat
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Pilih tingkat kelas untuk melihat data Sosiometri.
+                </p>
+
+            </div>
+
+
+            {{-- Card Tingkat --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+                @foreach(['X', 'XI', 'XII'] as $tingkat)
+
+                    <button
+                        type="button"
+                        wire:key="tingkat-{{ $tingkat }}"
+                        wire:click="pilihTingkat('{{ $tingkat }}')"
+                        class="group text-left bg-white border border-gray-200 rounded-xl p-6
+                               shadow-sm transition-all duration-200
+                               hover:border-brand-teal hover:shadow-md
+                               hover:-translate-y-0.5">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                                    Tingkat
+                                </p>
+
+                                <h3 class="mt-2 text-lg font-semibold text-gray-800
+                                           group-hover:text-brand-teal">
+                                    Sosiometri Kelas {{ $tingkat }}
+                                </h3>
+
+                            </div>
+
+                            <div class="w-11 h-11 rounded-lg bg-teal-50
+                                        flex items-center justify-center
+                                        text-brand-teal">
+
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="w-5 h-5"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332-.477 4.5-1.253m0-10.494C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332-.477-4.5-1.253" />
+
+                                </svg>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-5 flex items-center text-xs text-gray-400">
+
+                            <span>
+                                Lihat Sosiometri
+                            </span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+
+                            </svg>
+
+                        </div>
+
+                    </button>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+
+    {{-- Tabel data (setelah pilih tingkat) --}}
+    @else
+
+        {{-- Header Kelas --}}
+        <div class="px-6 sm:px-8 py-5 border-b border-gray-100">
+
+            <button
+                type="button"
+                wire:click="kembaliKeTingkat"
+                class="inline-flex items-center text-xs text-gray-500
+                       hover:text-brand-teal mb-2">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 19l-7-7 7-7" />
+
+                </svg>
+
+                Kembali ke Daftar Kelas
+
+            </button>
+
+            <h2 class="text-lg font-semibold text-gray-800">
+                Sosiometri Kelas {{ $selectedTingkat }}
+            </h2>
+
+        </div>
+
+
     {{-- =========================
         TOOLBAR
     ========================== --}}
@@ -160,67 +300,31 @@ new #[Layout('layouts.app')] class extends Index {};
     ====================================================== --}}
     <x-organisms.data-table
         :headers="[
-            '',
-            'Judul',
+            'Tanggal',
             'Siswa',
-            'Instruksi',
-            'Jumlah Pilihan',
-            'Jumlah Respon',
+            'Kelas',
             'Aksi'
         ]"
-        empty="Belum ada data asesmen sosiometri."
+        empty="Belum ada data Sosiometri untuk kelas {{ $selectedTingkat }}."
     >
 
         @forelse($records as $record)
 
             <tr
                 wire:key="sosiometri-{{ $record->id }}"
-                class="group border-b border-gray-100
+                wire:click="goToDetail({{ $record->id }})"
+                class="group border-b border-gray-100 cursor-pointer
                        transition-all duration-200 h-12 relative
                        hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]
-                       hover:z-10 hover:rounded-md
-                       {{ in_array($record->id, $selected)
-                            ? 'bg-teal-50/50'
-                            : 'bg-white'
-                       }}"
+                       hover:z-10 hover:rounded-md"
             >
 
                 {{-- =================================================
-                    CHECKBOX
+                    TANGGAL
                 ================================================== --}}
-                <td
-                    class="w-16 text-center align-middle rounded-l-md py-2"
-                    onclick="event.stopPropagation()"
-                >
+                <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap align-middle">
 
-                    <input
-                        type="checkbox"
-                        value="{{ $record->id }}"
-                        wire:model.live="selected"
-                        class="w-4 h-4 rounded border-gray-300
-                            text-brand-teal focus:ring-brand-teal
-                            accent-brand-teal cursor-pointer"
-                    >
-
-                </td>
-
-
-                {{-- =================================================
-                    JUDUL
-                ================================================== --}}
-                <td class="px-4 py-2 align-middle">
-
-                    <div class="font-semibold text-gray-900">
-
-                        {{ $record->judul ?: '-' }}
-
-                    </div>
-
-                    <div class="text-[11px] text-gray-400 mt-1">
-
-                        ID #{{ $record->id }}
-
-                    </div>
+                    {{ optional($record->created_at)->isoFormat('D MMM Y') }}
 
                 </td>
 
@@ -228,13 +332,18 @@ new #[Layout('layouts.app')] class extends Index {};
                 {{-- =================================================
                     SISWA
                 ================================================== --}}
-                <td class="px-4 py-2 align-middle">
+                <td class="px-4 py-2 font-semibold align-middle">
 
-                    <span class="font-semibold text-gray-900">
+                    <a
+                        href="{{ route('konselor.asesmen.sosiometri.detail', $record->id) }}"
+                        wire:navigate
+                        onclick="event.stopPropagation()"
+                        class="text-gray-900 hover:text-teal-600 hover:underline transition"
+                    >
 
                         {{ $record->siswa?->nama ?? '-' }}
 
-                    </span>
+                    </a>
 
                     <p class="text-[11px] text-gray-400">
 
@@ -246,84 +355,11 @@ new #[Layout('layouts.app')] class extends Index {};
 
 
                 {{-- =================================================
-                    INSTRUKSI
+                    KELAS
                 ================================================== --}}
-                <td class="px-4 py-2 text-sm text-gray-600 max-w-sm align-middle">
+                <td class="px-4 py-2 text-sm text-gray-700 align-middle">
 
-                    <div
-                        class="truncate max-w-[280px]"
-                        title="{{ $record->instruksi }}"
-                    >
-
-                        {{ $record->instruksi ?: '-' }}
-
-                    </div>
-
-                </td>
-
-
-                {{-- =================================================
-                    JUMLAH PILIHAN
-                ================================================== --}}
-                <td class="px-4 py-2 align-middle">
-
-                    <span
-                        class="inline-flex items-center
-                            px-3 py-1 rounded-full
-                            bg-indigo-50
-                            text-indigo-700
-                            text-xs font-semibold"
-                    >
-
-                        {{ $record->jumlah_pilihan }}
-
-                        Pilihan
-
-                    </span>
-
-                </td>
-
-
-                {{-- =================================================
-                    JUMLAH RESPON
-                ================================================== --}}
-                <td class="px-4 py-2 align-middle">
-
-                    @php
-                        $totalRespon = $record->respons?->count() ?? 0;
-                    @endphp
-
-                    @if($totalRespon > 0)
-
-                        <span
-                            class="inline-flex items-center
-                                px-3 py-1 rounded-full
-                                bg-emerald-50
-                                text-emerald-700
-                                text-xs font-semibold"
-                        >
-
-                            {{ $totalRespon }}
-
-                            Respon
-
-                        </span>
-
-                    @else
-
-                        <span
-                            class="inline-flex items-center
-                                px-3 py-1 rounded-full
-                                bg-gray-100
-                                text-gray-500
-                                text-xs font-semibold"
-                        >
-
-                            Belum Ada
-
-                        </span>
-
-                    @endif
+                    {{ $record->siswa?->kelas_label ?? '-' }}
 
                 </td>
 
@@ -337,21 +373,6 @@ new #[Layout('layouts.app')] class extends Index {};
                 >
 
                     <div class="flex items-center justify-end gap-2">
-
-                        {{-- Detail --}}
-                        <x-atoms.action-button
-                            color="green"
-                            title="Detail"
-                            wire:click="goToDetail({{ $record->id }})"
-                        >
-
-                            <x-atoms.icon
-                                variant="eye"
-                                size="sm"
-                            />
-
-                        </x-atoms.action-button>
-
 
                         {{-- Edit --}}
                         <x-atoms.action-button
@@ -394,7 +415,9 @@ new #[Layout('layouts.app')] class extends Index {};
         @endforelse
 
     </x-organisms.data-table>
-    
+
+    @endif
+
     {{-- Modal Sosiometri --}}
     @include('livewire.partials.asesmen.sosiometri.sosiometri-modal', [
         'editingId' => $editingId,

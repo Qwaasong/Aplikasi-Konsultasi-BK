@@ -39,6 +39,15 @@ class Detail extends Component
     }
 
     /**
+     * Pertanyaan per kelompok gaya belajar
+     */
+    #[Computed]
+    public function questionGroups(): array
+    {
+        return $this->record->questionGroups();
+    }
+
+    /**
      * Live Search
      */
     #[Computed]

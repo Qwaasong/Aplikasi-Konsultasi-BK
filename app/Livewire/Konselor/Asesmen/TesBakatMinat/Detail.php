@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Konselor\Asesmen\TesBakatMinat;
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
 use App\Models\Peminatan;
-use App\Services\PeminatanService;
+use App\Services\Asesmen\PeminatanService;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
+use Livewire\Volt\Component;
 
 #[Layout('layouts.app')]
 class Detail extends Component
@@ -30,6 +32,24 @@ class Detail extends Component
         $this->record = $this->service->findById($id);
     }
 
+    #[Computed]
+    public function questionGroups(): array
+    {
+        return $this->record->questionGroups();
+    }
+
+    #[Computed]
+    public function dominantIntelligences(): array
+    {
+        return $this->record->dominantIntelligences();
+    }
+
+    #[On('refreshTable')]
+    public function refreshRecord(): void
+    {
+        $this->record = $this->service->findById($this->record->id);
+    }
+
     public function getSearchResultsProperty()
     {
         if (strlen($this->search) < 2) {
@@ -48,11 +68,7 @@ class Detail extends Component
 
     public function edit(): void
     {
-        $this->editingId = $this->record->id;
-
-        $this->dispatch('loadTesBakatMinat', id: $this->record->id);
-
-        $this->showModal = true;
+        $this->dispatch('edit-peminatan', id: $this->record->id);
     }
 
     public function delete(): void
@@ -81,11 +97,4 @@ class Detail extends Component
     protected $listeners = [
         'refreshDetail' => '$refresh',
     ];
-
-    public function render()
-    {
-        return view(
-            'livewire.pages.konselor.asesmen.tes-bakat-minat.detail'
-        );
-    }
 }

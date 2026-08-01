@@ -62,7 +62,7 @@ new #[Layout('layouts.app')] class extends Index {};
 
                                 <h3 class="mt-2 text-lg font-semibold text-gray-800
                                            group-hover:text-brand-teal">
-                                    Kelas {{ $tingkat }}
+                                    AKPD Kelas {{ $tingkat }}
                                 </h3>
 
                             </div>

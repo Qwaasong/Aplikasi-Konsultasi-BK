@@ -4,13 +4,18 @@ namespace App\Livewire\Konselor\Asesmen\TesBakatMinat;
 
 use App\Models\DataSiswa;
 use App\Models\Jurusan;
-use App\Services\PeminatanService;
+use App\Models\Peminatan;
+use App\Services\Asesmen\PeminatanService;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 class Index extends Component
 {
+    use WithFileUploads;
+
 
     /*
     |--------------------------------------------------------------------------
@@ -61,6 +66,7 @@ class Index extends Component
 
     public string $filterKelas = '';
     public string $filterJurusan = '';
+    public ?string $selectedTingkat = null;
     public array $kelasOptions = [];
     public array $jurusanOptions = [];
 
@@ -78,6 +84,7 @@ class Index extends Component
     public $pilihan3 = '';
     public $hasil = '';
     public $catatan = '';
+    public array $jawaban = [];
     public $files = [];
     public $newFiles = [];
     public $existingFiles = [];
@@ -132,9 +139,34 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'tingkat' => $this->selectedTingkat,
 
         ]);
 
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->loadData();
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->selectedTingkat = null;
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+
+        $this->records = collect();
     }
 
     /*
@@ -279,6 +311,11 @@ class Index extends Component
         $this->catatan =
             $record->catatan;
 
+        $this->jawaban =
+            $record->jawaban ?? [];
+
+        $this->step = 1;
+
         $this->dispatch(
             'open-modal',
             'form-peminatan'
@@ -318,7 +355,14 @@ class Index extends Component
             'catatan'
                 =>'nullable|string',
 
+            'jawaban'
+                =>'nullable|array',
+
         ]);
+
+        $peminatan = new Peminatan();
+        $peminatan->jawaban = $this->jawaban;
+        $dominant = $peminatan->dominantIntelligences();
 
         $data = [
 
@@ -327,7 +371,8 @@ class Index extends Component
             'pilihan1'=>$this->pilihan1,
             'pilihan2'=>$this->pilihan2,
             'pilihan3'=>$this->pilihan3,
-            'hasil'=>$this->hasil,
+            'jawaban'=>$this->jawaban,
+            'hasil'=> $dominant[0] !== '' ? $dominant[0] : ($this->hasil ?: ''),
             'catatan'=>$this->catatan,
 
         ];
@@ -426,11 +471,22 @@ class Index extends Component
 
             'catatan',
 
+            'jawaban',
+
+            'files',
+
+            'newFiles',
+
+            'existingFiles',
+
         ]);
 
 
         $this->tanggal =
             now()->format('Y-m-d');
+
+
+        $this->step = 1;
 
 
         $this->editingId = null;
@@ -503,6 +559,84 @@ class Index extends Component
     public function goToDetail($id)
     {
         return redirect()->route('konselor.asesmen.tes-bakat-minat.detail',$id);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP
+    |--------------------------------------------------------------------------
+    */
+
+    public function nextStep(): void
+    {
+        $this->validate([
+            'siswa_id' => 'required|integer',
+            'tanggal' => 'required|date',
+            'pilihan1' => 'required|string',
+            'jawaban' => 'nullable|array',
+        ]);
+
+        $this->step = 2;
+    }
+
+    public function previousStep(): void
+    {
+        $this->step = 1;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILE UPLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    public function updatedNewFiles(): void
+    {
+        $this->validate([
+            'newFiles.*' => 'file|max:12288|mimes:pdf,jpg,jpeg,png,docx',
+        ]);
+
+        $this->files = array_merge($this->files ?? [], $this->newFiles);
+        $this->newFiles = [];
+    }
+
+    public function removeFile(int $index): void
+    {
+        unset($this->files[$index]);
+        $this->files = array_values($this->files);
+    }
+
+    public function removeExistingFile(int $index): void
+    {
+        unset($this->existingFiles[$index]);
+        $this->existingFiles = array_values($this->existingFiles);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMPUTED
+    |--------------------------------------------------------------------------
+    */
+
+    #[Computed]
+    public function skorKecerdasan(): array
+    {
+        return collect(Peminatan::SECTIONS)
+            ->map(fn (string $section) => [
+                'section' => $section,
+                'skor' => count($this->jawaban[$section] ?? []),
+                'total' => count(Peminatan::QUESTION_GROUPS[$section] ?? []),
+            ])
+            ->all();
+    }
+
+    #[Computed]
+    public function dominantKecerdasan(): string
+    {
+        $peminatan = new Peminatan();
+        $peminatan->jawaban = $this->jawaban;
+
+        return $peminatan->dominantIntelligences()[0] ?? '';
     }
 
 }
