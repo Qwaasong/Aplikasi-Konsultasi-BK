@@ -5,8 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -54,11 +54,18 @@ class User extends Authenticatable
 
     /**
      * Get the e-mail address where password reset links are sent.
-     *
-     * @return string
      */
     public function getEmailForPasswordReset(): string
     {
         return $this->username;
+    }
+
+    /**
+     * Cari user untuk OAuth password grant berdasarkan username ATAU email
+     * (default Passport hanya email).
+     */
+    public function findForPassport(string $username, mixed $clientEntity = null): ?self
+    {
+        return $this->where('email', $username)->orWhere('username', $username)->first();
     }
 }

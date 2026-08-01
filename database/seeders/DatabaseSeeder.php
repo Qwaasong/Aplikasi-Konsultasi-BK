@@ -3,12 +3,14 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
         $this->call([
             FirstDatabaseSeeder::class,
+            OAuthClientSeeder::class,
             DataSiswaSeeder::class,
             KonsultasiSeeder::class,
             // FactorySeeder::class,

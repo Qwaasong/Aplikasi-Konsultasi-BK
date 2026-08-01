@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\WordExportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\WordExportController;
 
 // Landing Page — hanya untuk yang belum login
 Route::get('/', function () {
@@ -20,11 +20,6 @@ Route::get('/', function () {
     return view('landing.index');
 })->name('landing');
 
-Volt::route('test', 'pages.test');
-
-// Landing Page
-Route::view('/', 'landing.index')->name('landing');
-
 // Layanan BK
 Route::view('/layanan', 'landing.layanan.index')->name('layanan');
 
@@ -36,7 +31,7 @@ Route::prefix('asesmen')->name('asesmen.')->group(function () {
     Route::view('/dcm', 'landing.asesmen.dcm.index')->name('dcm');
     Route::view('/sosiometri', 'landing.asesmen.sosiometri.index')->name('sosiometri');
     Route::view('/tes-bakat-minat', 'landing.asesmen.tes-bakat-minat.index')->name('tes-bakat-minat');
-    
+
 });
 
 // ── Export Word ──────────────────────────────────────────────
@@ -45,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('konsultasi.export');
 });
 
-//Admin
+// Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     // route lama
     Volt::route('admin/dashboard', 'pages.admin.dashboard')->name('admin.dashboard');
@@ -93,7 +88,6 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/pengunduran-diri/{id}/detail', 'pages.konselor.pengunduran-diri.detail')->name('konselor.pengunduran-diri.detail');
     Volt::route('konselor/peminatan', 'pages.konselor.peminatan.index')->name('konselor.peminatan.index');
     Volt::route('konselor/peminatan/{id}/detail', 'pages.konselor.peminatan.detail')->name('konselor.peminatan.detail');
-    
 
     // Kasus BK
     Volt::route('konselor/kasus-bk', 'pages.konselor.kasus-bk.index')->name('konselor.kasus-bk.index');
@@ -112,4 +106,4 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/asesmen/tes-bakat-minat/{id}/detail', 'pages.konselor.asesmen.tes-bakat-minat.detail')->name('konselor.asesmen.tes-bakat-minat.detail');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
