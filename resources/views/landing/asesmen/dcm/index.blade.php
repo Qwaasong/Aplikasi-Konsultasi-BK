@@ -65,9 +65,11 @@
 
                 </ul>
 
-                <a href="#" class="assessment-button">
-                    Mulai Mengisi DCM
-                </a>
+                <div style="display: flex; justify-content: flex-start; margin-top: 20px;">
+                    <a href="https://forms.gle/UDbDykodyMKY6Ejb8" target="_blank" class="assessment-button">
+                        Mulai Mengisi DCM
+                    </a>
+                </div>
 
             </div>
 
