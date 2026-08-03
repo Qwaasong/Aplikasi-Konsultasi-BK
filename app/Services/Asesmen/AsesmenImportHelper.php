@@ -8,18 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
-/**
- * Helper bersama untuk import CSV dari Google Forms.
- *
- * Spreadsheet gform tidak memuat kolom NIS — identitas hanya Nama + Kelas.
- * Bila siswa belum terdaftar, otomatis dibuatkan User (role siswa) + DataSiswa.
- */
 class AsesmenImportHelper
 {
-    /**
-     * Cocokkan siswa via nama (users.nama) + kelas (kelas.nama_kelas),
-     * case-insensitive. Bila tidak ditemukan dan nama+kelas terisi, buat otomatis.
-     */
     public static function resolveSiswa(string $nama, string $kelas): ?DataSiswa
     {
         $nama = trim($nama);
@@ -38,24 +28,17 @@ class AsesmenImportHelper
             return $matched;
         }
 
-        // Fallback: kelas "X RPL" vs "X RPL 1" — cocokkan substring.
         $matched = DataSiswa::query()
             ->whereHas('user', fn ($q) => $q->whereRaw('LOWER(nama) = ?', [mb_strtolower($nama)]))
             ->whereHas('kelas', fn ($q) => $q->whereRaw('LOWER(nama_kelas) LIKE ?', ['%'.mb_strtolower($kelas).'%']))
             ->first();
 
-        if ($matched) {
-            return $matched;
-        }
-
-        return self::createSiswa($nama, $kelas);
+        return $matched ?: self::createSiswa($nama, $kelas);
     }
 
     public static function createSiswa(string $nama, string $kelas, array $extra = []): DataSiswa
     {
-        $kelasId = self::resolveKelasId($kelas);
         $nis = self::uniqueNis();
-
         $user = User::create([
             'nama' => $nama,
             'username' => 'siswa_'.$nis,
@@ -71,7 +54,7 @@ class AsesmenImportHelper
         return DataSiswa::create([
             'user_id' => $user->id,
             'nis' => $nis,
-            'kelas_id' => $kelasId,
+            'kelas_id' => self::resolveKelasId($kelas),
             'alamat' => $extra['alamat'] ?? '',
             'tempat_lahir' => $extra['tempat_lahir'] ?? null,
             'tgl_lahir' => $extra['tgl_lahir'] ?? null,
@@ -108,95 +91,75 @@ class AsesmenImportHelper
 
     public static function normalizeJenisKelamin(string $value): string
     {
-        $v = strtolower(trim($value));
+        $value = strtolower(trim($value));
 
         return match (true) {
-            in_array($v, ['l', 'lk', 'laki', 'laki-laki', 'laki laki', 'pria', 'man'], true) => 'L',
-            in_array($v, ['p', 'pr', 'perempuan', 'wanita', 'w', 'cewek'], true) => 'P',
+            in_array($value, ['l', 'lk', 'laki', 'laki-laki', 'laki laki', 'pria'], true) => 'L',
+            in_array($value, ['p', 'pr', 'perempuan', 'wanita'], true) => 'P',
             default => 'L',
         };
     }
 
     public static function resolveTahunPelajaran(mixed $value): ?string
     {
-        $v = trim((string) ($value ?? ''));
+        $value = trim((string) ($value ?? ''));
 
-        return $v === '' ? null : $v;
+        return $value === '' ? null : $value;
     }
 
-    /**
-     * Parse timestamp Google Forms ("01/08/2026 23:44:58") atau format lain
-     * menjadi "Y-m-d". Fallback ke $fallback atau hari ini bila tak terbaca.
-     */
     public static function parseTimestamp(mixed $value, ?string $fallback = null): ?string
     {
         if ($value === null || trim((string) $value) === '') {
             return $fallback ?? now()->format('Y-m-d');
         }
 
-        $s = trim((string) $value);
+        $value = trim((string) $value);
 
-        foreach (['d/m/Y H:i:s', 'd/m/Y H:i', 'd/m/Y', 'Y-m-d H:i:s', 'Y-m-d'] as $fmt) {
+        foreach (['d/m/Y H:i:s', 'd/m/Y H:i', 'd/m/Y', 'Y-m-d H:i:s', 'Y-m-d'] as $format) {
             try {
-                return Carbon::createFromFormat($fmt, $s)->format('Y-m-d');
+                return Carbon::createFromFormat($format, $value)->format('Y-m-d');
             } catch (\Throwable) {
                 // coba format berikutnya
             }
         }
 
-        if (is_numeric($s)) {
+        if (is_numeric($value)) {
             try {
-                return ExcelDate::excelToDateTimeObject((float) $s)->format('Y-m-d');
+                return ExcelDate::excelToDateTimeObject((float) $value)->format('Y-m-d');
             } catch (\Throwable) {
                 // lanjut ke Carbon::parse
             }
         }
 
         try {
-            return Carbon::parse($s)->format('Y-m-d');
+            return Carbon::parse($value)->format('Y-m-d');
         } catch (\Throwable) {
             return $fallback ?? now()->format('Y-m-d');
         }
     }
 
-    /**
-     * Pisahkan kolom "Tempat, tanggal lahir" menjadi [tempat_lahir, tgl_lahir].
-     * Contoh: "Malang, 15-05-2008" → ["Malang", "2008-05-15"].
-     */
     public static function splitTempatTanggalLahir(mixed $value): array
     {
-        $s = trim((string) ($value ?? ''));
+        $value = trim((string) ($value ?? ''));
 
-        if ($s === '') {
+        if ($value === '') {
             return [null, null];
         }
 
-        $parts = preg_split('/[,-]\s*/', $s, 2);
+        $parts = preg_split('/[,|-]\s*/', $value, 2);
         $tempat = trim($parts[0] ?? '');
-        $tglRaw = trim($parts[1] ?? '');
+        $tanggal = null;
 
-        $tgl = null;
-
-        if ($tglRaw !== '') {
-            foreach (['d-m-Y', 'd/m/Y', 'd-m-y', 'd/m/y', 'j F Y', 'd F Y'] as $fmt) {
-                try {
-                    $tgl = Carbon::createFromFormat($fmt, $tglRaw)->format('Y-m-d');
-                    break;
-                } catch (\Throwable) {
-                    // coba format berikutnya
-                }
-            }
-
-            if ($tgl === null) {
-                try {
-                    $tgl = Carbon::parse($tglRaw)->format('Y-m-d');
-                } catch (\Throwable) {
-                    $tgl = null;
-                }
+        foreach (['d-m-Y', 'd/m/Y', 'd-m-y', 'd/m/y', 'j F Y', 'd F Y'] as $format) {
+            try {
+                $tanggal = Carbon::createFromFormat($format, trim($parts[1] ?? ''))->format('Y-m-d');
+                break;
+            } catch (\Throwable) {
+                // coba format berikutnya
             }
         }
 
-        return [$tempat !== '' ? $tempat : null, $tgl];
+        return [$tempat !== '' ? $tempat : null, $tanggal];
     }
 
     public static function normalizeText(string $text): string

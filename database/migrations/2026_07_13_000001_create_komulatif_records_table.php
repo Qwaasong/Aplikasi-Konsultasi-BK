@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('komulatif_record', function (Blueprint $table) {
             $table->id();
             $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
+            $table->string('tahun_pelajaran')->nullable();
             $table->string('nama_ayah')->nullable();
             $table->string('nama_ibu')->nullable();
             $table->string('pendidikan_ayah')->nullable();
@@ -21,7 +22,12 @@ return new class extends Migration
             $table->string('pekerjaan_ayah')->nullable();
             $table->string('pekerjaan_ibu')->nullable();
             $table->string('telp_ortu')->nullable();
+            $table->string('alamat_ayah')->nullable();
+            $table->string('alamat_ibu')->nullable();
+            $table->string('nomor_wa_ayah')->nullable();
+            $table->string('nomor_wa_ibu')->nullable();
             $table->string('status_rumah')->nullable();
+            $table->string('lokasi_rumah')->nullable();
             $table->string('dinding_rumah')->nullable();
             $table->string('lantai_rumah')->nullable();
             $table->integer('jml_kamar')->nullable();
@@ -31,6 +37,7 @@ return new class extends Migration
             $table->integer('kendaraan_motor')->nullable();
             $table->string('biaya_sekolah_dari')->nullable();
             $table->string('kendaraan_ke_sekolah')->nullable();
+            $table->string('media_sosial')->nullable();
             $table->timestamps();
         });
     }
