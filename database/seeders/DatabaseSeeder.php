@@ -10,7 +10,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FirstDatabaseSeeder::class,
-            OAuthClientSeeder::class,
             DataSiswaSeeder::class,
             KonsultasiSeeder::class,
             // FactorySeeder::class,
