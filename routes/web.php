@@ -14,6 +14,8 @@ Route::get('/', function () {
             return redirect()->route('admin.dashboard');
         } elseif ($role === 'guru_bk') {
             return redirect()->route('konselor.dashboard');
+        } elseif ($role === 'siswa') {
+            return redirect()->route('siswa.profile');
         }
     }
 
@@ -109,6 +111,11 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/asesmen/sosiometri/{id}/detail', 'pages.konselor.asesmen.sosiometri.detail')->name('konselor.asesmen.sosiometri.detail');
     Volt::route('konselor/asesmen/tes-bakat-minat', 'pages.konselor.asesmen.tes-bakat-minat.index')->name('konselor.asesmen.tes-bakat-minat.index');
     Volt::route('konselor/asesmen/tes-bakat-minat/{id}/detail', 'pages.konselor.asesmen.tes-bakat-minat.detail')->name('konselor.asesmen.tes-bakat-minat.detail');
+});
+
+// Siswa
+Route::middleware(['auth', 'role:siswa'])->group(function () {
+    Route::get('/siswa/profile', fn() => view('landing.siswa.profile'))->name('siswa.profile');
 });
 
 require __DIR__.'/auth.php';

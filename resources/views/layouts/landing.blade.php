@@ -32,6 +32,9 @@
     {{-- CSS khusus halaman --}}
     @stack('styles')
 
+    {{-- Livewire Styles --}}
+    @livewireStyles
+
 </head>
 
 <body>
@@ -54,6 +57,9 @@
 
     {{-- Script khusus halaman --}}
     @stack('scripts')
+
+    {{-- Livewire Scripts --}}
+    @livewireScripts
 
 </body>
 

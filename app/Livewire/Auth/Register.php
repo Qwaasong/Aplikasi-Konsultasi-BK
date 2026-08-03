@@ -25,6 +25,7 @@ class Register extends Component
     public array $roles = [
         ['value' => 'admin', 'label' => 'Admin'],
         ['value' => 'guru_bk', 'label' => 'Konselor'],
+        ['value' => 'siswa', 'label' => 'Siswa'],
     ];
 
     public array $jenisKelaminOptions = [
@@ -43,7 +44,7 @@ class Register extends Component
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'no_hp' => ['required', 'string', 'max:20'],
             'jenis_kelamin' => ['required', 'in:L,P'],
-            'role' => ['required', 'string', 'in:guru_bk,admin'],
+            'role' => ['required', 'string', 'in:guru_bk,admin,siswa'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -66,6 +67,8 @@ class Register extends Component
             $route = route('admin.dashboard', absolute: false);
         } elseif ($role === 'guru_bk') {
             $route = route('konselor.dashboard', absolute: false);
+        } elseif ($role === 'siswa') {
+            $route = route('siswa.profile', absolute: false);
         } else {
             $route = '/';
         }
