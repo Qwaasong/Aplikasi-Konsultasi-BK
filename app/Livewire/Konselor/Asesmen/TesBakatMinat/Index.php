@@ -6,16 +6,18 @@ use App\Models\DataSiswa;
 use App\Models\Jurusan;
 use App\Models\Peminatan;
 use App\Services\Asesmen\PeminatanService;
+use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Index extends Component
 {
     use WithFileUploads;
-
 
     /*
     |--------------------------------------------------------------------------
@@ -24,8 +26,8 @@ class Index extends Component
     */
 
     public Collection $records;
-    public array $students = [];
 
+    public array $students = [];
 
     /*
     |--------------------------------------------------------------------------
@@ -34,8 +36,8 @@ class Index extends Component
     */
 
     public bool $showFilters = false;
-    public array $selected = [];
 
+    public array $selected = [];
 
     /*
     |--------------------------------------------------------------------------
@@ -44,9 +46,10 @@ class Index extends Component
     */
 
     public bool $showStudentModal = false;
-    public int $step = 1;
-    public ?int $editingId = null;
 
+    public int $step = 1;
+
+    public ?int $editingId = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -55,8 +58,8 @@ class Index extends Component
     */
 
     public string $search = '';
-    public string $searchSiswa = '';
 
+    public string $searchSiswa = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -65,11 +68,14 @@ class Index extends Component
     */
 
     public string $filterKelas = '';
-    public string $filterJurusan = '';
-    public ?string $selectedTingkat = null;
-    public array $kelasOptions = [];
-    public array $jurusanOptions = [];
 
+    public string $filterJurusan = '';
+
+    public ?string $selectedTingkat = null;
+
+    public array $kelasOptions = [];
+
+    public array $jurusanOptions = [];
 
     /*
     |--------------------------------------------------------------------------
@@ -78,17 +84,35 @@ class Index extends Component
     */
 
     public $siswa_id = '';
+
     public $tanggal = '';
+
     public $pilihan1 = '';
+
     public $pilihan2 = '';
+
     public $pilihan3 = '';
+
     public $hasil = '';
+
     public $catatan = '';
+
     public array $jawaban = [];
+
     public $files = [];
+
     public $newFiles = [];
+
     public $existingFiles = [];
 
+    // ── IMPORT / EXPORT STATE ─────────────────────────
+    public bool $showImportModal = false;
+    #[Validate('required|file|mimes:csv,xlsx,xls|max:5120')]
+    public $importFile = null;
+    public int $importedCount = 0;
+    public array $importErrors = [];
+    public bool $showExportModal = false;
+    public int $exportPreviewCount = 0;
 
     /*
     |--------------------------------------------------------------------------
@@ -101,26 +125,23 @@ class Index extends Component
 
         $this->records = collect();
 
-
         $this->students = DataSiswa::with([
             'user',
-            'kelas.jurusan'
+            'kelas.jurusan',
         ])
-        ->get()
-        ->sortBy(fn($student)=>$student->nama ?? '')
-        ->values()
-        ->all();
+            ->get()
+            ->sortBy(fn ($student) => $student->nama ?? '')
+            ->values()
+            ->all();
 
         $this->jurusanOptions = Jurusan::query()
-        ->orderBy('nama_jurusan')
-        ->pluck('nama_jurusan')
-        ->toArray();
+            ->orderBy('nama_jurusan')
+            ->pluck('nama_jurusan')
+            ->toArray();
         $this->loadData();
         $this->loadFilterOptions();
 
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -147,7 +168,7 @@ class Index extends Component
 
     public function pilihTingkat(string $tingkat): void
     {
-        if (!in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+        if (! in_array($tingkat, ['X', 'XI', 'XII'], true)) {
             return;
         }
 
@@ -190,10 +211,6 @@ class Index extends Component
 
     }
 
-
-
-
-
     /*
     |--------------------------------------------------------------------------
     | STUDENT
@@ -221,7 +238,7 @@ class Index extends Component
     public function getInitials(?string $name): string
     {
 
-        if(!$name){
+        if (! $name) {
             return 'S';
         }
 
@@ -230,15 +247,15 @@ class Index extends Component
             trim($name)
         );
 
-        if(count($words)>=2){
+        if (count($words) >= 2) {
             return strtoupper(
-                substr($words[0],0,1).
-                substr($words[1],0,1)
+                substr($words[0], 0, 1).
+                substr($words[1], 0, 1)
             );
         }
 
         return strtoupper(
-            substr($name,0,2)
+            substr($name, 0, 2)
         );
 
     }
@@ -250,7 +267,6 @@ class Index extends Component
     */
 
     #[On('create-peminatan')]
-
     public function createPeminatan(): void
     {
         $this->resetValidation();
@@ -271,12 +287,10 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
 
-
     #[On('edit-peminatan')]
     public function loadPeminatan(
         int $id
-    ): void
-    {
+    ): void {
         $service = app(
             PeminatanService::class
         );
@@ -288,13 +302,12 @@ class Index extends Component
 
         $this->editingId = $id;
 
-
         $this->siswa_id =
             $record->siswa_id;
 
         $this->tanggal =
             optional($record->tanggal)
-            ->format('Y-m-d');
+                ->format('Y-m-d');
 
         $this->pilihan1 =
             $record->pilihan1;
@@ -330,69 +343,57 @@ class Index extends Component
 
     public function save(
         PeminatanService $service
-    ): void
-    {
+    ): void {
         $this->validate([
 
-            'siswa_id'
-                =>'required|integer',
+            'siswa_id' => 'required|integer',
 
-            'tanggal'
-                =>'required|date',
+            'tanggal' => 'required|date',
 
-            'pilihan1'
-                =>'required|string',
+            'pilihan1' => 'required|string',
 
-            'pilihan2'
-                =>'nullable|string',
+            'pilihan2' => 'nullable|string',
 
-            'pilihan3'
-                =>'nullable|string',
+            'pilihan3' => 'nullable|string',
 
-            'hasil'
-                =>'nullable|string',
+            'hasil' => 'nullable|string',
 
-            'catatan'
-                =>'nullable|string',
+            'catatan' => 'nullable|string',
 
-            'jawaban'
-                =>'nullable|array',
+            'jawaban' => 'nullable|array',
 
         ]);
 
-        $peminatan = new Peminatan();
+        $peminatan = new Peminatan;
         $peminatan->jawaban = $this->jawaban;
         $dominant = $peminatan->dominantIntelligences();
 
         $data = [
 
-            'siswa_id'=>$this->siswa_id,
-            'tanggal'=>$this->tanggal,
-            'pilihan1'=>$this->pilihan1,
-            'pilihan2'=>$this->pilihan2,
-            'pilihan3'=>$this->pilihan3,
-            'jawaban'=>$this->jawaban,
-            'hasil'=> $dominant[0] !== '' ? $dominant[0] : ($this->hasil ?: ''),
-            'catatan'=>$this->catatan,
+            'siswa_id' => $this->siswa_id,
+            'tanggal' => $this->tanggal,
+            'pilihan1' => $this->pilihan1,
+            'pilihan2' => $this->pilihan2,
+            'pilihan3' => $this->pilihan3,
+            'jawaban' => $this->jawaban,
+            'hasil' => $dominant[0] !== '' ? $dominant[0] : ($this->hasil ?: ''),
+            'catatan' => $this->catatan,
 
         ];
 
-        if($this->editingId){
-
+        if ($this->editingId) {
 
             $service->update(
                 $this->editingId,
                 $data
             );
 
-
             session()->flash(
                 'success',
                 'Data peminatan berhasil diperbarui!'
             );
 
-
-        }else{
+        } else {
             $service->create($data);
 
             session()->flash(
@@ -409,7 +410,6 @@ class Index extends Component
             'form-peminatan'
         );
 
-
         $this->dispatch(
             'refreshTable'
         );
@@ -422,37 +422,27 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
 
-
     public function delete(
         int $id,
         PeminatanService $service
-    ): void
-    {
+    ): void {
 
         $service->delete($id);
-
-
 
         session()->flash(
             'success',
             'Data peminatan berhasil dihapus!'
         );
 
-
-
         $this->loadData();
 
     }
-
-
-
 
     /*
     |--------------------------------------------------------------------------
     | RESET FORM
     |--------------------------------------------------------------------------
     */
-
 
     public function resetForm(): void
     {
@@ -481,21 +471,14 @@ class Index extends Component
 
         ]);
 
-
         $this->tanggal =
             now()->format('Y-m-d');
 
-
         $this->step = 1;
-
 
         $this->editingId = null;
 
     }
-
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -508,29 +491,23 @@ class Index extends Component
         $this->loadData();
     }
 
-
     public function updatedFilterKelas(): void
     {
         $this->loadData();
     }
-
 
     public function updatedFilterJurusan(): void
     {
         $this->loadData();
     }
 
-
-
     public function filterAction(): void
     {
 
         $this->showFilters =
-            !$this->showFilters;
+            ! $this->showFilters;
 
     }
-
-
 
     public function resetFilters(): void
     {
@@ -546,7 +523,6 @@ class Index extends Component
     }
 
     #[On('refreshTable')]
-
     public function refreshTable(): void
     {
 
@@ -558,7 +534,7 @@ class Index extends Component
 
     public function goToDetail($id)
     {
-        return redirect()->route('konselor.asesmen.tes-bakat-minat.detail',$id);
+        return redirect()->route('konselor.asesmen.tes-bakat-minat.detail', $id);
     }
 
     /*
@@ -633,10 +609,84 @@ class Index extends Component
     #[Computed]
     public function dominantKecerdasan(): string
     {
-        $peminatan = new Peminatan();
+        $peminatan = new Peminatan;
         $peminatan->jawaban = $this->jawaban;
 
         return $peminatan->dominantIntelligences()[0] ?? '';
     }
 
+    // ── IMPORT ───────────────────────────────
+
+    public function openImport(): void
+    {
+        $this->resetValidation('importFile');
+        $this->importFile = null;
+        $this->importedCount = 0;
+        $this->importErrors = [];
+        $this->showImportModal = true;
+    }
+
+    public function closeImport(): void
+    {
+        $this->showImportModal = false;
+    }
+
+    public function processImport(PeminatanService $service): void
+    {
+        $this->validate();
+
+        $result = $service->importFromFile($this->importFile);
+
+        $this->importedCount = $result['imported'];
+        $this->importErrors = $result['errors'];
+
+        if (empty($this->importErrors)) {
+            $this->showImportModal = false;
+            session()->flash('success', "{$this->importedCount} data tes bakat minat berhasil diimport.");
+            $this->loadData();
+            $this->loadFilterOptions();
+        }
+    }
+
+    // ── EXPORT ───────────────────────────────
+
+    public function openExport(PeminatanService $service): void
+    {
+        $this->exportPreviewCount = $service->getExportCount($this->exportFilters());
+        $this->showExportModal = true;
+    }
+
+    public function closeExport(): void
+    {
+        $this->showExportModal = false;
+    }
+
+    public function exportCsv(PeminatanService $service, ImportExportService $ies): StreamedResponse
+    {
+        $this->showExportModal = false;
+
+        return $ies->streamCsv('data-peminatan-'.date('Ymd-His').'.csv', $service->getTemplateHeaders(), $service->exportRows($this->exportFilters()));
+    }
+
+    public function exportExcel(PeminatanService $service, ImportExportService $ies): StreamedResponse
+    {
+        $this->showExportModal = false;
+
+        return $ies->streamExcelExport('data-peminatan-'.date('Ymd-His').'.xlsx', $service->getTemplateHeaders(), $service->exportRows($this->exportFilters()));
+    }
+
+    public function downloadTemplate(PeminatanService $service, ImportExportService $ies): StreamedResponse
+    {
+        return $ies->streamExcelTemplate('template-peminatan.xlsx', $service->getTemplateHeaders(), $service->getTemplateSampleRows());
+    }
+
+    private function exportFilters(): array
+    {
+        return [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'tingkat' => $this->selectedTingkat ?: null,
+        ];
+    }
 }
