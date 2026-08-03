@@ -3,7 +3,7 @@
 use App\Livewire\Admin\Bk\KasusBk\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {}; ?>
+new #[Layout('layouts.app', ['title' => 'Kelola Kasus BK'])] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full" x-data="{ loading: false }"
     x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"

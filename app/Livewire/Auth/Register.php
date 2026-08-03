@@ -18,15 +18,9 @@ class Register extends Component
     public string $email = '';
     public string $no_hp = '';
     public string $jenis_kelamin = 'L';
-    public string $role = 'guru_bk';
+    public string $role = 'siswa';
     public string $password = '';
     public string $password_confirmation = '';
-
-    public array $roles = [
-        ['value' => 'admin', 'label' => 'Admin'],
-        ['value' => 'guru_bk', 'label' => 'Konselor'],
-        ['value' => 'siswa', 'label' => 'Siswa'],
-    ];
 
     public array $jenisKelaminOptions = [
         ['value' => 'L', 'label' => 'Laki-laki'],
