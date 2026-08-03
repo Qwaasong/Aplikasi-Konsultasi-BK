@@ -58,4 +58,12 @@ class User extends Authenticatable
     {
         return $this->username;
     }
+
+    /**
+     * Relasi ke Pegawai (1:1). Null jika user adalah siswa.
+     */
+    public function pegawai()
+    {
+        return $this->hasOne(\App\Models\Pegawai::class);
+    }
 }

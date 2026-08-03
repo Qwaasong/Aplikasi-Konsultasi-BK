@@ -64,9 +64,11 @@
 
                 </ul>
 
-                <a href="#" class="assessment-button">
-                    Mulai Tes Gaya Belajar
-                </a>
+                <div style="display: flex; justify-content: flex-start; margin-top: 20px;">
+                    <a href="https://forms.gle/kTMVHMNSFGe9bgMF9" target="_blank" class="assessment-button">
+                        Mulai Tes Gaya Belajar
+                    </a>
+                </div>
 
             </div>
 

@@ -3,7 +3,7 @@
 use App\Livewire\Admin\Dashboard;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Dashboard {}; ?>
+new #[Layout('layouts.app', ['title' => 'Dashboard Admin'])] class extends Dashboard {}; ?>
 
 
 <div class="py-12">

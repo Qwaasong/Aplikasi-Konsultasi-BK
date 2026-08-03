@@ -15,6 +15,9 @@
     <!-- Preload auth background image -->
     <link rel="preload" as="image" href="{{ asset('asset/image/BackgroundForest.webp') }}" type="image/webp">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('asset/image/SMKLogo.png') }}">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

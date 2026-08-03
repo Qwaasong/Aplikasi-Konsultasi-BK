@@ -38,14 +38,7 @@ new #[Layout('layouts.guest')] class extends Register {}; ?>
                     </div>
                 </div>
 
-                {{-- Role --}}
-                <div class="mb-4">
-                    <x-atoms.input-label for="role" size="md">Role</x-atoms.input-label>
-                    <x-molecules.input-dropdown id="role" wire:model="role" size="md" :options="$roles" />
-                    @error('role')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+
 
                 {{-- Password --}}
                 <x-molecules.input-field label="Password" id="password" type="password" name="password" size="md"

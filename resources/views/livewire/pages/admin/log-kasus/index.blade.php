@@ -3,7 +3,7 @@
 use App\Livewire\Admin\Bk\LogKasus\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {}; ?>
+new #[Layout('layouts.app', ['title' => 'Log Kasus BK'])] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full">
 

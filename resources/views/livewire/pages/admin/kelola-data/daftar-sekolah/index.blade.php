@@ -3,7 +3,7 @@
 use App\Livewire\Admin\KelolaData\DaftarSekolah\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {}; ?>
+new #[Layout('layouts.app', ['title' => 'Kelola Profil Sekolah'])] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full" x-data="{ loading: false }"
     x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"
@@ -36,7 +36,7 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
 
             <option value="">Semua Sekolah</option>
 
-            @foreach($records->pluck('nama_sekolah')->unique()->sort() as $namaSekolah)
+            @foreach($sekolahOptions as $namaSekolah)
                 <option value="{{ $namaSekolah }}">
                     {{ $namaSekolah }}
                 </option>

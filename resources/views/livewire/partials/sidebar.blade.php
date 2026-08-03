@@ -160,6 +160,14 @@ state([
                     ],
                 ],
             ];
+
+            $menus[] = [
+                'label' => 'Profil Saya',
+                'url' => route('konselor.profile'),
+                'active' => request()->routeIs('konselor.profile'),
+                'variants' => 'user',
+                'children' => [],
+            ];
         }
 
         // Admin
@@ -253,6 +261,14 @@ state([
                 'url' => route('admin.log-kasus.index'),
                 'active' => request()->routeIs('admin.log-kasus.*'),
                 'variants' => 'file',
+            ];
+
+            $menus[] = [
+                'label' => 'Profil Saya',
+                'url' => route('admin.profile'),
+                'active' => request()->routeIs('admin.profile'),
+                'variants' => 'user',
+                'children' => [],
             ];
         }
 

@@ -2,9 +2,23 @@
     padding: 60px 0;
     background: #F8FAFC;
     min-height: calc(100vh - 180px);
+    position: relative;
+    overflow: hidden;
 }
 
-.assessment-card{
+.assessment-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(11, 124, 149, 0.12) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.assessment-card {
     display: flex;
     align-items: flex-start;
     gap: 2rem;
@@ -38,10 +52,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    background: linear-gradient(135deg, #E0F2FE 0%, #CCFBF1 100%);
+    border-radius: 20px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), 0 8px 16px -4px rgba(11, 124, 149, 0.15);
+    transition: transform 0.3s ease;
+}
 
-    background: #DDF5FB;
-
-    border-radius: 16px;
+.assessment-card:hover .assessment-icon {
+    transform: scale(1.05) rotate(3deg);
 }
 
 .assessment-svg{
@@ -50,6 +68,7 @@
     height: 48px;
 
     fill: #0B7C95;
+    filter: drop-shadow(0 2px 4px rgba(11, 124, 149, 0.2));
 }
 
 /* CONTENT */
@@ -62,28 +81,34 @@
 
     font-size: 2rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 9999px;
+    margin-bottom: 0.85rem;
+}
 
+.assessment-title {
+    font-size: 2.15rem;
+    font-weight: 800;
     color: #0F172A;
-
-    margin-bottom: .3rem;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
 }
 
 .assessment-subtitle{
 
     font-size: 1.2rem;
     font-weight: 600;
-
-    color: #334155;
-
-    margin-bottom: 1.8rem;
+    color: #0B7C95;
+    margin-bottom: 1.5rem;
 }
 
 .assessment-description{
 
     color: #475569;
-
-    line-height: 1.8;
-
+    font-size: 1rem;
+    line-height: 1.75;
     margin-bottom: 2rem;
 }
 
@@ -122,20 +147,18 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-
-    padding: .95rem 2rem;
-
-    border-radius: 12px;
-
-    background: #0B7C95;
-
+    gap: 0.65rem;
+    padding: 1rem 2.25rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0B7C95 0%, #09697F 100%);
     color: #FFFFFF;
-
-    font-weight: 600;
-
+    font-weight: 700;
+    font-size: 1rem;
     text-decoration: none;
-
-    transition: .3s ease;
+    box-shadow: 0 4px 14px rgba(11, 124, 149, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 .assessment-button:hover{
@@ -155,10 +178,11 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        padding: 2.25rem;
     }
 
-    .assessment-content{
-        width:100%;
+    .assessment-content {
+        width: 100%;
     }
 
     .assessment-detail-title{
@@ -169,7 +193,6 @@
         text-align:left;
         padding-left:1.5rem;
     }
-
 }
 
 @media (max-width:576px){

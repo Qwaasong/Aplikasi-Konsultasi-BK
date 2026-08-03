@@ -107,6 +107,23 @@ class UserService
                 'nip' => $this->generateNip($user),
                 'jabatan' => $user->role === 'admin' ? 'Admin' : 'Guru BK',
             ]);
+        } elseif ($user->role === 'siswa') {
+            $nis = '12' . rand(100000, 999999);
+            $kelasId = \App\Models\Kelas::first()?->id;
+
+            if (!$kelasId) {
+                // Hapus user jika tidak ada kelas — admin harus buat kelas dulu
+                $user->delete();
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'role' => 'Belum ada data kelas. Minta Admin untuk menambahkan kelas terlebih dahulu.',
+                ]);
+            }
+
+            \App\Models\DataSiswa::create([
+                'user_id'  => $user->id,
+                'nis'      => $nis,
+                'kelas_id' => $kelasId,
+            ]);
         }
 
         event(new Registered($user));

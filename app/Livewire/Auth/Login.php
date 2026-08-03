@@ -28,6 +28,8 @@ class Login extends Component
                 $this->redirect(route('admin.dashboard', absolute: false), navigate: true);
             } elseif ($role === 'guru_bk') {
                 $this->redirect(route('konselor.dashboard', absolute: false), navigate: true);
+            } elseif ($role === 'siswa') {
+                $this->redirect(route('siswa.profile', absolute: false), navigate: true);
             }
         }
     }
@@ -48,6 +50,8 @@ class Login extends Component
             $route = route('admin.dashboard', absolute: false);
         } elseif ($role === 'guru_bk') {
             $route = route('konselor.dashboard', absolute: false);
+        } elseif ($role === 'siswa') {
+            $route = route('siswa.profile', absolute: false);
         } else {
             $route = '/';
         }

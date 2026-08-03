@@ -3,7 +3,7 @@
 use App\Livewire\Admin\Bk\KasusBk\Detail;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Detail {}; ?>
+new #[Layout('layouts.app', ['title' => 'Detail Kasus BK'])] class extends Detail {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white min-h-screen p-8 lg:p-12">
 

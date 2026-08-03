@@ -33,7 +33,17 @@ class AsesmenImportHelper
             ->whereHas('kelas', fn ($q) => $q->whereRaw('LOWER(nama_kelas) LIKE ?', ['%'.mb_strtolower($kelas).'%']))
             ->first();
 
-        return $matched ?: self::createSiswa($nama, $kelas);
+        // Jika belum ada, buat siswa baru — tapi hanya jika kelas ditemukan
+        if (!$matched) {
+            $kelasId = self::resolveKelasId($kelas);
+            if ($kelasId === null) {
+                // Kelas tidak ditemukan di database, tidak bisa membuat siswa baru
+                return null;
+            }
+            return self::createSiswa($nama, $kelas);
+        }
+
+        return $matched;
     }
 
     public static function createSiswa(string $nama, string $kelas, array $extra = []): DataSiswa
@@ -63,21 +73,42 @@ class AsesmenImportHelper
         ]);
     }
 
-    public static function resolveKelasId(string $kelas): int
+    public static function resolveKelasId(string $kelas): ?int
     {
         if ($kelas === '') {
-            return 0;
+            return null;
         }
 
-        $exact = Kelas::whereRaw('LOWER(nama_kelas) = ?', [mb_strtolower($kelas)])->first();
+        $normalized = mb_strtolower(trim($kelas));
 
-        if ($exact) {
-            return $exact->id;
+        // 1. Exact match
+        $found = Kelas::whereRaw('LOWER(nama_kelas) = ?', [$normalized])->first();
+        if ($found) {
+            return $found->id;
         }
 
-        $like = Kelas::whereRaw('LOWER(nama_kelas) LIKE ?', ['%'.mb_strtolower($kelas).'%'])->first();
+        // 2. LIKE — database berisi string dari input (mis. "XII RPL" cocok dengan "XII RPL 1")
+        $found = Kelas::whereRaw('LOWER(nama_kelas) LIKE ?', ['%'.$normalized.'%'])->first();
+        if ($found) {
+            return $found->id;
+        }
 
-        return $like?->id ?? 0;
+        // 3. Input berisi string dari database — input mungkin "XII RPL 1" (dengan nomor rombel)
+        //    sedangkan database hanya punya "XII RPL". Coba strip trailing angka/spasi.
+        $stripped = rtrim(preg_replace('/\s+\d+$/', '', $kelas));
+        if ($stripped !== '' && mb_strtolower($stripped) !== $normalized) {
+            $found = Kelas::whereRaw('LOWER(nama_kelas) = ?', [mb_strtolower($stripped)])->first();
+            if ($found) {
+                return $found->id;
+            }
+
+            $found = Kelas::whereRaw('LOWER(nama_kelas) LIKE ?', ['%'.mb_strtolower($stripped).'%'])->first();
+            if ($found) {
+                return $found->id;
+            }
+        }
+
+        return null;
     }
 
     public static function uniqueNis(): string

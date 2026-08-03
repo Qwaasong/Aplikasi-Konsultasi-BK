@@ -370,7 +370,7 @@ class Index extends Component
 
     public function processImport(AkpdService $service): void
     {
-        $this->validate();
+        $this->validate(['importFile' => 'required|file|mimes:csv,xlsx,xls|max:5120']);
 
         $result = $service->importFromFile($this->importFile);
 

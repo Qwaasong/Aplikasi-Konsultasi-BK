@@ -52,7 +52,16 @@ class SekolahService
             });
         }
 
+        if (!empty($filters['nama_sekolah'])) {
+            $query->where('nama_sekolah', $filters['nama_sekolah']);
+        }
+
         return $query->latest()->get();
+    }
+
+    public function getSekolahOptions(): array
+    {
+        return Sekolah::orderBy('nama_sekolah')->pluck('nama_sekolah')->toArray();
     }
 
     public function getFilterOptions(): array

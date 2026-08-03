@@ -8,6 +8,7 @@ use App\Services\ImportExportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use App\Services\Asesmen\AsesmenImportHelper;
 
 class AkpdService
 {
@@ -183,7 +184,12 @@ class AkpdService
             $siswa = AsesmenImportHelper::resolveSiswa($nama, $kelas);
 
             if (! $siswa) {
-                $errors[] = "Baris {$lineNumber}: siswa \"{$nama}\" tidak bisa diproses.";
+                $kelasId = AsesmenImportHelper::resolveKelasId($kelas);
+                if ($kelasId === null) {
+                    $errors[] = "Baris {$lineNumber}: kelas \"{$kelas}\" tidak ditemukan di database.";
+                } else {
+                    $errors[] = "Baris {$lineNumber}: siswa \"{$nama}\" tidak bisa diproses.";
+                }
                 continue;
             }
 

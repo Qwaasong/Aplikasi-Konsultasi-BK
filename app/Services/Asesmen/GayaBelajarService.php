@@ -151,22 +151,34 @@ class GayaBelajarService
         $statementColumns = $this->buildStatementColumns();
         $namaKey = $this->firstKey($rows[0] ?? [], ['nama_lengkap', 'nama_siswa', 'nama']);
         $kelasKey = $this->firstKey($rows[0] ?? [], ['kelas']);
+        $emailKey = $this->firstKey($rows[0] ?? [], ['alamat_email', 'email_address', 'email']);
         $timestampKey = $this->firstKey($rows[0] ?? [], ['timestamp']);
 
         foreach ($rows as $index => $row) {
             $lineNumber = $index + 2;
             $nama = trim((string) ($row[$namaKey] ?? ''));
             $kelas = trim((string) ($row[$kelasKey] ?? ''));
+            $email = trim((string) ($row[$emailKey] ?? ''));
 
-            if ($nama === '' || $kelas === '') {
-                $errors[] = "Baris {$lineNumber}: kolom Nama dan Kelas wajib diisi.";
-                continue;
+            $siswa = null;
+
+            if ($nama !== '' && $kelas !== '') {
+                $siswa = AsesmenImportHelper::resolveSiswa($nama, $kelas);
             }
 
-            $siswa = AsesmenImportHelper::resolveSiswa($nama, $kelas);
+            if (! $siswa && $email !== '') {
+                $siswa = DataSiswa::whereHas('user', fn ($q) => $q->where('email', $email))->first();
+
+                if (! $siswa) {
+                    $nis = explode('@', $email)[0];
+                    if ($nis !== '') {
+                        $siswa = DataSiswa::where('nis', $nis)->first();
+                    }
+                }
+            }
 
             if (! $siswa) {
-                $errors[] = "Baris {$lineNumber}: siswa \"{$nama}\" tidak bisa diproses.";
+                $errors[] = "Baris {$lineNumber}: siswa tidak dapat diidentifikasi. Pastikan ada kolom Nama+Kelas atau Email yang valid.";
                 continue;
             }
 

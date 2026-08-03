@@ -64,9 +64,11 @@
 
                 </ul>
 
-                <a href="#" class="assessment-button">
-                    Mulai Mengisi Sosiometri
-                </a>
+                <div style="display: flex; justify-content: flex-start; margin-top: 20px;">
+                    <a href="#" class="assessment-button">
+                        Mulai Mengisi Sosiometri
+                    </a>
+                </div>
 
             </div>
 

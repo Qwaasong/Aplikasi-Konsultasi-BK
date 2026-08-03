@@ -14,6 +14,8 @@ Route::get('/', function () {
             return redirect()->route('admin.dashboard');
         } elseif ($role === 'guru_bk') {
             return redirect()->route('konselor.dashboard');
+        } elseif ($role === 'siswa') {
+            return redirect()->route('siswa.profile');
         }
     }
 
@@ -61,10 +63,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('/admin/log-kasus', 'pages.admin.log-kasus.index')->name('admin.log-kasus.index');
     Volt::route('/admin/log-kasus/{id}/detail', 'pages.admin.log-kasus.detail')->name('admin.log-kasus.detail');
     Volt::route('/admin/rekap-absensi', 'pages.admin.rekap-absensi.index')->name('admin.rekap-absensi.index');
+    // Profile
+    Volt::route('/admin/profile', 'pages.shared.profile')->name('admin.profile');
 });
 
 // Guru / Konselor
 Route::middleware(['auth', 'role:guru_bk'])->group(function () {
+
+    // Profile
+    Volt::route('konselor/profile', 'pages.shared.profile')->name('konselor.profile');
 
     // Dashboard
     Volt::route('konselor/dashboard', 'pages.konselor.dashboard')->name('konselor.dashboard');
@@ -104,6 +111,11 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
     Volt::route('konselor/asesmen/sosiometri/{id}/detail', 'pages.konselor.asesmen.sosiometri.detail')->name('konselor.asesmen.sosiometri.detail');
     Volt::route('konselor/asesmen/tes-bakat-minat', 'pages.konselor.asesmen.tes-bakat-minat.index')->name('konselor.asesmen.tes-bakat-minat.index');
     Volt::route('konselor/asesmen/tes-bakat-minat/{id}/detail', 'pages.konselor.asesmen.tes-bakat-minat.detail')->name('konselor.asesmen.tes-bakat-minat.detail');
+});
+
+// Siswa
+Route::middleware(['auth', 'role:siswa'])->group(function () {
+    Route::get('/siswa/profile', fn() => view('landing.siswa.profile'))->name('siswa.profile');
 });
 
 require __DIR__.'/auth.php';

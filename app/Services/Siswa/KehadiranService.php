@@ -88,14 +88,20 @@ class KehadiranService
         return $query->latest('tanggal_kehadiran')->get();
     }
 
-    public function getFilterOptions(): array
+    public function getFilterOptions(?string $kelas = null): array
     {
         $all = $this->getAll();
 
+        if ($kelas) {
+            $filtered = $all->filter(fn ($item) => $item->siswa?->kelas_label === $kelas);
+        } else {
+            $filtered = $all;
+        }
+
         return [
             'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
-            'statusOptions' => $all->pluck('status')->filter()->unique()->values()->toArray(),
-            'tahunOptions' => $all->pluck('tahunAjaran.tahun')->filter()->unique()->values()->toArray(),
+            'statusOptions' => $filtered->pluck('status')->filter()->unique()->values()->toArray(),
+            'tahunOptions' => $filtered->pluck('tahunAjaran.tahun')->filter()->unique()->sort()->values()->toArray(),
         ];
     }
 
