@@ -67,9 +67,17 @@
 
                     </ul>
 
-                    <a href="#" class="assessment-button">
-                        Mulai Mengisi AKPD
-                    </a>
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-top: 20px;">
+                        <a href="https://forms.gle/EiEaJS2VYU6k6AeV8" target="_blank" class="assessment-button" style="flex: 1; min-width: 150px; text-align: center; padding: 16px 20px;">
+                            AKPD - Kelas X
+                        </a>
+                        <a href="https://forms.gle/xNyicyELono4yn9Z7" target="_blank" class="assessment-button" style="flex: 1; min-width: 150px; text-align: center; padding: 16px 20px;">
+                            AKPD - Kelas XI
+                        </a>
+                        <a href="https://forms.gle/s5K1thgso3C673DS6" target="_blank" class="assessment-button" style="flex: 1; min-width: 150px; text-align: center; padding: 16px 20px;">
+                            AKPD - Kelas XII
+                        </a>
+                    </div>
 
                 </div>
 
