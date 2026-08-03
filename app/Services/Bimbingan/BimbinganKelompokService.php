@@ -7,6 +7,7 @@ use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Models\TahunAjaran;
 use App\Repositories\Contracts\Bimbingan\BimbinganKelompokRepositoryInterface;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Collection;
 
 class BimbinganKelompokService
