@@ -6,11 +6,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -58,14 +57,5 @@ class User extends Authenticatable
     public function getEmailForPasswordReset(): string
     {
         return $this->username;
-    }
-
-    /**
-     * Cari user untuk OAuth password grant berdasarkan username ATAU email
-     * (default Passport hanya email).
-     */
-    public function findForPassport(string $username, mixed $clientEntity = null): ?self
-    {
-        return $this->where('email', $username)->orWhere('username', $username)->first();
     }
 }
