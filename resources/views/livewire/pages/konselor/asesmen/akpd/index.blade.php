@@ -27,7 +27,7 @@ new #[Layout('layouts.app')] class extends Index {};
             </button>
         </x-slot:actions>
 
-        Asesmen Kebutuhan Peserta Didik (AKPD)
+        Tambah
     </x-organisms.header>
 
 

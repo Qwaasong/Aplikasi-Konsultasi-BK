@@ -27,7 +27,7 @@ new #[Layout('layouts.app')] class extends Index {};
             </button>
         </x-slot:actions>
 
-        Daftar Catatan Masalah (DCM)
+        Tambah
     </x-organisms.header>
 
 

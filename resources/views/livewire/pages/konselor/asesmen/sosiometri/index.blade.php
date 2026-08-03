@@ -30,7 +30,7 @@ new #[Layout('layouts.app')] class extends Index {};
             </button>
         </x-slot:actions>
 
-        Asesmen Sosiometri
+        Tambah
 
     </x-organisms.header>
 
