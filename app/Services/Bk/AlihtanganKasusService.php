@@ -2,8 +2,6 @@
 
 namespace App\Services\Bk;
 use App\Models\Pegawai;
-use App\Models\BimbinganIndividu;
-use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\KonferensiKasus;
@@ -100,12 +98,12 @@ class AlihTanganKasusService
 
     /**
      * Reassign all records terkait ke guru BK baru.
+     * Catatan: bimbingan_individus dan bimbingan_kelompok tidak memiliki kolom guru_bk_id;
+     * data guru BK pada record tersebut diakses via relasi kasus->guruBk.
      */
     private function reassignGuruBk(int $kasusId, int $newGuruBkId): void
     {
         KasusBk::where('id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
-        BimbinganIndividu::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
-        BimbinganKelompok::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
         HomeVisit::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
         KonferensiKasus::where('kasus_id', $kasusId)->update(['guru_bk_id' => $newGuruBkId]);
     }
