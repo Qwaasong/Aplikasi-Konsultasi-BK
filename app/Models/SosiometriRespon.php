@@ -16,6 +16,7 @@ class SosiometriRespon extends Model
         'siswa_pemilih_id',
         'urutan',
         'alasan',
+        'pertanyaan',
     ];
 
     public function sosiometri()

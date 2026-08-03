@@ -11,23 +11,22 @@ class DcmFactory extends Factory
 
     public function definition(): array
     {
-        $masalahPool = [
-            'Pribadi: Percaya diri',
-            'Pribadi: Motivasi belajar',
-            'Pribadi: Manajemen waktu',
-            'Sosial: Pergaulan',
-            'Sosial: Konflik teman',
-            'Belajar: Kesulitan memahami',
-            'Belajar: Konsentrasi',
-            'Karir: Perencanaan karir',
-            'Karir: Pilihan jurusan',
-            'Keluarga: Komunikasi orang tua',
-        ];
+        // Pilih beberapa kode acak dari setiap bagian A-L sebagai jawaban.
+        $jawaban = [];
+
+        foreach (\App\Models\Dcm::QUESTION_GROUPS as $section => $items) {
+            $codes = array_keys($items);
+            $jawaban[$section] = $this->faker->randomElements($codes, $this->faker->numberBetween(1, 5));
+        }
+
+        $dcm = new \App\Models\Dcm();
+        $dcm->jawaban = $jawaban;
 
         return [
             'siswa_id' => DataSiswa::factory(),
             'tanggal' => $this->faker->date(),
-            'masalah_teridentifikasi' => $this->faker->randomElements($masalahPool, $this->faker->numberBetween(1, 5)),
+            'jawaban' => $jawaban,
+            'masalah_teridentifikasi' => $dcm->masalahSummary(),
             'kesimpulan' => $this->faker->optional()->sentence(),
             'catatan' => $this->faker->optional()->sentence(),
         ];

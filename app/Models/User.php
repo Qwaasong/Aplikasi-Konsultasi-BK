@@ -53,8 +53,6 @@ class User extends Authenticatable
 
     /**
      * Get the e-mail address where password reset links are sent.
-     *
-     * @return string
      */
     public function getEmailForPasswordReset(): string
     {

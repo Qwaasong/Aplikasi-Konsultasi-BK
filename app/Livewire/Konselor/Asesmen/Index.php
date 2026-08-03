@@ -15,6 +15,11 @@ class Index extends Component
 
     public string $search = '';
 
+    public function refreshData(): void
+    {
+        $this->loadKelas();
+    }
+
     public function mount(): void
     {
         $this->loadKelas();

@@ -11,8 +11,8 @@ use App\Models\BimbinganKelompok;
 use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\KonferensiKasus;
-use App\Services\AlihTanganKasusService;
-use App\Services\PegawaiService;
+use App\Services\Bk\AlihTanganKasusService;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Facades\DB;
 
 class CreateAlihTanganHandler implements HandlerInterface

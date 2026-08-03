@@ -12,12 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('siswa_id')->constrained('data_siswa')->cascadeOnDelete();
             $table->date('tanggal');
-            $table->text('pribadi')->nullable();
-            $table->text('sosial')->nullable();
-            $table->text('belajar')->nullable();
-            $table->text('karir')->nullable();
-            $table->text('kesimpulan')->nullable();
-            $table->text('catatan')->nullable();
+            $table->string('tahun_pelajaran', 20)->nullable();
+            for ($i = 1; $i <= 50; $i++) {
+                $table->string('q' . str_pad((string) $i, 2, '0', STR_PAD_LEFT), 3)->nullable();
+            }
             $table->timestamps();
         });
     }
