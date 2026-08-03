@@ -3,8 +3,7 @@
     {{ $search }}
 
     @if(!empty($action))
-        <x-atoms.button wire:click="{{ $action }}"
-            class="bg-brand-teal hover:bg-brand-dark-3 text-white px-6 py-3 rounded-lg flex items-center font-medium gap-2 shadow-sm transition">
+        <x-atoms.button wire:click="{{ $action }}" variant="primary" size="md" class="flex items-center font-medium gap-2">
             <x-atoms.icon variant="plus" size="md" />
             {{ $slot }}
         </x-atoms.button>

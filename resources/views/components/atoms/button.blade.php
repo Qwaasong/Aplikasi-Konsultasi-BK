@@ -2,10 +2,11 @@
     'variant' => 'primary',
     'size'    => 'md',
     'type'    => 'button',
+    'tag'     => 'button',
 ])
 
 @php
-    // Class dasar 
+    // Class dasar
     $baseClasses = 'inline-flex items-center justify-center font-semibold rounded-md
                     focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
@@ -25,9 +26,15 @@
     ];
 @endphp
 
-<button
-    type="{{ $type }}"
-    {{ $attributes->merge(['class' => "$baseClasses {$variants[$variant]} {$sizes[$size]}"]) }}
->
-    {{ $slot }}
-</button>
+@if ($tag === 'a')
+    <a {{ $attributes->merge(['class' => "$baseClasses {$variants[$variant]} {$sizes[$size]}"]) }}>
+        {{ $slot }}
+    </a>
+@else
+    <button
+        type="{{ $type }}"
+        {{ $attributes->merge(['class' => "$baseClasses {$variants[$variant]} {$sizes[$size]}"]) }}
+    >
+        {{ $slot }}
+    </button>
+@endif
