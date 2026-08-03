@@ -5,13 +5,18 @@ namespace App\Livewire\Konselor\Asesmen\Dcm;
 use App\Models\DataSiswa;
 use App\Models\Dcm;
 use App\Services\Asesmen\DcmService;
+use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Index extends Component
 {
+    use WithFileUploads;
+
     public Collection $records;
 
     public bool $showFilters = false;
@@ -48,6 +53,15 @@ class Index extends Component
     public array $files = [];
     public array $existingFiles = [];
     public array $newFiles = [];
+
+    // ── IMPORT / EXPORT STATE ─────────────────────────
+    public bool $showImportModal = false;
+    #[Validate('required|file|mimes:csv,xlsx,xls|max:5120')]
+    public $importFile = null;
+    public int $importedCount = 0;
+    public array $importErrors = [];
+    public bool $showExportModal = false;
+    public int $exportPreviewCount = 0;
 
     public function mount(): void
     {
@@ -350,5 +364,80 @@ class Index extends Component
     public function goToDetail($id)
     {
         return redirect()->route('konselor.asesmen.dcm.detail', $id);
+    }
+
+    // ── IMPORT ───────────────────────────────
+
+    public function openImport(): void
+    {
+        $this->resetValidation('importFile');
+        $this->importFile = null;
+        $this->importedCount = 0;
+        $this->importErrors = [];
+        $this->showImportModal = true;
+    }
+
+    public function closeImport(): void
+    {
+        $this->showImportModal = false;
+    }
+
+    public function processImport(DcmService $service): void
+    {
+        $this->validate();
+
+        $result = $service->importFromFile($this->importFile);
+
+        $this->importedCount = $result['imported'];
+        $this->importErrors = $result['errors'];
+
+        if (empty($this->importErrors)) {
+            $this->showImportModal = false;
+            session()->flash('success', "{$this->importedCount} data DCM berhasil diimport.");
+            $this->loadData();
+            $this->loadFilterOptions();
+        }
+    }
+
+    // ── EXPORT ───────────────────────────────
+
+    public function openExport(DcmService $service): void
+    {
+        $this->exportPreviewCount = $service->getExportCount($this->exportFilters());
+        $this->showExportModal = true;
+    }
+
+    public function closeExport(): void
+    {
+        $this->showExportModal = false;
+    }
+
+    public function exportCsv(DcmService $service, ImportExportService $ies): StreamedResponse
+    {
+        $this->showExportModal = false;
+
+        return $ies->streamCsv('data-dcm-'.date('Ymd-His').'.csv', $service->getTemplateHeaders(), $service->exportRows($this->exportFilters()));
+    }
+
+    public function exportExcel(DcmService $service, ImportExportService $ies): StreamedResponse
+    {
+        $this->showExportModal = false;
+
+        return $ies->streamExcelExport('data-dcm-'.date('Ymd-His').'.xlsx', $service->getTemplateHeaders(), $service->exportRows($this->exportFilters()));
+    }
+
+    public function downloadTemplate(DcmService $service, ImportExportService $ies): StreamedResponse
+    {
+        return $ies->streamExcelTemplate('template-dcm.xlsx', $service->getTemplateHeaders(), $service->getTemplateSampleRows());
+    }
+
+    private function exportFilters(): array
+    {
+        return [
+            'search' => $this->search ?: null,
+            'kelas' => $this->filterKelas ?: null,
+            'jurusan' => $this->filterJurusan ?: null,
+            'tingkat' => $this->selectedTingkat ?: null,
+        ];
     }
 }

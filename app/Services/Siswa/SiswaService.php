@@ -4,6 +4,7 @@ namespace App\Services\Siswa;
 
 use App\Models\DataSiswa;
 use App\Repositories\Contracts\Siswa\SiswaRepositoryInterface;
+use App\Services\Asesmen\AsesmenImportHelper;
 use App\Services\ImportExportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -690,5 +691,196 @@ class SiswaService
         }
 
         return [$validRows, $errors];
+    }
+
+    // ─────────────────────────────────────────
+    // IMPORT / EXPORT GOOGLE FORMS (KOMULATIF RECORD)
+    // ─────────────────────────────────────────
+
+    /**
+     * Import spreadsheet Google Forms klien (Komulatif Record). Identitas
+     * Nama + Kelas; siswa di-create otomatis bila belum ada.
+     *
+     * @return array{imported: int, errors: array}
+     */
+    public function importGformFromFile(UploadedFile $file): array
+    {
+        $rows = $this->importExportService->parseUploadedFile($file);
+        $imported = 0;
+        $errors = [];
+
+        // Header ternormalisasi tidak menghapus koma/slash ("TEMPAT, TANGGAL LAHIR"
+        // → "tempat,_tanggal_lahir"), jadi kita menormalkan juga koma+slash.
+        $rows = array_map(fn ($row) => $this->normalizeGformKeys($row), $rows);
+
+        foreach ($rows as $index => $row) {
+            $lineNumber = $index + 2;
+
+            $nama = trim((string) ($row['nama_lengkap'] ?? $row['nama_siswa'] ?? $row['nama'] ?? ''));
+            $kelas = trim((string) ($row['kelas'] ?? ''));
+
+            if ($nama === '' || $kelas === '') {
+                $errors[] = "Baris {$lineNumber}: kolom Nama dan Kelas wajib diisi.";
+                continue;
+            }
+
+            $siswa = AsesmenImportHelper::resolveSiswa($nama, $kelas);
+
+            if (! $siswa) {
+                $errors[] = "Baris {$lineNumber}: siswa \"{$nama}\" tidak bisa diproses.";
+                continue;
+            }
+
+            // Update User (nama, jenis kelamin, foto).
+            $jenisKelamin = AsesmenImportHelper::normalizeJenisKelamin($row['jenis_kelamin'] ?? '');
+            $foto = trim((string) ($row['foto_diri_selfie'] ?? '')) ?: null;
+            $userData = ['nama' => $nama, 'jenis_kelamin' => $jenisKelamin];
+
+            if ($foto !== null) {
+                $userData['foto'] = $foto;
+            }
+
+            $siswa->user?->update($userData);
+
+            // Update DataSiswa.
+            [$tempatLahir, $tglLahir] = AsesmenImportHelper::splitTempatTanggalLahir($row['tempat_tanggal_lahir'] ?? '');
+
+            $siswa->update([
+                'kelas_id' => AsesmenImportHelper::resolveKelasId($kelas),
+                'alamat' => trim((string) ($row['alamat_rumah_rt_rw'] ?? $row['alamat_rumah'] ?? '')) ?: '',
+                'tempat_lahir' => $tempatLahir,
+                'tgl_lahir' => $tglLahir,
+                'asal_smp' => trim((string) ($row['asal_smp'] ?? '')) ?: null,
+                'agama' => trim((string) ($row['agama'] ?? '')) ?: null,
+            ]);
+
+            // Upsert komulatif_record.
+            $komulatif = [
+                'siswa_id' => $siswa->id,
+                'tahun_pelajaran' => AsesmenImportHelper::resolveTahunPelajaran($row['tahun_pelajaran'] ?? null),
+                'nama_ayah' => $this->clean($row['nama_lengkap_ayah_wali'] ?? ''),
+                'nama_ibu' => $this->clean($row['nama_lengkap_ibu_wali'] ?? ''),
+                'pendidikan_ayah' => $this->clean($row['pendidikan_terakhir_ayah_wali'] ?? ''),
+                'pendidikan_ibu' => $this->clean($row['pendidikan_terakhir_ibu_wali'] ?? ''),
+                'pekerjaan_ayah' => $this->clean($row['pekerjaan_ayah_wali'] ?? ''),
+                'pekerjaan_ibu' => $this->clean($row['pekerjaan_ibu_wali'] ?? ''),
+                'nomor_wa_ayah' => $this->clean($row['nomor_wa_ayah_wali'] ?? ''),
+                'nomor_wa_ibu' => $this->clean($row['nomor_wa_ibu_wali'] ?? ''),
+                'alamat_ayah' => $this->clean($row['alamat_rumah_ayah_wali'] ?? ''),
+                'alamat_ibu' => $this->clean($row['alamat_rumah_ibu_wali'] ?? ''),
+                'status_rumah' => $this->clean($row['status_rumah'] ?? ''),
+                'lokasi_rumah' => $this->clean($row['lokasi_rumah'] ?? ''),
+                'punya_kamar_sendiri' => $this->toBool($row['punya_kamar_sendiri'] ?? ''),
+                'kendaraan_ke_sekolah' => $this->clean($row['transportasi_ke_sekolah'] ?? ''),
+                'media_sosial' => $this->clean($row['akun_media_sosial'] ?? ''),
+            ];
+
+            \App\Models\KeluargaSiswa::updateOrCreate(['siswa_id' => $siswa->id], $komulatif);
+
+            $imported++;
+        }
+
+        return compact('imported', 'errors');
+    }
+
+    /**
+     * Tambahan normalisasi: koma, slash, tanda kurung → underscore, agar lookup
+     * kolom gform (mis. "TEMPAT, TANGGAL LAHIR") mudah.
+     */
+    private function normalizeGformKeys(array $row): array
+    {
+        $out = [];
+
+        foreach ($row as $key => $value) {
+            $k = strtolower(trim((string) $key));
+            $k = str_replace([',', '/', '(', ')'], '_', $k);
+            $k = preg_replace('/_+/', '_', $k);
+            $out[trim($k, '_')] = $value;
+        }
+
+        return $out;
+    }
+
+    public function getGformTemplateHeaders(): array
+    {
+        return [
+            'Timestamp',
+            'KELAS',
+            'TAHUN PELAJARAN',
+            'NAMA LENGKAP',
+            'JENIS KELAMIN',
+            'TEMPAT, TANGGAL LAHIR',
+            'ASAL SMP',
+            'AGAMA',
+            'ALAMAT RUMAH (RT, RW)',
+            'FOTO DIRI / SELFIE',
+            'NAMA LENGKAP AYAH / WALI',
+            'PENDIDIKAN TERAKHIR AYAH / WALI',
+            'PEKERJAAN AYAH / WALI',
+            'NOMOR WA AYAH / WALI',
+            'ALAMAT RUMAH AYAH / WALI',
+            'NAMA LENGKAP IBU / WALI',
+            'PENDIDIKAN TERAKHIR IBU / WALI',
+            'PEKERJAAN IBU / WALI',
+            'NOMOR WA IBU / WALI',
+            'ALAMAT RUMAH IBU / WALI',
+            'STATUS RUMAH',
+            'LOKASI RUMAH',
+            'PUNYA KAMAR SENDIRI',
+            'TRANSPORTASI KE SEKOLAH',
+            'AKUN MEDIA SOSIAL',
+        ];
+    }
+
+    public function exportGformRows(): array
+    {
+        return $this->siswaRepository->getAll()->map(function (DataSiswa $s) {
+            $k = $s->keluarga;
+
+            return [
+                'Timestamp' => $s->created_at?->format('d/m/Y H:i:s') ?? '',
+                'KELAS' => $s->kelas_label,
+                'TAHUN PELAJARAN' => $k?->tahun_pelajaran ?? '',
+                'NAMA LENGKAP' => $s->nama,
+                'JENIS KELAMIN' => $s->jenis_kelamin === 'P' ? 'PEREMPUAN' : 'LAKI-LAKI',
+                'TEMPAT, TANGGAL LAHIR' => trim(($s->tempat_lahir ?? '').', '.($s->tgl_lahir?->format('d-m-Y') ?? '')),
+                'ASAL SMP' => (string) ($s->asal_smp ?? ''),
+                'AGAMA' => (string) ($s->agama ?? ''),
+                'ALAMAT RUMAH (RT, RW)' => (string) ($s->alamat ?? ''),
+                'FOTO DIRI / SELFIE' => (string) ($s->user?->foto ?? ''),
+                'NAMA LENGKAP AYAH / WALI' => (string) ($k?->nama_ayah ?? ''),
+                'PENDIDIKAN TERAKHIR AYAH / WALI' => (string) ($k?->pendidikan_ayah ?? ''),
+                'PEKERJAAN AYAH / WALI' => (string) ($k?->pekerjaan_ayah ?? ''),
+                'NOMOR WA AYAH / WALI' => (string) ($k?->nomor_wa_ayah ?? ''),
+                'ALAMAT RUMAH AYAH / WALI' => (string) ($k?->alamat_ayah ?? ''),
+                'NAMA LENGKAP IBU / WALI' => (string) ($k?->nama_ibu ?? ''),
+                'PENDIDIKAN TERAKHIR IBU / WALI' => (string) ($k?->pendidikan_ibu ?? ''),
+                'PEKERJAAN IBU / WALI' => (string) ($k?->pekerjaan_ibu ?? ''),
+                'NOMOR WA IBU / WALI' => (string) ($k?->nomor_wa_ibu ?? ''),
+                'ALAMAT RUMAH IBU / WALI' => (string) ($k?->alamat_ibu ?? ''),
+                'STATUS RUMAH' => (string) ($k?->status_rumah ?? ''),
+                'LOKASI RUMAH' => (string) ($k?->lokasi_rumah ?? ''),
+                'PUNYA KAMAR SENDIRI' => $k?->punya_kamar_sendiri ? 'YA' : 'TIDAK',
+                'TRANSPORTASI KE SEKOLAH' => (string) ($k?->kendaraan_ke_sekolah ?? ''),
+                'AKUN MEDIA SOSIAL' => (string) ($k?->media_sosial ?? ''),
+            ];
+        })->values()->toArray();
+    }
+
+    public function getGformExportCount(): int
+    {
+        return $this->siswaRepository->getAll()->count();
+    }
+
+    private function clean(mixed $value): ?string
+    {
+        $v = trim((string) ($value ?? ''));
+
+        return $v === '' ? null : $v;
+    }
+
+    private function toBool(mixed $value): bool
+    {
+        return in_array(strtolower(trim((string) ($value ?? ''))), ['ya', 'y', '1', 'true', 'ada'], true);
     }
 }

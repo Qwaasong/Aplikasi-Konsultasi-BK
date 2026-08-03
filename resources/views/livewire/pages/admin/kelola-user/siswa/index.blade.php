@@ -13,6 +13,16 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
         <x-slot:search>
             <x-molecules.search-input model="search" />
             </x-slot>
+        <x-slot:actions>
+            <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <x-atoms.icon variant="template" size="md" /> Template
+            </button>
+            <button wire:click="openImport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <x-atoms.icon variant="upload" size="md" /> Import
+            </button>
+            <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <x-atoms.icon variant="download" size="md" /> Export
+            </button>
             Tambah User Siswa
     </x-organisms.header>
 
@@ -236,4 +246,88 @@ new #[Layout('layouts.app')] class extends Index {}; ?>
             </div>
         </div>
     </div>
+
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- MODAL IMPORT KOMULATIF RECORD              --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    @if($showImportModal)
+        <x-shared.modal name="import-siswa" :show="true" maxWidth="md">
+            <div class="flex flex-col">
+                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                    <h2 class="text-base font-bold text-gray-900">Import Komulatif Record</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Format: CSV, XLS, atau XLSX — maks 5 MB. Siswa dicocokkan via Nama + Kelas; bila belum ada, otomatis dibuat.</p>
+                </div>
+                <div class="px-6 py-5 space-y-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
+                        <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
+                        <code class="block">Timestamp | KELAS | TAHUN PELAJARAN | NAMA LENGKAP | JENIS KELAMIN | TEMPAT, TANGGAL LAHIR | ASAL SMP | AGAMA | ALAMAT RUMAH (RT, RW) | FOTO DIRI / SELFIE | NAMA LENGKAP AYAH / WALI | ... | AKUN MEDIA SOSIAL</code>
+                    </div>
+                    <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
+                        <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">
+                        <p class="text-sm font-medium text-gray-600">Klik atau tarik file ke sini</p>
+                        <p class="text-xs text-gray-400 mt-1">CSV, XLS, XLSX — maks 5 MB</p>
+                        @if($importFile)
+                            <p class="mt-3 text-xs font-semibold text-brand-teal">✓ {{ $importFile->getClientOriginalName() }}</p>
+                        @endif
+                    </div>
+                    @error('importFile')
+                        <p class="text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                    @if($importedCount > 0)
+                        <div class="bg-green-50 border border-green-100 rounded-lg px-4 py-2 text-sm text-green-700">✓ Berhasil memproses {{ $importedCount }} baris data.</div>
+                    @endif
+                    @if(!empty($importErrors))
+                        <div class="bg-red-50 border border-red-100 rounded-lg px-4 py-2 text-xs text-red-700 max-h-40 overflow-y-auto">
+                            <p class="font-semibold mb-1">Baris yang gagal:</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                @foreach($importErrors as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
+                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+                    <x-atoms.button variant="secondary" wire:click="$set('showImportModal', false)">Batal</x-atoms.button>
+                    <x-atoms.button wire:click="processImport" :disabled="!$importFile">
+                        <span wire:loading.remove wire:target="processImport">Proses Import</span>
+                        <span wire:loading wire:target="processImport">Memproses...</span>
+                    </x-atoms.button>
+                </div>
+            </div>
+        </x-shared.modal>
+    @endif
+
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- MODAL EXPORT KOMULATIF RECORD              --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    @if($showExportModal)
+        <x-shared.modal name="export-siswa" :show="true" maxWidth="md">
+            <div class="flex flex-col">
+                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                    <h2 class="text-base font-bold text-gray-900">Export Komulatif Record</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
+                </div>
+                <div class="px-6 py-5 space-y-4">
+                    <div class="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-lg px-4 py-3">
+                        <div>
+                            <p class="text-xs text-gray-500">Data yang akan di-export</p>
+                            <p class="text-2xl font-bold text-brand-teal leading-tight">{{ $exportPreviewCount ?? 0 }} <span class="text-sm font-normal text-gray-500">siswa</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+                    <x-atoms.button variant="secondary" wire:click="$set('showExportModal', false)">Batal</x-atoms.button>
+                    <x-atoms.button wire:click="exportCsv" :disabled="($exportPreviewCount ?? 0) === 0">
+                        <span wire:loading.remove wire:target="exportCsv">Download CSV</span>
+                        <span wire:loading wire:target="exportCsv">Menyiapkan...</span>
+                    </x-atoms.button>
+                    <x-atoms.button wire:click="exportExcel" :disabled="($exportPreviewCount ?? 0) === 0">
+                        <span wire:loading.remove wire:target="exportExcel">Download Excel</span>
+                        <span wire:loading wire:target="exportExcel">Menyiapkan...</span>
+                    </x-atoms.button>
+                </div>
+            </div>
+        </x-shared.modal>
+    @endif
 </div>

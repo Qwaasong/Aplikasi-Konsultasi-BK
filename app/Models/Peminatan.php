@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Peminatan extends Model
 {
     use HasFactory;
+
     protected $table = 'peminatans';
 
     protected $fillable = [
