@@ -54,32 +54,6 @@ class KonselorSeeder extends Seeder
             ],
         ];
 
-        foreach ($konselor as $data) {
-            // Buat / ambil user yang sudah ada berdasarkan email
-            $user = User::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'role'          => 'guru_bk',
-                    'nama'          => $data['nama'],
-                    'username'      => $data['username'],
-                    'password'      => Hash::make('password123'),
-                    'jenis_kelamin' => $data['jenis_kelamin'],
-                    'no_hp'         => $data['no_hp'],
-                    'foto'          => '',
-                    'status'        => 'aktif',
-                ]
-            );
-
-            // Buat / ambil pegawai berdasarkan user_id
-            Pegawai::firstOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'nip'     => $data['nip'],
-                    'jabatan' => $data['jabatan'],
-                ]
-            );
-        }
-
         $this->command->info('✅ 4 konselor berhasil di-seed: Pak Danny, Bu Bening, Bu Mayang, Bu Bawon');
         $this->command->info('   Password default: password123');
     }
