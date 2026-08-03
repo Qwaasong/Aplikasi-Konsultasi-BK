@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Admin\LogKasus\Index;
+use App\Livewire\Admin\Bk\LogKasus\Index;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Index {}; ?>

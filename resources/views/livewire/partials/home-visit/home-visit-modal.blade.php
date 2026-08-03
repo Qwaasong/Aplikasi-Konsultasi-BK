@@ -5,9 +5,9 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Models\DataSiswa;
-use App\Services\SiswaService;
-use App\Services\HomeVisitService;
-use App\Services\LampiranService;
+use App\Services\Siswa\SiswaService;
+use App\Services\Bk\HomeVisitService;
+use App\Services\Bimbingan\LampiranService;
 
 new class extends Component {
 

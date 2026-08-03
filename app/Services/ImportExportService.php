@@ -29,6 +29,10 @@ class ImportExportService
             throw new \RuntimeException('Library PhpSpreadsheet tidak ditemukan. Jalankan: composer require phpoffice/phpspreadsheet');
         }
 
+        if (!class_exists(\ZipArchive::class)) {
+            throw new \RuntimeException('Ekstensi PHP "zip" tidak aktif. Aktifkan extension=zip di php.ini lalu restart server.');
+        }
+
         $spreadsheet = IOFactory::load($file->getRealPath());
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray(null, true, true, true);

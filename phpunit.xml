@@ -25,6 +25,8 @@
         <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
         <!-- <env name="DB_DATABASE" value=":memory:"/> -->
         <env name="MAIL_MAILER" value="array"/>
+        <env name="OAUTH_CLIENT_ID" value="92ff6369-6206-4c7f-9f7e-2002dfe6c458"/>
+        <env name="OAUTH_CLIENT_SECRET" value="RCaR0Z7LLelin6W4Mh8G7DctnOHVqgaNKxUKc6fl"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

@@ -19,6 +19,7 @@ class SosiometriResponFactory extends Factory
             'siswa_pemilih_id' => DataSiswa::factory(),
             'urutan' => $this->faker->numberBetween(1, 5),
             'alasan' => $this->faker->sentence(),
+            'pertanyaan' => $this->faker->randomElement(array_keys(Sosiometri::PERTANYAAN)),
         ];
     }
 }

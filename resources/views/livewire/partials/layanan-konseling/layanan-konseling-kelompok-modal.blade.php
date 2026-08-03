@@ -5,8 +5,8 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Models\DataSiswa;
-use App\Services\SiswaService;
-use App\Services\BimbinganKelompokService;
+use App\Services\Siswa\SiswaService;
+use App\Services\Bimbingan\BimbinganKelompokService;
 use App\Models\TahunAjaran;
 
 new class extends Component {

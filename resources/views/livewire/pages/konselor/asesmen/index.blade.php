@@ -14,7 +14,7 @@ new #[Layout('layouts.app')] class extends Index {};
 
         <x-slot:search>
             @if($selectedKelas)
-                <x-molecules.search-input model="search" />
+                <x-molecules.search-input model="search" maxWidth="max-w-md" />
             @endif
         </x-slot:search>
 
@@ -54,10 +54,10 @@ new #[Layout('layouts.app')] class extends Index {};
                 <button
                     type="button"
                     wire:click="pilihKelas(@js($kelas['nama']))"
-                    class="group text-left bg-white border border-gray-200 rounded-xl p-6
-                        shadow-sm transition-all duration-200
-                        hover:border-brand-teal hover:shadow-md
-                        hover:-translate-y-0.5">
+                    class="group text-left bg-white border border-gray-200 rounded-xl p-6 shadow-sm
+                           transition-all duration-200
+                           hover:border-brand-teal hover:shadow-md hover:-translate-y-0.5
+                           focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2">
 
                     <div class="flex items-center justify-between">
 
@@ -130,11 +130,11 @@ new #[Layout('layouts.app')] class extends Index {};
 
             <div>
 
-                <button
-                    type="button"
+                <x-atoms.button
+                    variant="ghost"
+                    size="md"
                     wire:click="kembaliKeKelas"
-                    class="inline-flex items-center text-xs text-gray-500
-                           hover:text-brand-teal mb-2">
+                    class="mb-2">
 
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +153,7 @@ new #[Layout('layouts.app')] class extends Index {};
 
                     Kembali ke Daftar Kelas
 
-                </button>
+                </x-atoms.button>
 
                 <h2 class="text-lg font-semibold text-gray-800">
                     Asesmen {{ $selectedKelas }}
@@ -242,13 +242,13 @@ new #[Layout('layouts.app')] class extends Index {};
                     {{-- AKPD --}}
                     <td class="px-4 py-2">
 
-                        <a
+                        <x-atoms.button
+                            tag="a"
                             href=""
-                            class="text-xs text-brand-teal hover:underline">
-
+                            variant="ghost"
+                            size="md">
                             AKPD
-
-                        </a>
+                        </x-atoms.button>
 
                     </td>
 
@@ -256,13 +256,13 @@ new #[Layout('layouts.app')] class extends Index {};
                     {{-- DCM --}}
                     <td class="px-4 py-2">
 
-                        <a
+                        <x-atoms.button
+                            tag="a"
                             href=""
-                            class="text-xs text-brand-teal hover:underline">
-
+                            variant="ghost"
+                            size="md">
                             DCM
-
-                        </a>
+                        </x-atoms.button>
 
                     </td>
 
@@ -270,13 +270,13 @@ new #[Layout('layouts.app')] class extends Index {};
                     {{-- Gaya Belajar --}}
                     <td class="px-4 py-2">
 
-                        <a
+                        <x-atoms.button
+                            tag="a"
                             href=""
-                            class="text-xs text-brand-teal hover:underline">
-
+                            variant="ghost"
+                            size="md">
                             Gaya Belajar
-
-                        </a>
+                        </x-atoms.button>
 
                     </td>
 
@@ -284,13 +284,13 @@ new #[Layout('layouts.app')] class extends Index {};
                     {{-- Sosiometri --}}
                     <td class="px-4 py-2">
 
-                        <a
+                        <x-atoms.button
+                            tag="a"
                             href=""
-                            class="text-xs text-brand-teal hover:underline">
-
+                            variant="ghost"
+                            size="md">
                             Sosiometri
-
-                        </a>
+                        </x-atoms.button>
 
                     </td>
 
@@ -298,13 +298,13 @@ new #[Layout('layouts.app')] class extends Index {};
                     {{-- Tes Bakat Minat --}}
                     <td class="px-4 py-2">
 
-                        <a
-                            href= ""
-                            class="text-xs text-brand-teal hover:underline">
-
+                        <x-atoms.button
+                            tag="a"
+                            href=""
+                            variant="ghost"
+                            size="md">
                             Tes Bakat Minat
-
-                        </a>
+                        </x-atoms.button>
 
                     </td>
 

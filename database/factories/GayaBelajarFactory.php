@@ -25,6 +25,8 @@ class GayaBelajarFactory extends Factory
             'kinestetik' => $kinestetik,
             'hasil' => $hasil,
             'catatan' => $this->faker->optional()->sentence(),
+            'faktor_penghambat' => $this->faker->optional()->sentence(),
+            'faktor_pendukung' => $this->faker->optional()->sentence(),
         ];
     }
 }

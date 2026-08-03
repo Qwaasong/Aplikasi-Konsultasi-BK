@@ -3,7 +3,7 @@
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
-use App\Services\SiswaService;
+use App\Services\Siswa\SiswaService;
 use App\Models\Kelas;
 
 new class extends Component {
