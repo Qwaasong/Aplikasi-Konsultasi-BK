@@ -3,7 +3,7 @@
 use App\Livewire\Konselor\Asesmen\TesBakatMinat\Detail;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Detail {};
+new #[Layout('layouts.app', ['title' => 'Detail Bakat Minat - Bimbingan Konseling'])] class extends Detail {};
 
 ?>
 

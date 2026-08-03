@@ -3,7 +3,7 @@
 use App\Livewire\Konselor\Asesmen\GayaBelajar\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {};
+new #[Layout('layouts.app', ['title' => 'Asesmen Gaya Belajar - Bimbingan Konseling'])] class extends Index {};
 
 ?>
 

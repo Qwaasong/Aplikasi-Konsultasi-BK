@@ -3,7 +3,7 @@
 use App\Livewire\Konselor\Asesmen\Sosiometri\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {};
+new #[Layout('layouts.app', ['title' => 'Asesmen Sosiometri - Bimbingan Konseling'])] class extends Index {};
 
 ?>
 

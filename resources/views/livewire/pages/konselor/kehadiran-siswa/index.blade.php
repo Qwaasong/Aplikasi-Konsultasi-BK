@@ -3,7 +3,7 @@
 use App\Livewire\Konselor\KehadiranSiswa\Index;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Index {}; ?>
+new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling'])] class extends Index {}; ?>
 
 <div class="flex-1 flex flex-col min-w-0 bg-white h-full">
 

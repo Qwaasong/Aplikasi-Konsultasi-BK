@@ -3,7 +3,7 @@
 use App\Livewire\Konselor\Asesmen\GayaBelajar\Detail;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Detail {};
+new #[Layout('layouts.app', ['title' => 'Detail Gaya Belajar - Bimbingan Konseling'])] class extends Detail {};
 
 ?>
 
