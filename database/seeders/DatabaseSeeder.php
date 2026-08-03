@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FirstDatabaseSeeder::class,
+            KonselorSeeder::class,
             DataSiswaSeeder::class,
             KonsultasiSeeder::class,
             // FactorySeeder::class,
