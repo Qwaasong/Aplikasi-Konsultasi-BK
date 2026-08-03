@@ -61,10 +61,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('/admin/log-kasus', 'pages.admin.log-kasus.index')->name('admin.log-kasus.index');
     Volt::route('/admin/log-kasus/{id}/detail', 'pages.admin.log-kasus.detail')->name('admin.log-kasus.detail');
     Volt::route('/admin/rekap-absensi', 'pages.admin.rekap-absensi.index')->name('admin.rekap-absensi.index');
+    // Profile
+    Volt::route('/admin/profile', 'pages.shared.profile')->name('admin.profile');
 });
 
 // Guru / Konselor
 Route::middleware(['auth', 'role:guru_bk'])->group(function () {
+
+    // Profile
+    Volt::route('konselor/profile', 'pages.shared.profile')->name('konselor.profile');
 
     // Dashboard
     Volt::route('konselor/dashboard', 'pages.konselor.dashboard')->name('konselor.dashboard');
