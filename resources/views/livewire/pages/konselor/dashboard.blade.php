@@ -13,7 +13,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
             <div
                 class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
                 <div class="p-6 font-medium">
-                    Anda masuk sebagai {{ auth()->user()->nama }}.
+                    Anda masuk sebagai <span class="font-bold">{{ auth()->user()->role == 'guru_bk' ? 'Konselor' : ucfirst(auth()->user()->role) }}</span>.
                 </div>
             </div>
         </x-molecules.header-card>
@@ -22,7 +22,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
 
             {{-- Kelas 10 --}}
             <x-molecules.stat-card label="Siswa Kelas 10" textColor='text-[#086375]' textContainerClass="bg-white"
-                :value="$countKelas10" bgClassIcon="bg-white" color="blue">
+                :value="$countKelas10" bgClassIcon="bg-white" color="blue" :show-button="false">
                 <x-slot name="icon">
                     <x-atoms.icon variant="student" size="lg" color="#086375" />
                 </x-slot>
@@ -30,7 +30,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
 
             {{-- Kelas 11 --}}
             <x-molecules.stat-card label="Siswa Kelas 11" textColor='text-[#086375]' textContainerClass="bg-white"
-                bgClassIcon="bg-white" :value="$countKelas11" color="teal">
+                bgClassIcon="bg-white" :value="$countKelas11" color="teal" :show-button="false">
                 <x-slot name="icon">
                     <x-atoms.icon variant="student" size="lg" color="#086375" />
                 </x-slot>
@@ -38,7 +38,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
 
             {{-- Kelas 12 --}}
             <x-molecules.stat-card label="Siswa Kelas 12" textColor='text-[#086375]' textContainerClass="bg-white"
-                bgClassIcon="bg-white" :value="$countKelas12" color="kuning">
+                bgClassIcon="bg-white" :value="$countKelas12" color="kuning" :show-button="false">
                 <x-slot name="icon">
                     <x-atoms.icon variant="student" size="lg" color="#086375" />
                 </x-slot>
