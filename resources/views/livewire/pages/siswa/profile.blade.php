@@ -4,17 +4,15 @@
         {{-- Top Bar --}}
         <div class="siswa-topbar">
             <div class="siswa-brand">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:26px;height:26px;">
-                    <path d="M12 2L3 7l9 5 9-5-9-5zm0 10.23L3 7.46v7.08c0 3.47 3.88 6.25 9 6.25s9-2.78 9-6.25V7.46l-9 4.77z"/>
-                </svg>
+                <x-atoms.icon variant="student" size="lg" color="#086375" />
                 Portal Siswa — Bimbingan Konseling
             </div>
             <div class="siswa-topbar-actions">
                 <a href="{{ route('logout') }}"
-                   onclick="event.preventDefault(); document.getElementById('logout-form-siswa').submit();">
-                    Logout
+                   class="inline-flex items-center gap-1.5">
+                    <x-atoms.icon variant="logout" size="sm" />
+                    <span>Logout</span>
                 </a>
-                <form id="logout-form-siswa" action="{{ route('logout') }}" method="POST" style="display:none;">@csrf</form>
             </div>
         </div>
 
@@ -40,17 +38,20 @@
 
         {{-- Tabs --}}
         <div class="tabs-bar">
-            <button class="tab-btn {{ $activeTab === 'profil' ? 'active' : '' }}"
+            <button class="tab-btn inline-flex items-center justify-center gap-2 {{ $activeTab === 'profil' ? 'active' : '' }}"
                     wire:click="$set('activeTab', 'profil')">
-                📋 Data Pribadi
+                <x-atoms.icon variant="user" size="sm" />
+                <span>Data Pribadi</span>
             </button>
-            <button class="tab-btn {{ $activeTab === 'komulatif' ? 'active' : '' }}"
+            <button class="tab-btn inline-flex items-center justify-center gap-2 {{ $activeTab === 'komulatif' ? 'active' : '' }}"
                     wire:click="$set('activeTab', 'komulatif')">
-                📁 Kumulatif Record
+                <x-atoms.icon variant="assessment" size="sm" />
+                <span>Kumulatif Record</span>
             </button>
-            <button class="tab-btn {{ $activeTab === 'password' ? 'active' : '' }}"
+            <button class="tab-btn inline-flex items-center justify-center gap-2 {{ $activeTab === 'password' ? 'active' : '' }}"
                     wire:click="$set('activeTab', 'password')">
-                🔐 Ubah Password
+                <x-atoms.icon variant="lock" size="sm" />
+                <span>Ubah Password</span>
             </button>
         </div>
 
@@ -59,9 +60,7 @@
             <div class="card-panel">
                 <div class="card-header-section">
                     <div class="card-icon" style="background:#eff6ff;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#3b82f6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
+                        <x-atoms.icon variant="user" size="md" color="#3b82f6" />
                     </div>
                     <h3>Data Pribadi</h3>
                 </div>
@@ -149,9 +148,12 @@
                     </div>
 
                     <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-                        <button type="submit" class="save-btn">
+                        <button type="submit" class="save-btn inline-flex items-center gap-2">
                             <span wire:loading wire:target="updateProfil">Menyimpan...</span>
-                            <span wire:loading.remove wire:target="updateProfil">💾 Simpan Data Pribadi</span>
+                            <span wire:loading.remove wire:target="updateProfil" class="inline-flex items-center gap-2">
+                                <x-atoms.icon variant="file" size="sm" color="white" />
+                                <span>Simpan Data Pribadi</span>
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -163,9 +165,7 @@
             <div class="card-panel">
                 <div class="card-header-section">
                     <div class="card-icon" style="background:#fef3c7;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#d97706">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" />
-                        </svg>
+                        <x-atoms.icon variant="assessment" size="md" color="#d97706" />
                     </div>
                     <div>
                         <h3>Kumulatif Record Siswa</h3>
@@ -365,9 +365,12 @@
                     </div>
 
                     <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-                        <button type="submit" class="save-btn">
+                        <button type="submit" class="save-btn inline-flex items-center gap-2">
                             <span wire:loading wire:target="saveKomulatifRecord">Menyimpan...</span>
-                            <span wire:loading.remove wire:target="saveKomulatifRecord">💾 Simpan Kumulatif Record</span>
+                            <span wire:loading.remove wire:target="saveKomulatifRecord" class="inline-flex items-center gap-2">
+                                <x-atoms.icon variant="file" size="sm" color="white" />
+                                <span>Simpan Kumulatif Record</span>
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -379,9 +382,7 @@
             <div class="card-panel" style="max-width:520px;">
                 <div class="card-header-section">
                     <div class="card-icon" style="background:#fef2f2;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ef4444">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                        </svg>
+                        <x-atoms.icon variant="lock" size="md" color="#ef4444" />
                     </div>
                     <h3>Ubah Password</h3>
                 </div>
@@ -406,9 +407,12 @@
                         <input type="password" id="pw-confirm" wire:model="new_password_confirmation" placeholder="Ulangi password baru">
                     </div>
                     <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-                        <button type="submit" class="save-btn">
+                        <button type="submit" class="save-btn inline-flex items-center gap-2">
                             <span wire:loading wire:target="updatePassword">Memperbarui...</span>
-                            <span wire:loading.remove wire:target="updatePassword">🔐 Perbarui Password</span>
+                            <span wire:loading.remove wire:target="updatePassword" class="inline-flex items-center gap-2">
+                                <x-atoms.icon variant="lock" size="sm" color="white" />
+                                <span>Perbarui Password</span>
+                            </span>
                         </button>
                     </div>
                 </form>

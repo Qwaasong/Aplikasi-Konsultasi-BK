@@ -30,7 +30,7 @@
         href="{{ asset('asset/css/landing.css') }}">
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('asset/image/SMKLogo.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     {{-- CSS khusus halaman --}}
     @stack('styles')

@@ -13,7 +13,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard Admin'])] class extends Dashb
             <div
                 class="bg-[#e0f7fa]/20 backdrop-blur-sm overflow-hidden shadow-sm sm:rounded-lg mt-4 border border-[#086375]/20">
                 <div class="p-6 font-medium">
-                    {{ __("Anda masuk sebagai Admin.") }}
+                    Anda masuk sebagai <span class="font-bold">{{ auth()->user()->role == 'guru_bk' ? 'Konselor' : ucfirst(auth()->user()->role) }}</span>.
                 </div>
             </div>
         </x-molecules.header-card>
