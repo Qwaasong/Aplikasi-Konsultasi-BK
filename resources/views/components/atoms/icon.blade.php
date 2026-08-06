@@ -16,9 +16,17 @@ $sizes = [
 'xl' => 'w-8 h-8',
 '2xl'=> 'w-10 h-10',
 ];
+
+$sizeStyles = [
+'sm' => 'width: 1rem; height: 1rem;',
+'md' => 'width: 1.25rem; height: 1.25rem;',
+'lg' => 'width: 1.5rem; height: 1.5rem;',
+'xl' => 'width: 2rem; height: 2rem;',
+'2xl'=> 'width: 2.5rem; height: 2.5rem;',
+];
 @endphp
 
-<span {{ $attributes->merge(['class' => "$baseClasses {$sizes[$size]}"]) }}>
+<span {{ $attributes->merge(['class' => "$baseClasses {$sizes[$size]}", 'style' => $sizeStyles[$size] ?? 'width: 1.25rem; height: 1.25rem;']) }}>
 
     @switch($variant)
 
@@ -254,6 +262,13 @@ $sizes = [
     @case('template')
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="{{ $color }}">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+    </svg>
+    @break
+
+    {{-- Lock --}}
+    @case('lock')
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="{{ $color }}">
+        <path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/>
     </svg>
     @break
 
