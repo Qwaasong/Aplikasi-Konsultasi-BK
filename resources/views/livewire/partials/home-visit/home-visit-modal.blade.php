@@ -193,7 +193,7 @@ new class extends Component {
             'status'            => $this->status,
         ];
 
-        $lampiranService = app(\App\Services\LampiranService::class);
+        $lampiranService = app(LampiranService::class);
 
         $result = $this->editingId
             ? $updateHandler->handle($data, ['id' => $this->editingId])

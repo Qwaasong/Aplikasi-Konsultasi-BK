@@ -43,6 +43,7 @@ new class extends Component {
     public function create()
     {
         $this->reset();
+        $this->resetValidation();
 
         $this->jenis_kelamin = 'L';
 
@@ -52,6 +53,7 @@ new class extends Component {
     #[On('edit-siswa')]
     public function edit($id)
     {
+        $this->resetValidation();
         $this->editingId = $id;
 
         $siswa = app(SiswaService::class)->findById($id);
@@ -100,109 +102,93 @@ new class extends Component {
 ?>
 
 <x-shared.modal name="form-siswa" maxWidth="2xl">
+    <div class="flex flex-col h-full max-h-[80vh]">
 
-<div class="flex flex-col">
-
-<div class="px-6 py-4 border-b">
-    <h2 class="text-lg font-bold">
-        {{ $editingId ? 'Edit Siswa' : 'Tambah Siswa' }}
-    </h2>
-</div>
-
-<div class="p-6 space-y-5">
-
-    <div class="grid grid-cols-2 gap-4">
-
-        <div>
-            <x-atoms.input-label>Nama</x-atoms.input-label>
-            <x-atoms.text-input wire:model="nama"/>
+        {{-- HEADER ─────────────────────────────────────── --}}
+        <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+            <h2 class="text-base font-bold text-gray-900 leading-tight">
+                {{ $editingId ? 'Edit Siswa' : 'Tambah Siswa' }}
+            </h2>
+            <p class="text-xs text-gray-500 mt-0.5">
+                {{ $editingId ? 'Perbarui data siswa' : 'Catat data siswa baru' }}
+            </p>
         </div>
 
-        <div>
-            <x-atoms.input-label>Username</x-atoms.input-label>
-            <x-atoms.text-input wire:model="username"/>
+        {{-- SCROLLABLE CONTENT ────────────────────────────────── --}}
+        <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                <div>
+                    <x-atoms.input-label for="nama" size="sm">Nama <span class="text-red-500">*</span></x-atoms.input-label>
+                    <x-atoms.text-input id="nama" wire:model="nama" size="md" placeholder="Masukkan nama siswa"/>
+                    @error('nama') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="username" size="sm">Username <span class="text-red-500">*</span></x-atoms.input-label>
+                    <x-atoms.text-input id="username" wire:model="username" size="md" placeholder="Masukkan username"/>
+                    @error('username') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="email" size="sm">Email</x-atoms.input-label>
+                    <x-atoms.text-input id="email" type="email" wire:model="email" size="md" placeholder="contoh@email.com"/>
+                    @error('email') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="no_hp" size="sm">No HP</x-atoms.input-label>
+                    <x-atoms.text-input id="no_hp" wire:model="no_hp" size="md" placeholder="08..."/>
+                    @error('no_hp') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="nis" size="sm">NIS <span class="text-red-500">*</span></x-atoms.input-label>
+                    <x-atoms.text-input id="nis" wire:model="nis" size="md" placeholder="Masukkan NIS"/>
+                    @error('nis') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="kelas_id" size="sm">Kelas <span class="text-red-500">*</span></x-atoms.input-label>
+                    <select id="kelas_id" wire:model="kelas_id"
+                        class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="">Pilih Kelas</option>
+                        @foreach($this->kelasOptions() as $kelas)
+                            <option value="{{ $kelas->id }}">{{ $kelas->nama_kelas }}</option>
+                        @endforeach
+                    </select>
+                     @error('kelas_id') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <x-atoms.input-label for="jenis_kelamin" size="sm">Jenis Kelamin <span class="text-red-500">*</span></x-atoms.input-label>
+                    <select id="jenis_kelamin" wire:model="jenis_kelamin"
+                        class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                    @error('jenis_kelamin') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <x-atoms.input-label for="alamat" size="sm">Alamat</x-atoms.input-label>
+                <textarea id="alamat" wire:model="alamat" rows="3" class="w-full border border-gray-200 rounded-md p-4 text-[14.5px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none shadow-sm leading-relaxed" placeholder="Masukkan alamat lengkap siswa..."></textarea>
+                @error('alamat') <span class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</span> @enderror
+            </div>
+
         </div>
 
-        <div>
-            <x-atoms.input-label>Email</x-atoms.input-label>
-            <x-atoms.text-input type="email" wire:model="email"/>
-        </div>
-
-        <div>
-            <x-atoms.input-label>No HP</x-atoms.input-label>
-            <x-atoms.text-input wire:model="no_hp"/>
-        </div>
-
-        <div>
-            <x-atoms.input-label>NIS</x-atoms.input-label>
-            <x-atoms.text-input wire:model="nis"/>
-        </div>
-
-        <div>
-            <x-atoms.input-label>Kelas</x-atoms.input-label>
-
-            <select
-                wire:model="kelas_id"
-                class="w-full rounded-lg border-gray-300">
-
-                <option value="">Pilih Kelas</option>
-
-                @foreach($this->kelasOptions() as $kelas)
-                    <option value="{{ $kelas->id }}">
-                        {{ $kelas->nama_kelas }}
-                    </option>
-                @endforeach
-
-            </select>
-
-        </div>
-
-        <div>
-            <x-atoms.input-label>Jenis Kelamin</x-atoms.input-label>
-
-            <select
-                wire:model="jenis_kelamin"
-                class="w-full rounded-lg border-gray-300">
-
-                <option value="L">Laki-laki</option>
-                <option value="P">Perempuan</option>
-
-            </select>
-
+        {{-- FOOTER ─────────────────────────────────────── --}}
+        <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-3">
+            <x-atoms.button variant="secondary" x-on:click="show=false">
+                Batal
+            </x-atoms.button>
+            <x-atoms.button wire:click="save">
+                {{ $editingId ? 'Perbarui' : 'Simpan' }}
+            </x-atoms.button>
         </div>
 
     </div>
-
-    <div>
-
-        <x-atoms.input-label>Alamat</x-atoms.input-label>
-
-        <textarea
-            wire:model="alamat"
-            rows="3"
-            class="w-full rounded-lg border-gray-300"></textarea>
-
-    </div>
-
-</div>
-
-<div class="px-6 py-4 border-t flex justify-end gap-2">
-
-    <x-atoms.button
-        variant="secondary"
-        x-on:click="show=false">
-        Batal
-    </x-atoms.button>
-
-    <x-atoms.button
-        wire:click="save">
-
-        {{ $editingId ? 'Perbarui' : 'Simpan' }}
-
-    </x-atoms.button>
-
-</div>
-
-</div>
-
 </x-shared.modal>
