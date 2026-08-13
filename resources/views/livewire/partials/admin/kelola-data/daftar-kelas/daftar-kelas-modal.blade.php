@@ -9,9 +9,7 @@ use App\Services\User\PegawaiService;
 
 new class extends Component
 {
-    public bool $show = false;
     public bool $editMode = false;
-
     public ?int $kelasId = null;
 
     public ?int $sekolah_id = null;
@@ -43,14 +41,14 @@ new class extends Component
     public function create()
     {
         $this->resetForm();
-
         $this->editMode = false;
-        $this->show = true;
+        $this->dispatch('open-modal', 'form-kelas');
     }
 
     #[On('edit-kelas')]
     public function edit($id)
     {
+        $this->resetForm();
         $record = app(KelasService::class)->findById($id);
 
         if (!$record) return;
@@ -60,11 +58,10 @@ new class extends Component
         $this->nama_kelas = $record->nama_kelas;
         $this->tingkat = $record->tingkat;
         $this->wali_kelas_id = $record->wali_kelas_id;
-
         $this->sekolah_id = $record->jurusan?->sekolah_id;
 
         $this->editMode = true;
-        $this->show = true;
+        $this->dispatch('open-modal', 'form-kelas');
     }
 
     public function save()
@@ -72,17 +69,10 @@ new class extends Component
         $validated = $this->validate();
 
         if ($this->editMode) {
-
-            app(KelasService::class)
-                ->update($this->kelasId, $validated);
-
+            app(KelasService::class)->update($this->kelasId, $validated);
             session()->flash('success', 'Data kelas berhasil diperbarui.');
-
         } else {
-
-            app(KelasService::class)
-                ->create($validated);
-
+            app(KelasService::class)->create($validated);
             session()->flash('success', 'Data kelas berhasil ditambahkan.');
         }
 
@@ -92,194 +82,115 @@ new class extends Component
     public function close()
     {
         $this->resetForm();
-
-        $this->show = false;
+        $this->dispatch('close-modal', 'form-kelas');
     }
 
     private function resetForm()
     {
-        $this->reset([
-            'kelasId',
-            'sekolah_id',
-            'jurusan_id',
-            'nama_kelas',
-            'tingkat',
-            'wali_kelas_id',
-        ]);
-
+        $this->reset(['kelasId', 'sekolah_id', 'jurusan_id', 'nama_kelas', 'tingkat', 'wali_kelas_id']);
         $this->resetValidation();
-
         $this->editMode = false;
     }
 };
 
 ?>
 
-<div>
+<x-shared.modal name="form-kelas" maxWidth="xl">
+    <div class="flex flex-col h-full max-h-[80vh]">
 
-@if($show)
-
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-xl">
-
-        {{-- Header --}}
-        <div class="px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold">
+        {{-- HEADER --}}
+        <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+            <h2 class="text-base font-bold text-gray-900 leading-tight">
                 {{ $editMode ? 'Edit Kelas' : 'Tambah Kelas' }}
             </h2>
+            <p class="text-xs text-gray-500 mt-0.5">
+                {{ $editMode ? 'Perbarui data kelas' : 'Catat data kelas baru' }}
+            </p>
         </div>
 
-        {{-- Body --}}
-        <div class="p-6 space-y-5">
+        {{-- BODY --}}
+        <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
+            <div class="space-y-5">
 
-            {{-- Sekolah --}}
-            <div>
-                <label class="block text-sm font-medium mb-2">
-                    Sekolah
-                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {{-- Sekolah --}}
+                    <div>
+                        <x-atoms.input-label for="sekolah_id_kelas" size="sm">Sekolah <span class="text-red-500">*</span></x-atoms.input-label>
+                        <select id="sekolah_id_kelas" wire:model.live="sekolah_id" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Sekolah</option>
+                            @foreach($sekolahOptions as $sekolah)
+                                <option value="{{ $sekolah->id }}">{{ $sekolah->nama_sekolah }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <select
-                    wire:model.live="sekolah_id"
-                    class="w-full rounded-lg border-gray-300">
+                    {{-- Jurusan --}}
+                    <div>
+                        <x-atoms.input-label for="jurusan_id_kelas" size="sm">Jurusan <span class="text-red-500">*</span></x-atoms.input-label>
+                        <select id="jurusan_id_kelas" wire:model="jurusan_id" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Jurusan</option>
+                            @foreach($jurusanOptions->where('sekolah_id', $sekolah_id) as $jurusan)
+                                <option value="{{ $jurusan->id }}">{{ $jurusan->nama_jurusan }}</option>
+                            @endforeach
+                        </select>
+                        @error('jurusan_id')
+                            <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                    <option value="">Pilih Sekolah</option>
+                {{-- Nama Kelas --}}
+                <div>
+                    <x-atoms.input-label for="nama_kelas" size="sm">Nama Kelas <span class="text-red-500">*</span></x-atoms.input-label>
+                    <x-atoms.text-input id="nama_kelas" wire:model="nama_kelas" size="md" placeholder="e.g., XII RPL 1" />
+                    @error('nama_kelas')
+                        <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    @foreach($sekolahOptions as $sekolah)
-                        <option value="{{ $sekolah->id }}">
-                            {{ $sekolah->nama_sekolah }}
-                        </option>
-                    @endforeach
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {{-- Tingkat --}}
+                    <div>
+                        <x-atoms.input-label for="tingkat" size="sm">Tingkat <span class="text-red-500">*</span></x-atoms.input-label>
+                        <select id="tingkat" wire:model="tingkat" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Tingkat</option>
+                            <option value="X">X</option>
+                            <option value="XI">XI</option>
+                            <option value="XII">XII</option>
+                        </select>
+                        @error('tingkat')
+                            <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                </select>
-            </div>
-
-            {{-- Jurusan --}}
-            <div>
-                <label class="block text-sm font-medium mb-2">
-                    Jurusan
-                </label>
-
-                <select
-                    wire:model="jurusan_id"
-                    class="w-full rounded-lg border-gray-300">
-
-                    <option value="">Pilih Jurusan</option>
-
-                    @foreach($jurusanOptions->where('sekolah_id', $sekolah_id) as $jurusan)
-
-                        <option value="{{ $jurusan->id }}">
-                            {{ $jurusan->nama_jurusan }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-                @error('jurusan_id')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
-            {{-- Nama Kelas --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Nama Kelas
-                </label>
-
-                <input
-                    type="text"
-                    wire:model="nama_kelas"
-                    class="w-full rounded-lg border-gray-300">
-
-                @error('nama_kelas')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
-            {{-- Tingkat --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Tingkat
-                </label>
-
-                <select
-                    wire:model="tingkat"
-                    class="w-full rounded-lg border-gray-300">
-
-                    <option value="">Pilih Tingkat</option>
-                    <option value="X">X</option>
-                    <option value="XI">XI</option>
-                    <option value="XII">XII</option>
-
-                </select>
-
-                @error('tingkat')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                    {{-- Wali Kelas --}}
+                    <div>
+                        <x-atoms.input-label for="wali_kelas_id" size="sm">Wali Kelas</x-atoms.input-label>
+                        <select id="wali_kelas_id" wire:model="wali_kelas_id" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Wali Kelas</option>
+                            @foreach($pegawaiOptions as $pegawai)
+                                <option value="{{ $pegawai->id }}">{{ $pegawai->user?->nama }}</option>
+                            @endforeach
+                        </select>
+                        @error('wali_kelas_id')
+                            <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
             </div>
-
-            {{-- Wali Kelas --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Wali Kelas
-                </label>
-
-                <select
-                    wire:model="wali_kelas_id"
-                    class="w-full rounded-lg border-gray-300">
-
-                    <option value="">Pilih Wali Kelas</option>
-
-                    @foreach($pegawaiOptions as $pegawai)
-
-                        <option value="{{ $pegawai->id }}">
-                            {{ $pegawai->user?->nama }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-                @error('wali_kelas_id')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
         </div>
 
-        {{-- Footer --}}
-        <div class="px-6 py-4 border-t flex justify-end gap-3">
-
-            <button
-                wire:click="close"
-                class="px-4 py-2 rounded-lg border">
-
+        {{-- FOOTER --}}
+        <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-3">
+            <x-atoms.button variant="secondary" wire:click="close">
                 Batal
+            </x-atoms.button>
 
-            </button>
-
-            <button
-                wire:click="save"
-                class="px-4 py-2 rounded-lg bg-brand-teal text-white">
-
+            <x-atoms.button wire:click="save">
                 {{ $editMode ? 'Simpan Perubahan' : 'Tambah Kelas' }}
-
-            </button>
-
+            </x-atoms.button>
         </div>
 
     </div>
-
-</div>
-
-@endif
-
-</div>
+</x-shared.modal>
