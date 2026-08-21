@@ -13,6 +13,7 @@ class SosiometriRespon extends Model
     protected $fillable = [
         'sosiometri_id',
         'siswa_dipilih_id',
+        'nama_dipilih',
         'siswa_pemilih_id',
         'urutan',
         'alasan',

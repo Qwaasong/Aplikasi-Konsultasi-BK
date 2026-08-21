@@ -59,10 +59,7 @@ class Detail extends Component
 
     public function edit()
     {
-        $this->dispatch(
-            'edit-dcm',
-            id: (int) $this->record->id
-        );
+        return redirect()->route('konselor.asesmen.dcm.index', ['edit' => $this->record->id]);
     }
 
     public function delete()

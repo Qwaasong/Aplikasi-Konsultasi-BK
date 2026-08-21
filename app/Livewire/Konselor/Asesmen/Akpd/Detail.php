@@ -36,4 +36,16 @@ class Detail extends Component
     {
         return redirect()->route('konselor.asesmen.akpd.index');
     }
+
+    public function edit()
+    {
+        return redirect()->route('konselor.asesmen.akpd.index', ['edit' => $this->record->id]);
+    }
+
+    public function delete()
+    {
+        app(AkpdService::class)->delete($this->record->id);
+        session()->flash('success', 'Data AKPD berhasil dihapus.');
+        return redirect()->route('konselor.asesmen.akpd.index');
+    }
 }

@@ -6,6 +6,7 @@ use App\Services\Asesmen\AkpdService;
 use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use App\Models\DataSiswa;
@@ -30,6 +31,9 @@ class Index extends Component
     public int $step = 1;
 
     public ?int $editingId = null;
+
+    #[Url]
+    public ?int $edit = null;
 
     public string $search = '';
     public string $searchSiswa = '';
@@ -75,6 +79,19 @@ class Index extends Component
 
         $this->loadData();
         $this->loadFilterOptions();
+
+        if ($this->edit) {
+            $record = app(AkpdService::class)->findById($this->edit);
+            if ($record) {
+                // Determine 'tingkat' from 'kelas_label'
+                $kelas = explode(' ', $record->siswa?->kelas_label ?? '')[0];
+                if (in_array($kelas, ['X', 'XI', 'XII'])) {
+                    $this->pilihTingkat($kelas);
+                }
+                $this->loadAkpd($this->edit);
+            }
+            $this->edit = null;
+        }
     }
 
     public function loadData(): void
