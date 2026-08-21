@@ -60,6 +60,20 @@ class KehadiranService
         $this->repo->delete($id);
     }
 
+    public function upsertKehadiran(int $siswaId, int $tahunAjaranId, string $tanggal, string $status): void
+    {
+        Kehadiran::updateOrCreate(
+            [
+                'siswa_id' => $siswaId,
+                'tanggal_kehadiran' => $tanggal,
+                'tahun_ajaran_id' => $tahunAjaranId,
+            ],
+            [
+                'status' => $status,
+            ]
+        );
+    }
+
     public function getFiltered(array $filters = []): Collection
     {
         $query = $this->repo->query();
