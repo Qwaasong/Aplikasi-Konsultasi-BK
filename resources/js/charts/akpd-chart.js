@@ -15,11 +15,15 @@ Chart.register(
     Tooltip
 );
 
-document.addEventListener('DOMContentLoaded', () => {
+const initializeAkpdCharts = () => {
 
     const charts = document.querySelectorAll('[data-akpd-chart]');
 
     charts.forEach((canvas) => {
+
+        if (Chart.getChart(canvas)) {
+            return;
+        }
 
         const data = JSON.parse(canvas.dataset.data);
 
@@ -184,4 +188,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-});
+};
+
+const destroyAkpdCharts = () => {
+    document.querySelectorAll('[data-akpd-chart]').forEach((canvas) => {
+        Chart.getChart(canvas)?.destroy();
+    });
+};
+
+document.addEventListener('DOMContentLoaded', initializeAkpdCharts);
+document.addEventListener('livewire:navigated', initializeAkpdCharts);
+document.addEventListener('livewire:navigating', destroyAkpdCharts);
+document.addEventListener('livewire:navigated', initializeAkpdCharts);

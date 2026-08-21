@@ -15,10 +15,14 @@ Chart.register(
     Tooltip
 );
 
-document.addEventListener('DOMContentLoaded', () => {
+const initializeBarCharts = () => {
     const charts = document.querySelectorAll('[data-bar-chart]');
 
     charts.forEach((canvas) => {
+        if (Chart.getChart(canvas)) {
+            return;
+        }
+
         const labels = JSON.parse(canvas.dataset.labels || '[]');
         const values = JSON.parse(canvas.dataset.values || '[]');
 
@@ -158,4 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
+};
+
+const destroyBarCharts = () => {
+    document.querySelectorAll('[data-bar-chart]').forEach((canvas) => {
+        Chart.getChart(canvas)?.destroy();
+    });
+};
+
+document.addEventListener('DOMContentLoaded', initializeBarCharts);
+document.addEventListener('livewire:navigated', initializeBarCharts);
+document.addEventListener('livewire:navigating', destroyBarCharts);

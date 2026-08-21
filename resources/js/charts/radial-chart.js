@@ -11,10 +11,14 @@ Chart.register(
     Tooltip
 );
 
-document.addEventListener('DOMContentLoaded', () => {
+const initializeRadialCharts = () => {
     const charts = document.querySelectorAll('[data-radial-chart]');
 
     charts.forEach((canvas) => {
+        if (Chart.getChart(canvas)) {
+            return;
+        }
+
         const labels = JSON.parse(canvas.dataset.labels || '[]');
         const values = JSON.parse(canvas.dataset.values || '[]');
 
@@ -95,4 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
+};
+
+const destroyRadialCharts = () => {
+    document.querySelectorAll('[data-radial-chart]').forEach((canvas) => {
+        Chart.getChart(canvas)?.destroy();
+    });
+};
+
+document.addEventListener('DOMContentLoaded', initializeRadialCharts);
+document.addEventListener('livewire:navigated', initializeRadialCharts);
+document.addEventListener('livewire:navigating', destroyRadialCharts);
