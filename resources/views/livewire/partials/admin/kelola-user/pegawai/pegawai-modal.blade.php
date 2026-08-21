@@ -6,8 +6,8 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     public ?int $editingId = null;
 
     public int $step = 1;
@@ -17,8 +17,11 @@ new class extends Component {
     // ==========================
 
     public $nama = '';
+
     public $email = '';
+
     public $password = '';
+
     public $role = '';
 
     // ==========================
@@ -26,6 +29,7 @@ new class extends Component {
     // ==========================
 
     public $nip = '';
+
     public $jabatan = '';
 
     #[Computed]
@@ -34,15 +38,15 @@ new class extends Component {
         return [
             [
                 'value' => 'admin',
-                'label' => 'Administrator'
+                'label' => 'Administrator',
             ],
             [
                 'value' => 'konselor',
-                'label' => 'Konselor'
+                'label' => 'Konselor',
             ],
             [
                 'value' => 'pegawai',
-                'label' => 'Pegawai'
+                'label' => 'Pegawai',
             ],
         ];
     }
@@ -61,7 +65,7 @@ new class extends Component {
 
     public function getInitials($name)
     {
-        if (!$name) {
+        if (! $name) {
             return '--';
         }
 
@@ -69,7 +73,7 @@ new class extends Component {
 
         if (count($words) >= 2) {
             return strtoupper(
-                substr($words[0], 0, 1) .
+                substr($words[0], 0, 1).
                 substr($words[1], 0, 1)
             );
         }
@@ -95,7 +99,7 @@ new class extends Component {
 
             ];
 
-            if (!$this->editingId) {
+            if (! $this->editingId) {
 
                 $rules['password'] = 'required|min:8';
 
@@ -206,7 +210,7 @@ new class extends Component {
 
         ];
 
-        if (!$this->editingId) {
+        if (! $this->editingId) {
 
             $rules['password'] = 'required|min:8';
 
@@ -216,13 +220,17 @@ new class extends Component {
 
         $data = [
 
-            'name' => $this->nama,
+            'nama' => $this->nama,
 
             'email' => $this->email,
 
             'password' => $this->password,
 
-            'role' => $this->role,
+            'role' => $this->role === 'konselor' ? 'guru_bk' : $this->role,
+
+            'jenis_kelamin' => 'L',
+
+            'no_hp' => '-',
 
             'nip' => $this->nip,
 
@@ -248,7 +256,6 @@ new class extends Component {
 
         $this->dispatch('refreshTable');
     }
-
 };
 
 ?>
