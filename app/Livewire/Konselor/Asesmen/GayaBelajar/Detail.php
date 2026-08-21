@@ -87,9 +87,9 @@ class Detail extends Component
      */
     public function edit()
     {
-        $this->dispatch(
-            'edit-gaya-belajar',
-            id: (int) $this->record->id
+        return redirect()->route(
+            'konselor.asesmen.gaya-belajar.index', 
+            ['edit' => $this->record->id]
         );
     }
 
