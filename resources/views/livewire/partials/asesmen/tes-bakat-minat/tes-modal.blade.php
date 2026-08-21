@@ -47,7 +47,11 @@
 
                         @php
                             $selectedStudent = collect($students)
-                                ->firstWhere('id', $siswa_id);
+                                ->first(fn($s) => (int)(is_array($s) ? ($s['id'] ?? 0) : ($s->id ?? 0)) === (int)$siswa_id);
+                            // Normalisasi ke object agar akses property konsisten
+                            if (is_array($selectedStudent)) {
+                                $selectedStudent = (object) $selectedStudent;
+                            }
                         @endphp
 
                         @if($selectedStudent)
@@ -412,10 +416,10 @@
                             }
 
                             return str_contains(
-                                strtolower($student->nama ?? ''),
+                                strtolower($student['nama'] ?? ''),
                                 $keyword
                             ) || str_contains(
-                                strtolower($student->nis ?? ''),
+                                strtolower($student['nis'] ?? ''),
                                 $keyword
                             );
                         });
@@ -426,32 +430,32 @@
                         @forelse($filteredStudents as $siswa)
 
                             <div
-                                wire:click="selectStudent({{ $siswa->id }})"
-                                class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa->id ? 'border-primary bg-bg-light' : '' }}"
+                                wire:click="selectStudent({{ $siswa['id'] }})"
+                                class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-colors {{ $siswa_id == $siswa['id'] ? 'border-primary bg-bg-light' : '' }}"
                             >
 
                                 <div class="flex items-center gap-3">
 
                                     <div class="w-10 h-10 bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[13px] shrink-0">
-                                        {{ $this->getInitials($siswa->nama ?? '') }}
+                                        {{ $this->getInitials($siswa['nama'] ?? '') }}
                                     </div>
 
                                     <div>
 
                                         <h4 class="text-[14px] font-bold text-gray-900">
-                                            {{ $siswa->nama ?? '-' }}
+                                            {{ $siswa['nama'] ?? '-' }}
                                         </h4>
 
                                         <p class="text-[12px] text-gray-500 mt-1">
-                                            NIS: {{ $siswa->nis ?? '-' }}
+                                            NIS: {{ $siswa['nis'] ?? '-' }}
 
                                             <span class="ml-2">
-                                                Kelas: {{ $siswa->kelas_label ?? '-' }}
+                                                Kelas: {{ $siswa['kelas_label'] ?? '-' }}
                                             </span>
 
-                                            @if($siswa->jurusan_label)
+                                            @if($siswa['jurusan_label'] ?? '')
                                                 <span class="ml-1">
-                                                    {{ $siswa->jurusan_label }}
+                                                    {{ $siswa['jurusan_label'] }}
                                                 </span>
                                             @endif
 

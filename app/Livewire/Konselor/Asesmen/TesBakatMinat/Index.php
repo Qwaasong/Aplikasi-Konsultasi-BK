@@ -130,6 +130,13 @@ class Index extends Component
             ->get()
             ->sortBy(fn ($student) => $student->nama ?? '')
             ->values()
+            ->map(fn ($student) => [
+                'id'            => $student->id,
+                'nama'          => $student->nama ?? '',
+                'nis'           => $student->nis ?? '',
+                'kelas_label'   => $student->kelas_label ?? '-',
+                'jurusan_label' => $student->jurusan_label ?? '-',
+            ])
             ->all();
 
         $this->jurusanOptions = Jurusan::query()
@@ -300,8 +307,7 @@ class Index extends Component
 
         $this->editingId = $id;
 
-        $this->siswa_id =
-            $record->siswa_id;
+        $this->siswa_id = (int) $record->siswa_id;
 
         $this->tanggal =
             optional($record->tanggal)
@@ -313,8 +319,15 @@ class Index extends Component
         $this->catatan =
             $record->catatan;
 
-        $this->jawaban =
-            $record->jawaban ?? [];
+        // Pastikan struktur jawaban lengkap per-section
+        $loadedJawaban = $record->jawaban ?? [];
+        $jawaban = $this->initializeJawaban();
+        foreach (Peminatan::SECTIONS as $section) {
+            if (isset($loadedJawaban[$section]) && is_array($loadedJawaban[$section])) {
+                $jawaban[$section] = $loadedJawaban[$section];
+            }
+        }
+        $this->jawaban = $jawaban;
 
         $this->dispatch(
             'open-modal',

@@ -622,4 +622,10 @@ new #[Layout('layouts.app', ['title' => 'Detail Bakat Minat - Bimbingan Konselin
     <x-shared.flash-message />
 
 </div>
+
+{{-- Modal Edit Tes Bakat Minat --}}
+@include('livewire.partials.asesmen.tes-bakat-minat.tes-modal', [
+    'editingId' => $editingId,
+])
+
 </div>

@@ -53,6 +53,8 @@ class Index extends Component
     public $faktor_penghambat = '';
     public $faktor_pendukung = '';
 
+    public array $jawaban = [];
+
     public array $files = [];
     public array $existingFiles = [];
     public array $newFiles = [];
@@ -76,10 +78,29 @@ class Index extends Component
         ])
             ->get()
             ->sortBy(fn($student) => $student->nama ?? '')
-            ->values();
+            ->values()
+            ->map(fn($s) => [
+                'id' => $s->id,
+                'nama' => $s->nama ?? '',
+                'nis' => $s->nis ?? '',
+                'kelas_label' => $s->kelas_label ?? '-',
+                'jurusan_label' => $s->jurusan_label ?? '-',
+            ])
+            ->all();
+
+        $this->jawaban = $this->initializeJawaban();
 
         $this->loadData();
         $this->loadFilterOptions();
+    }
+
+    private function initializeJawaban(): array
+    {
+        return [
+            'Visual' => [],
+            'Auditorial' => [],
+            'Kinestetik' => []
+        ];
     }
 
     public function loadData(): void
@@ -130,6 +151,14 @@ class Index extends Component
 
     public function nextStep(): void
     {
+        // Hitung visual, auditori, kinestetik dari checkbox jika jawaban ada isinya
+        if (!empty($this->jawaban['Visual']) || !empty($this->jawaban['Auditorial']) || !empty($this->jawaban['Kinestetik'])) {
+            $this->visual = count($this->jawaban['Visual'] ?? []);
+            $this->auditori = count($this->jawaban['Auditorial'] ?? []);
+            $this->kinestetik = count($this->jawaban['Kinestetik'] ?? []);
+            $this->computeHasil();
+        }
+
         $this->validate([
             'siswa_id' => 'required|integer',
             'tanggal' => 'required|date',
@@ -150,18 +179,11 @@ class Index extends Component
         $this->step = 1;
     }
 
-    public function updatedVisual(): void
+    public function updatedJawaban(): void
     {
-        $this->computeHasil();
-    }
-
-    public function updatedAuditori(): void
-    {
-        $this->computeHasil();
-    }
-
-    public function updatedKinestetik(): void
-    {
+        $this->visual = count($this->jawaban['Visual'] ?? []);
+        $this->auditori = count($this->jawaban['Auditorial'] ?? []);
+        $this->kinestetik = count($this->jawaban['Kinestetik'] ?? []);
         $this->computeHasil();
     }
 
@@ -237,6 +259,8 @@ class Index extends Component
             'existingFiles',
             'newFiles',
         ]);
+        
+        $this->jawaban = $this->initializeJawaban();
 
         $this->editingId = null;
         $this->tanggal = now()->format('Y-m-d');
@@ -267,6 +291,8 @@ class Index extends Component
         $this->catatan = $record->catatan;
         $this->faktor_penghambat = $record->faktor_penghambat;
         $this->faktor_pendukung = $record->faktor_pendukung;
+
+        $this->jawaban = array_merge($this->initializeJawaban(), is_array($record->jawaban) ? $record->jawaban : []);
 
         $this->step = 1;
 
@@ -344,7 +370,8 @@ class Index extends Component
             'hasil'      => $this->hasil,
             'catatan'    => $this->catatan,
             'faktor_penghambat' => $this->faktor_penghambat,
-            'faktor_pendukung' => $this->faktor_pendukung,
+            'faktor_pendukung'  => $this->faktor_pendukung,
+            'jawaban'    => $this->jawaban,
         ];
 
         if ($this->editingId) {

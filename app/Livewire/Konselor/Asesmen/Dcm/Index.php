@@ -82,8 +82,19 @@ class Index extends Component
             ->sortBy(fn ($student) => $student->nama ?? '')
             ->values();
 
+        $this->jawaban = $this->initializeJawaban();
+
         $this->loadData();
         $this->loadFilterOptions();
+    }
+
+    private function initializeJawaban(): array
+    {
+        $jawaban = [];
+        foreach (array_keys(Dcm::SECTIONS) as $section) {
+            $jawaban[$section] = [];
+        }
+        return $jawaban;
     }
 
     public function loadData(): void
@@ -139,10 +150,11 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'jawaban',
             'kesimpulan',
             'catatan',
         ]);
+
+        $this->jawaban = $this->initializeJawaban();
 
         $this->step = 1;
         $this->showStudentModal = false;
@@ -167,10 +179,19 @@ class Index extends Component
         }
 
         $this->editingId = $id;
-        $this->siswa_id = $record->siswa_id;
+        $this->siswa_id = (int) $record->siswa_id;
         $this->tanggal = optional($record->tanggal)->format('Y-m-d');
 
-        $this->jawaban = $record->jawaban ?? [];
+        // Pastikan struktur jawaban lengkap per-section
+        $loadedJawaban = $record->jawaban ?? [];
+        $jawaban = $this->initializeJawaban();
+        foreach (array_keys(Dcm::SECTIONS) as $section) {
+            if (isset($loadedJawaban[$section]) && is_array($loadedJawaban[$section])) {
+                $jawaban[$section] = $loadedJawaban[$section];
+            }
+        }
+        $this->jawaban = $jawaban;
+
         $this->kesimpulan = $record->kesimpulan;
         $this->catatan = $record->catatan;
         $this->step = 1;
