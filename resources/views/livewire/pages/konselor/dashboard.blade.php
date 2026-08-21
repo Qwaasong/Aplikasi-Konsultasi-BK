@@ -3,8 +3,44 @@
 use App\Livewire\Konselor\Dashboard;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] class extends Dashboard {}; ?>
+new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] class extends Dashboard {
 
+    public array $bakatMinatData = [
+        ['label' => 'Kecerdasan Linguistik', 'value' => 12],
+        ['label' => 'Kecerdasan Logis Matematik', 'value' => 9],
+        ['label' => 'Kecerdasan Visual Spasial', 'value' => 13],
+        ['label' => 'Kecerdasan Musikal', 'value' => 15],
+        ['label' => 'Kecerdasan Interpersonal', 'value' => 11],
+        ['label' => 'Kecerdasan Intrapersonal', 'value' => 8],
+        ['label' => 'Kecerdasan Kinestetik', 'value' => 10],
+        ['label' => 'Kecerdasan Naturalis', 'value' => 5],
+    ];
+
+    public array $gayaBelajarData = [
+        ['label' => 'Visual', 'value' => 280],
+        ['label' => 'Auditorial', 'value' => 150],
+        ['label' => 'Kinestetik', 'value' => 180],
+    ];
+
+    public array $akpdData = [
+        'Pribadi' => [
+            'ya' => 25,
+            'tidak' => 15,
+        ],
+        'Sosial' => [
+            'ya' => 20,
+            'tidak' => 20,
+        ],
+        'Belajar' => [
+            'ya' => 14,
+            'tidak' => 26,
+        ],
+        'Karir' => [
+            'ya' => 10,
+            'tidak' => 30,
+        ],
+    ];
+}; ?>
 
 <div class="py-12">
     <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -43,6 +79,66 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
                     <x-atoms.icon variant="student" size="lg" color="#086375" />
                 </x-slot>
             </x-molecules.stat-card>
+
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
+
+            {{-- Gaya Belajar --}}
+            <div class="lg:col-span-2 bg-white border border-[#086375]/15 rounded-2xl p-6 shadow-sm h-full flex flex-col">
+
+                <h2 class="text-lg font-semibold text-[#086375] mb-4">
+                    Gaya Belajar Siswa
+                </h2>
+
+                <div class="flex-1">
+                    <x-molecules.radial-chart :data="$gayaBelajarData" />
+                </div>
+
+                <div class="mt-6">
+                    <x-atoms.detail-link
+                        text="Lihat Detail"
+                        href="asesmen/gaya-belajar"/>
+                </div>
+
+            </div>
+
+
+            {{-- Bakat & Minat --}}
+            <div class="lg:col-span-3 bg-white border border-[#086375]/15 rounded-2xl p-6 shadow-sm h-full flex flex-col">
+
+                <h2 class="text-lg font-semibold text-[#086375] mb-4">
+                    Bakat & Minat Siswa
+                </h2>
+
+                <div class="flex-1">
+                    <x-molecules.bar-chart :data="$bakatMinatData" />
+                </div>
+
+                <div class="mt-6">
+                    <x-atoms.detail-link
+                        text="Lihat Detail"
+                        href="asesmen/tes-bakat-minat/detail" />
+                </div>
+
+            </div>
+
+            {{-- Hasil AKPD --}}
+            <div class="lg:col-span-5 bg-white border border-[#086375]/15 rounded-2xl p-6 shadow-sm">
+
+                <h2 class="text-lg font-semibold text-[#086375] mb-4">
+                    Hasil AKPD
+                </h2>
+
+                <x-molecules.akpd-chart :data="$akpdData" />
+
+                <div class="mt-6">
+                    <x-atoms.detail-link
+                        text="Lihat Detail"
+                        href="asesmen/akpd" />
+                </div>
+
+            </div>
 
         </div>
     </div>
