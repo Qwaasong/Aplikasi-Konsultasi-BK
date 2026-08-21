@@ -6,7 +6,6 @@ use App\Constants\FlashMessages;
 use App\Events\KonferensiKasus\KonferensiKasusUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
-use App\Models\KasusBk;
 use App\Services\Bk\KonferensiKasusService;
 use Illuminate\Support\Facades\DB;
 
@@ -21,27 +20,15 @@ class UpdateKonferensiKasusHandler implements HandlerInterface
         $id = $context['id'] ?? null;
         $pesertaData = $context['peserta_data'] ?? [];
 
-        if (!$id) {
+        if (! $id) {
             return HandlerResult::fail('ID record tidak ditemukan.');
         }
 
         return DB::transaction(function () use ($id, $data, $pesertaData) {
             $record = $this->service->findById($id);
-            if (!$record) {
+            if (! $record) {
                 return HandlerResult::fail('Data konferensi kasus tidak ditemukan.');
             }
-
-            // Sync penanganan/uraian_masalah/tindak_lanjut to kasus_bk
-            if ($record->kasus_id) {
-                KasusBk::where('id', $record->kasus_id)->update([
-                    'penanganan' => $data['penanganan'] ?? null,
-                    'uraian_masalah' => $data['uraian_masalah'] ?? null,
-                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
-                ]);
-            }
-
-            // Clean fields already stored in kasus_bk
-            unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
             $this->service->update($id, $data, $pesertaData);
 

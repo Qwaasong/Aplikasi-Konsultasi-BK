@@ -19,6 +19,33 @@
                     }}
                 </p>
 
+                {{-- PROGRESS BAR --}}
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-gray-600">Langkah {{ $step }} Dari 2</span>
+                        <span class="text-xs text-gray-400">
+                            @if($step === 1) Isi Data @else Unggah Berkas @endif
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full transition-all duration-500 ease-in-out"
+                            style="width: {{ ($step / 2) * 100 }}%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1.5">
+                        @foreach([1, 2] as $s)
+                            <div class="flex items-center gap-1">
+                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
+                                    {{ $step >= $s ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500' }}">
+                                    {{ $s }}
+                                </div>
+                                <span class="text-[10px] {{ $step >= $s ? 'text-primary font-semibold' : 'text-gray-400' }}">
+                                    {{ $s === 1 ? 'Data' : 'Berkas' }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
             </div>
 
 
@@ -34,22 +61,6 @@
                     STEP 1
                 ================================================== --}}
                 <div class="{{ $step === 1 ? 'block' : 'hidden' }}">
-
-                    {{-- PROGRESS --}}
-                    <div class="mb-6">
-
-                        <p class="text-[14px] font-bold text-primary mb-2.5">
-                            Langkah 1 Dari 2
-                        </p>
-
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-gray-200/80 rounded-full"></div>
-                        </div>
-
-                    </div>
-
-
                     {{-- =================================================
                         SISWA
                     ================================================== --}}
@@ -60,7 +71,7 @@
                         </x-atoms.input-label>
 
                         @php
-                            $selectedStudent = collect($students)
+                            $selectedStudent = collect($this->students)
                                 ->firstWhere('id', $siswa_id);
                         @endphp
 
@@ -195,6 +206,10 @@
                         />
 
                         @error('tahun_pelajaran')
+                                        <span wire:loading.remove wire:target="save">
+                                            {{ $editingId ? 'Perbarui' : 'Simpan' }}
+                                        </span>
+                                        <span wire:loading wire:target="save">Menyimpan...</span>
                             <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                                 {{ $message }}
                             </span>
@@ -335,24 +350,6 @@
                     STEP 2 - UPLOAD FILE
                 ================================================== --}}
                 <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
-
-                    <div class="mb-6">
-
-                        <p class="text-[14px] font-bold text-primary mb-2.5">
-                            Langkah 2 Dari 2
-                        </p>
-
-                        <div class="flex gap-2.5">
-
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-
-                        </div>
-
-                    </div>
-
-
                     {{-- UPLOAD --}}
                     <div class="mb-6">
 
@@ -545,8 +542,11 @@
                         Batal
                     </x-atoms.button>
 
-                    <x-atoms.button wire:click="nextStep">
-                        Langkah Terakhir : Upload File
+                    <x-atoms.button variant="primary" size="md" wire:click="nextStep">
+                        Selanjutnya
+                        <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
                     </x-atoms.button>
 
                 </div>
@@ -560,11 +560,17 @@
                         size="md"
                         wire:click="previousStep"
                     >
+                        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
                         Kembali
                     </x-atoms.button>
 
-                    <x-atoms.button wire:click="save">
-                        {{ $editingId ? 'Perbarui AKPD' : 'Simpan AKPD' }}
+                    <x-atoms.button variant="primary" wire:click="save" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            {{ $editingId ? 'Perbarui' : 'Simpan' }}
+                        </span>
+                        <span wire:loading wire:target="save">Menyimpan...</span>
                     </x-atoms.button>
 
                 </div>
@@ -631,7 +637,7 @@
 
                     {{-- LIST SISWA --}}
                     @php
-                        $filteredStudents = collect($students)->filter(function ($student) {
+                        $filteredStudents = collect($this->students)->filter(function ($student) {
                             $keyword = strtolower(trim($this->searchSiswa));
 
                             if ($keyword === '') {

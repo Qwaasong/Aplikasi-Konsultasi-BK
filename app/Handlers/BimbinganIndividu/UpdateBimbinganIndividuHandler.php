@@ -19,13 +19,13 @@ class UpdateBimbinganIndividuHandler implements HandlerInterface
     public function handle(array $data, array $context = []): HandlerResult
     {
         $id = $context['id'] ?? null;
-        if (!$id) {
+        if (! $id) {
             return HandlerResult::fail('ID record tidak ditemukan.');
         }
 
         return DB::transaction(function () use ($id, $data) {
             $record = $this->service->findById($id);
-            if (!$record) {
+            if (! $record) {
                 return HandlerResult::fail('Data layanan konseling individu tidak ditemukan.');
             }
 
@@ -34,6 +34,7 @@ class UpdateBimbinganIndividuHandler implements HandlerInterface
             // Sync penanganan/uraian_masalah/tindak_lanjut to kasus_bk
             if ($record->kasus_id) {
                 KasusBk::where('id', $record->kasus_id)->update([
+                    'tahun_ajaran_id' => $data['tahun_ajaran_id'],
                     'penanganan' => $data['penanganan'] ?? null,
                     'uraian_masalah' => $data['uraian_masalah'] ?? null,
                     'tindak_lanjut' => $data['tindak_lanjut'] ?? null,

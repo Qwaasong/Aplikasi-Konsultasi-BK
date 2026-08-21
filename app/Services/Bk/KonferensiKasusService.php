@@ -2,11 +2,11 @@
 
 namespace App\Services\Bk;
 
-use App\Models\KonferensiKasusPeserta;
 use App\Models\KasusBk;
-use App\Models\KategoriKasus;
-use App\Services\User\PegawaiService;
+use App\Models\KonferensiKasus;
+use App\Models\KonferensiKasusPeserta;
 use App\Repositories\Contracts\Bk\KonferensiKasusRepositoryInterface;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Collection;
 
 class KonferensiKasusService
@@ -20,17 +20,17 @@ class KonferensiKasusService
         return $this->repo->getAll();
     }
 
-    public function findById(int $id): ?\App\Models\KonferensiKasus
+    public function findById(int $id): ?KonferensiKasus
     {
         return $this->repo->findById($id);
     }
 
-    public function create(array $data, array $pesertaData = []): \App\Models\KonferensiKasus
+    public function create(array $data, array $pesertaData = []): KonferensiKasus
     {
         $pegawai = app(PegawaiService::class)->getCurrentPegawai();
 
         // Konferensi kasus = follow-up dari kasus yang sudah ada
-        //kasus_id langsung dari form (user pilih kasus)
+        // kasus_id langsung dari form (user pilih kasus)
         $data['guru_bk_id'] = $data['guru_bk_id'] ?? $pegawai?->id;
 
         // Hapus field yang tidak ada di tabel konferensi_kasus (sudah di kasus_bk)
@@ -38,8 +38,8 @@ class KonferensiKasusService
 
         $record = $this->repo->create($data);
 
-        if (!empty($pesertaData)) {
-            $insert = collect($pesertaData)->map(fn($p) => [
+        if (! empty($pesertaData)) {
+            $insert = collect($pesertaData)->map(fn ($p) => [
                 'konferensi_kasus_id' => $record->id,
                 'nama_peserta' => $p['nama_peserta'],
                 'peran_peserta' => $p['peran_peserta'],
@@ -52,27 +52,15 @@ class KonferensiKasusService
         return $record->fresh(['kasus.siswa.user', 'kasus.lampirans', 'peserta']);
     }
 
-    public function update(int $id, array $data, array $pesertaData = []): \App\Models\KonferensiKasus
+    public function update(int $id, array $data, array $pesertaData = []): KonferensiKasus
     {
         $record = $this->repo->findById($id);
 
-        // Simpan penanganan/uraian_masalah/tindak_lanjut ke kasus_bk
-        if ($record->kasus_id) {
-            KasusBk::where('id', $record->kasus_id)->update([
-                'penanganan'    => $data['penanganan'] ?? null,
-                'uraian_masalah' => $data['uraian_masalah'] ?? null,
-                'tindak_lanjut'  => $data['tindak_lanjut'] ?? null,
-            ]);
-        }
-
-        // Hapus field yang tidak ada di tabel konferensi_kasus (sudah di kasus_bk)
-        unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
-
         $this->repo->update($id, $data);
 
-        if (!empty($pesertaData)) {
+        if (! empty($pesertaData)) {
             KonferensiKasusPeserta::where('konferensi_kasus_id', $id)->delete();
-            $insert = collect($pesertaData)->map(fn($p) => [
+            $insert = collect($pesertaData)->map(fn ($p) => [
                 'konferensi_kasus_id' => $id,
                 'nama_peserta' => $p['nama_peserta'],
                 'peran_peserta' => $p['peran_peserta'],
@@ -99,20 +87,20 @@ class KonferensiKasusService
     {
         $query = $this->repo->query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $keyword = $filters['search'];
             $query->where(function ($q) use ($keyword) {
-                $q->whereHas('kasus', fn($q2) => $q2->where('uraian_masalah', 'like', "%{$keyword}%"))
-                    ->orWhereHas('kasus.siswa.user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
+                $q->whereHas('kasus', fn ($q2) => $q2->where('uraian_masalah', 'like', "%{$keyword}%"))
+                    ->orWhereHas('kasus.siswa.user', fn ($q2) => $q2->where('nama', 'like', "%{$keyword}%"));
             });
         }
 
-        if (!empty($filters['kelas'])) {
-            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        if (! empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn ($q) => $q->whereHas('kelas', fn ($q2) => $q2->where('nama_kelas', $filters['kelas'])));
         }
 
-        if (!empty($filters['jurusan'])) {
-            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        if (! empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn ($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }
 
         return $query->latest('tanggal_konferensi')->get();
@@ -140,15 +128,15 @@ class KonferensiKasusService
             ->where('status', 'Open')
             ->latest('tanggal_mulai')
             ->get()
-            ->map(fn($k) => [
-                'id'            => $k->id,
-                'nama_siswa'    => $k->siswa->user->nama ?? '-',
-                'nis'           => $k->siswa->nis ?? '-',
-                'kelas_label'   => $k->siswa->kelas_label ?? '-',
-                'penanganan'    => $k->penanganan ?? '-',
-                'kategori'      => $k->kategori->nama_kategori ?? '-',
+            ->map(fn ($k) => [
+                'id' => $k->id,
+                'nama_siswa' => $k->siswa->user->nama ?? '-',
+                'nis' => $k->siswa->nis ?? '-',
+                'kelas_label' => $k->siswa->kelas_label ?? '-',
+                'penanganan' => $k->penanganan ?? '-',
+                'kategori' => $k->kategori->nama_kategori ?? '-',
                 'tanggal_mulai' => optional($k->tanggal_mulai)->format('d M Y'),
-                'prioritas'     => $k->prioritas ?? '-',
+                'prioritas' => $k->prioritas ?? '-',
             ]);
     }
 }

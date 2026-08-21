@@ -149,7 +149,7 @@ new class extends Component {
         $record = $service->findById($id);
 
         $this->editingId = $id;
-        $this->tahun_ajaran_id = $record->tahun_ajaran_id;
+        $this->tahun_ajaran_id = $record->kasus?->tahun_ajaran_id ?? '';
         $this->tanggal_layanan = \Carbon\Carbon::parse($record->tanggal_layanan)->format('Y-m-d');
         $this->siswa_id = $record->kasus?->siswa_id ?? '';
         $this->penanganan = $record->penanganan ?? '';
