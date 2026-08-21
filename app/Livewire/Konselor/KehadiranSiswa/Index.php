@@ -22,6 +22,8 @@ class Index extends Component
     public string $selectedTanggal = '';
     public ?int $selectedTahunAjaranId = null;
 
+    public bool $showFilters = false;
+
     public array $records = [];
     public array $kelasOptions = [];
     public array $tahunOptions = [];
@@ -189,14 +191,24 @@ class Index extends Component
      */
     public function kembaliKeKelas(): void
     {
-        $this->selectedKelas = null;
-        $this->search = '';
-        $this->records = [];
-        $this->attendance = [];
+        $this->reset(['selectedKelas', 'records', 'attendance', 'search', 'filterStatus', 'showFilters']);
         $this->loadKelas();
     }
 
-    // ── IMPORT ───────────────────────────────
+    public function filterAction(): void
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function resetFilter(): void
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+        $this->selectedTanggal = date('Y-m-d');
+        $this->loadData();
+    }
+
+    // ── IMPORT METHODS ───────────────────────────────
 
     public function openImport(): void
     {

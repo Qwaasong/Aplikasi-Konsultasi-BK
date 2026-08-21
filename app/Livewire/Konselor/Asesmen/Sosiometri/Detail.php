@@ -46,7 +46,7 @@ class Detail extends Component
 
     public function edit()
     {
-        $this->dispatch('edit-sosiometri', id: $this->sosiometri->id);
+        return redirect()->route('konselor.asesmen.sosiometri.index', ['edit' => $this->sosiometri->id]);
     }
 
     #[On('refreshTable')]

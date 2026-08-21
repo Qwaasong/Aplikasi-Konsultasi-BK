@@ -6,7 +6,6 @@ use App\Constants\FlashMessages;
 use App\Events\BimbinganKelompok\BimbinganKelompokUpdated;
 use App\Handlers\Contracts\HandlerInterface;
 use App\Handlers\Results\HandlerResult;
-use App\Models\KasusBk;
 use App\Services\Bimbingan\BimbinganKelompokService;
 use Illuminate\Support\Facades\DB;
 
@@ -21,27 +20,15 @@ class UpdateBimbinganKelompokHandler implements HandlerInterface
         $id = $context['id'] ?? null;
         $siswaIds = $context['siswa_ids'] ?? [];
 
-        if (!$id) {
+        if (! $id) {
             return HandlerResult::fail('ID record tidak ditemukan.');
         }
 
         return DB::transaction(function () use ($id, $data, $siswaIds) {
             $record = $this->service->findById($id);
-            if (!$record) {
+            if (! $record) {
                 return HandlerResult::fail('Data layanan konseling kelompok tidak ditemukan.');
             }
-
-            // Sync penanganan/uraian_masalah/tindak_lanjut to kasus_bk
-            if ($record->kasus_id) {
-                KasusBk::where('id', $record->kasus_id)->update([
-                    'penanganan' => $data['penanganan'] ?? null,
-                    'uraian_masalah' => $data['uraian_masalah'] ?? null,
-                    'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
-                ]);
-            }
-
-            // Clean fields already stored in kasus_bk
-            unset($data['penanganan'], $data['uraian_masalah'], $data['tindak_lanjut']);
 
             $this->service->update($id, $data, $siswaIds);
 

@@ -71,19 +71,19 @@
                                 <div class="flex items-center gap-3">
 
                                     <div class="w-[45px] h-[45px] bg-icon-bg text-primary rounded-full flex items-center justify-center font-bold text-[16px]">
-                                        {{ $this->getInitials($selectedStudent->nama ?? '') }}
+                                        {{ $this->getInitials($selectedStudent['nama'] ?? '') }}
                                     </div>
 
                                     <div>
 
                                         <h3 class="text-[14px] font-bold text-gray-900">
-                                            {{ $selectedStudent->nama ?? '-' }}
+                                            {{ $selectedStudent['nama'] ?? '-' }}
                                         </h3>
 
                                         <p class="text-[12px] text-gray-400 mt-0.5">
-                                            Kelas {{ $selectedStudent->kelas_label ?? '-' }}
-                                            {{ $selectedStudent->jurusan_label ?? '' }}
-                                            - NIS {{ $selectedStudent->nis ?? '-' }}
+                                            Kelas {{ $selectedStudent['kelas_label'] ?? '-' }}
+                                            {{ $selectedStudent['jurusan_label'] ?? '' }}
+                                            - NIS {{ $selectedStudent['nis'] ?? '-' }}
                                         </p>
 
                                     </div>
@@ -177,152 +177,50 @@
                     </div>
 
 
-                    {{-- =================================================
-                        NILAI GAYA BELAJAR
-                    ================================================== --}}
+                    <div class="space-y-6">
 
-                    <div class="space-y-5">
-
-                        {{-- VISUAL --}}
-                        <div class="bg-bg-light border border-gray-200 rounded-xl p-5">
-
-                            <x-atoms.input-label for="visual" size="sm">
-                                Visual
-                            </x-atoms.input-label>
-
-                            <x-atoms.text-input
-                                id="visual"
-                                type="number"
-                                min="0"
-                                max="100"
-                                wire:model.live="visual"
-                                placeholder="Masukkan skor Visual"
-                            />
-
-                            <p class="text-xs text-gray-400 mt-2">
-                                Semakin tinggi nilainya, semakin dominan kecenderungan belajar visual.
-                            </p>
-
-                            @error('visual')
-                                <span class="text-red-500 text-[13px] font-medium mt-2 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- AUDITORI --}}
-                        <div class="bg-bg-light border border-gray-200 rounded-xl p-5">
-
-                            <x-atoms.input-label for="auditori" size="sm">
-                                Auditori
-                            </x-atoms.input-label>
-
-                            <x-atoms.text-input
-                                id="auditori"
-                                type="number"
-                                min="0"
-                                max="100"
-                                wire:model.live="auditori"
-                                placeholder="Masukkan skor Auditori"
-                            />
-
-                            <p class="text-xs text-gray-400 mt-2">
-                                Nilai ini menunjukkan kecenderungan memahami materi melalui pendengaran.
-                            </p>
-
-                            @error('auditori')
-                                <span class="text-red-500 text-[13px] font-medium mt-2 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- KINESTETIK --}}
-                        <div class="bg-bg-light border border-gray-200 rounded-xl p-5">
-
-                            <x-atoms.input-label for="kinestetik" size="sm">
-                                Kinestetik
-                            </x-atoms.input-label>
-
-                            <x-atoms.text-input
-                                id="kinestetik"
-                                type="number"
-                                min="0"
-                                max="100"
-                                wire:model.live="kinestetik"
-                                placeholder="Masukkan skor Kinestetik"
-                            />
-
-                            <p class="text-xs text-gray-400 mt-2">
-                                Nilai ini menunjukkan kecenderungan belajar melalui praktik atau aktivitas fisik.
-                            </p>
-
-                            @error('kinestetik')
-                                <span class="text-red-500 text-[13px] font-medium mt-2 block">
-                                    {{ $message }}
-                                </span>
-                            @enderror
-
-                        </div>
+                        @foreach(\App\Models\GayaBelajar::QUESTION_GROUPS as $section => $questions)
+                            <div class="bg-bg-light border border-gray-200 rounded-xl p-5">
+                                <h3 class="font-bold text-[15px] text-primary mb-4 uppercase">{{ $section }}</h3>
+                                <div class="space-y-3">
+                                    @foreach($questions as $index => $question)
+                                        <label class="flex items-start gap-3 cursor-pointer group">
+                                            <div class="flex-shrink-0 pt-0.5">
+                                                <input type="checkbox"
+                                                    wire:model.live="jawaban.{{ $section }}.{{ $index }}"
+                                                    value="1"
+                                                    class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary transition-colors">
+                                            </div>
+                                            <span class="text-[14px] text-gray-700 leading-snug group-hover:text-primary transition-colors">
+                                                {{ $question }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
 
                     </div>
-                                        {{-- =================================================
-                            HASIL GAYA BELAJAR
-                        ================================================== --}}
-                        <div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-100 rounded-xl p-6">
 
-                            <div class="flex items-center gap-3 mb-3">
-
-                                <div class="w-12 h-12 rounded-full bg-icon-bg flex items-center justify-center">
-
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="2"
-                                        stroke="currentColor"
-                                        class="w-6 h-6 text-primary">
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M9 12.75L11.25 15 15 9.75M21
-                                            12a9 9 0 11-18 0
-                                            9 9 0 0118 0z"/>
-
-                                    </svg>
-
-                                </div>
-
-                                <div>
-
-                                    <h3 class="text-[15px] font-bold text-gray-900">
-                                        Hasil Analisis
-                                    </h3>
-
-                                    <p class="text-[12px] text-gray-500">
-                                        Otomatis berdasarkan nilai tertinggi
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <div class="text-center py-3">
-
-                                <p class="text-xs text-gray-500 uppercase tracking-wider">
-                                    Gaya Belajar Dominan
-                                </p>
-
-                                <h2 class="mt-2 text-3xl font-extrabold text-primary">
-                                    {{ $hasil ?: '-' }}
-                                </h2>
-
-                            </div>
-
-                        </div>
+                    {{-- =================================================
+                        GAYA BELAJAR YANG SESUAI (HASIL)
+                    ================================================== --}}
+                    <div class="mt-6">
+                        <x-atoms.input-label for="hasil" size="sm" required>
+                            Gaya belajar yang sesuai dengan saya adalah
+                        </x-atoms.input-label>
+                        
+                        <select id="hasil" wire:model="hasil" class="w-full mt-1 border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm text-[14px]">
+                            <option value="">Pilih Gaya Belajar...</option>
+                            <option value="visual">VISUAL</option>
+                            <option value="auditori">AUDITORIAL</option>
+                            <option value="kinestetik">KINESTETIK</option>
+                        </select>
+                        
+                        @error('hasil')
+                            <span class="text-red-500 text-[13px] font-medium mt-2 block">{{ $message }}</span>
+                        @enderror
+                    </div>
 
 
                         {{-- =================================================
@@ -374,9 +272,9 @@
 
                             <x-atoms.input-label
                                 for="faktor_penghambat"
-                                size="sm">
+                                size="sm" required>
 
-                                Faktor Penghambat Belajar
+                                Faktor apa sajakah yang menghambat belajar saya?
 
                             </x-atoms.input-label>
 
@@ -395,7 +293,7 @@
                                     resize-none shadow-sm
                                     leading-relaxed"
 
-                                placeholder="Faktor apa sajakah yang menghambat belajar Anda?"
+                                placeholder="Sebutkan faktor penghambat..."
                             ></textarea>
 
                             @error('faktor_penghambat')
@@ -416,9 +314,9 @@
 
                             <x-atoms.input-label
                                 for="faktor_pendukung"
-                                size="sm">
+                                size="sm" required>
 
-                                Faktor Pendukung Belajar
+                                Faktor apa sajakah yang mendukung belajar saya?
 
                             </x-atoms.input-label>
 
@@ -437,7 +335,7 @@
                                     resize-none shadow-sm
                                     leading-relaxed"
 
-                                placeholder="Faktor apa sajakah yang mendukung belajar Anda?"
+                                placeholder="Sebutkan faktor pendukung..."
                             ></textarea>
 
                             @error('faktor_pendukung')
@@ -736,20 +634,15 @@
                         $filteredStudents = collect($students)
                             ->filter(function ($student) {
 
-                                $keyword = strtolower(trim($this->searchSiswa));
-
-                                if ($keyword === '') {
-                                    return true;
-                                }
-
-                                return str_contains(
-                                    strtolower($student->nama ?? ''),
-                                    $keyword
-                                )
-                                ||
+                                $searchSiswaLower = strtolower(trim($this->searchSiswa));
+                                return $searchSiswaLower === '' || 
                                 str_contains(
-                                    strtolower($student->nis ?? ''),
-                                    $keyword
+                                    strtolower($student['nama'] ?? ''),
+                                    $searchSiswaLower
+                                ) ||
+                                str_contains(
+                                    strtolower($student['nis'] ?? ''),
+                                    $searchSiswaLower
                                 );
 
                             });
@@ -761,54 +654,49 @@
                         @forelse($filteredStudents as $student)
 
                             <div
-                                wire:click="selectStudent({{ $student->id }})"
-                                class="border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-bg-light transition-all
-                                {{ $student->id == $siswa_id
-                                    ? 'border-primary bg-bg-light'
-                                    : ''
-                                }}"
+                                wire:click="selectStudent({{ $student['id'] }})"
+                                class="flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all {{ $student['id'] == $siswa_id 
+                                        ? 'bg-primary/5 border-primary ring-1 ring-primary' 
+                                        : 'border-gray-200 hover:border-primary/30 hover:bg-gray-50' }}"
                             >
 
                                 <div class="flex items-center gap-3">
 
-                                    <div class="w-10 h-10 rounded-full bg-icon-bg text-primary flex items-center justify-center font-bold">
-
-                                        {{ $this->getInitials($student->nama) }}
-
+                                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-primary font-bold text-[13px]">
+                                            {{ $this->getInitials($student['nama']) }}
+                                        </span>
                                     </div>
 
                                     <div>
 
-                                        <h4 class="font-bold text-[14px] text-gray-900">
+                                        <h4 class="text-[14px] font-bold text-gray-900 leading-none">
 
-                                            {{ $student->nama }}
+                                            {{ $student['nama'] }}
 
                                         </h4>
 
-                                        <p class="text-[12px] text-gray-500 mt-1">
-
-                                            NIS :
-                                            {{ $student->nis }}
-
-                                            <span class="ml-2">
-
-                                                Kelas
-                                                {{ $student->kelas_label }}
-
+                                        <div class="flex items-center gap-2 mt-1.5">
+                                            <span class="text-[12px] text-gray-500 font-medium">
+                                                NIS:
+                                            </span>
+                                            <span class="text-[12px] text-gray-700">
+                                            {{ $student['nis'] }}
                                             </span>
 
-                                            @if($student->jurusan_label)
+                                            <span class="text-gray-300">&bull;</span>
 
-                                                <span class="ml-1">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                                                {{ $student['kelas_label'] }}
+                                            </span>
 
-                                                    {{ $student->jurusan_label }}
-
+                                            @if($student['jurusan_label'])
+                                                <span class="text-gray-300">&bull;</span>
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
+                                                    {{ $student['jurusan_label'] }}
                                                 </span>
-
                                             @endif
-
-                                        </p>
-
+                                        </div>
                                     </div>
 
                                 </div>

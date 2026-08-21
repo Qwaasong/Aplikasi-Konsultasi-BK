@@ -1,18 +1,21 @@
 <?php
 
-use Livewire\Volt\Component;
-use Livewire\WithFileUploads;
+use App\Services\Asesmen\PeminatanService;
+use App\Services\Siswa\SiswaService;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
-use Livewire\Attributes\Computed;
-use App\Services\Siswa\SiswaService;
-use App\Services\Asesmen\PeminatanService;
+use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
-new class extends Component {
+new class extends Component
+{
     use WithFileUploads;
 
     public int $step = 1;
+
     public ?int $editingId = null; // Menentukan mode: null = Tambah, ada angka = Edit
+
     public array $existingFiles = [];
 
     #[Validate('required|integer')]
@@ -41,14 +44,16 @@ new class extends Component {
         'files.*' => 'file|max:12288|mimes:pdf,jpg,png,docx',
     ])]
     public $files = [];
+
     public $newFiles = [];
 
     public $searchSiswa = '';
+
     public $showStudentModal = false;
 
     public function mount()
     {
-        $this->tanggal= date('Y-m-d');
+        $this->tanggal = date('Y-m-d');
     }
 
     public function nextStep()
@@ -111,7 +116,10 @@ new class extends Component {
     #[Computed]
     public function selectedStudent()
     {
-        if (!$this->siswa_id) return null;
+        if (! $this->siswa_id) {
+            return null;
+        }
+
         return app(SiswaService::class)->findById($this->siswa_id);
     }
 
@@ -123,11 +131,14 @@ new class extends Component {
 
     public function getInitials(?string $name): string
     {
-        if (!$name) return 'S';
+        if (! $name) {
+            return 'S';
+        }
         $words = explode(' ', trim($name));
         if (count($words) >= 2) {
-            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            return strtoupper(substr($words[0], 0, 1).substr($words[1], 0, 1));
         }
+
         return strtoupper(substr($name, 0, 2));
     }
 
@@ -150,7 +161,7 @@ new class extends Component {
             'catatan',
         ]);
         $this->editingId = null;
-        $this->tanggal= date('Y-m-d');
+        $this->tanggal = date('Y-m-d');
         $this->step = 1;
 
         $this->dispatch('open-modal', 'form-peminatan');
@@ -183,7 +194,7 @@ new class extends Component {
 
         $this->step = 1;
 
-        $this->dispatch('open-modal','form-peminatan');
+        $this->dispatch('open-modal', 'form-peminatan');
     }
 
     // ── SIMPAN (CREATE ATAU UPDATE) ─────────────────────────────
@@ -205,13 +216,13 @@ new class extends Component {
 
             $service->update($this->editingId, $data);
 
-            session()->flash('success','Peminatan berhasil diperbarui!');
+            session()->flash('success', 'Peminatan berhasil diperbarui!');
 
         } else {
 
             $service->create($data);
 
-            session()->flash('success','Peminatan berhasil ditambahkan!');
+            session()->flash('success', 'Peminatan berhasil ditambahkan!');
         }
 
         $this->reset([
@@ -228,7 +239,7 @@ new class extends Component {
 
         $this->step = 1;
 
-        $this->dispatch('close-modal','form-peminatan');
+        $this->dispatch('close-modal', 'form-peminatan');
 
         $this->dispatch('refreshTable');
     }
@@ -243,21 +254,40 @@ new class extends Component {
                     {{ $editingId ? 'Edit Peminatan Siswa' : 'Tambah Peminatan Siswa' }}
                 </h2>
                 <p class="text-xs text-gray-500 mt-0.5">
-                    {{ $editingId ? 'Perbarui Peminatan Siswa' : 'Simpan Peminatan Siswa' }}
+                    {{ $editingId ? 'Perbarui data peminatan siswa' : 'Catat peminatan siswa baru' }}
                 </p>
+
+                {{-- PROGRESS BAR --}}
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-gray-600">Langkah {{ $step }} Dari 2</span>
+                        <span class="text-xs text-gray-400">
+                            @if($step === 1) Isi Data @else Unggah Berkas @endif
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2 rounded-full">
+                        <div class="bg-primary h-2 rounded-full transition-all duration-500 ease-in-out"
+                            style="width: {{ ($step / 2) * 100 }}%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1.5">
+                        @foreach([1, 2] as $s)
+                            <div class="flex items-center gap-1">
+                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
+                                    {{ $step >= $s ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500' }}">
+                                    {{ $s }}
+                                </div>
+                                <span class="text-[10px] {{ $step >= $s ? 'text-primary font-semibold' : 'text-gray-400' }}">
+                                    {{ $s === 1 ? 'Data' : 'Berkas' }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
             <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
 
                 <div class="{{ $step === 1 ? 'block' : 'hidden' }}">
-                    <div class="mb-6">
-                        <p class="text-[14px] font-bold text-primary mb-2.5">Langkah 1 Dari 2</p>
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-gray-200/80 rounded-full"></div>
-                        </div>
-                    </div>
-
                     <div class="mb-6">
                         <x-atoms.input-label for="id_siswa" size="sm">Siswa</x-atoms.input-label>
                         @if($this->selectedStudent)
@@ -411,16 +441,9 @@ new class extends Component {
                         @enderror
                     </div>
 
+                </div>
 
                 <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
-                    <div class="mb-6">
-                        <p class="text-[14px] font-bold text-primary mb-2.5">Langkah 2 Dari 2</p>
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                        </div>
-                    </div>
-
                     <div class="mb-6">
                         <label class="block text-[14px] font-bold text-gray-700 mb-2">Pilih File Tambahan</label>
                         <div x-data="{ isDropping: false }" x-on:dragover.prevent="isDropping = true" x-on:dragleave.prevent="isDropping = false" x-on:drop.prevent="isDropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="bg-bg-light border-2 py-16 px-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#e9f3f5] transition-colors border-dashed rounded-xl" :class="isDropping ? 'bg-[#e9f3f5] border-primary' : 'border-icon-bg/40'">
@@ -513,13 +536,26 @@ new class extends Component {
             <div class="bg-bg-light px-7 py-5 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl">
                 <div class="{{ $step === 1 ? 'flex' : 'hidden' }} gap-3">
                     <x-atoms.button variant="secondary" size="md" x-on:click="show = false">Batal</x-atoms.button>
-                    <x-atoms.button wire:click="nextStep">Langkah Terakhir : Upload File</x-atoms.button>
+                    <x-atoms.button variant="primary" size="md" wire:click="nextStep">
+                        Selanjutnya
+                        <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </x-atoms.button>
                 </div>
 
                 <div class="{{ $step === 2 ? 'flex' : 'hidden' }} gap-3">
-                    <x-atoms.button variant="secondary" size="md" wire:click="previousStep">Kembali</x-atoms.button>
-                    <x-atoms.button wire:click="save">
-                        {{ $editingId ? 'Perbarui Peminatan Siswa' : 'Simpan Peminatan Siswa' }}
+                    <x-atoms.button variant="secondary" size="md" wire:click="previousStep">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Kembali
+                    </x-atoms.button>
+                    <x-atoms.button variant="primary" size="md" wire:click="save" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            {{ $editingId ? 'Perbarui' : 'Simpan' }}
+                        </span>
+                        <span wire:loading wire:target="save">Menyimpan...</span>
                     </x-atoms.button>
                 </div>
             </div>

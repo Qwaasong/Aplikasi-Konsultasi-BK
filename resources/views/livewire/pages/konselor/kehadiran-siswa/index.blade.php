@@ -11,9 +11,7 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
     <header class="h-20 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
 
         @if($selectedKelas)
-            <div class="flex items-center gap-3">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Kehadiran: {{ $selectedKelas }}</h2>
-            </div>
+            <x-molecules.search-input model="search" />
         @else
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Kehadiran Siswa</h2>
         @endif
@@ -167,14 +165,14 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
 
     @else
 
-        {{-- Header kelas --}}
+        {{-- Header Kelas --}}
         <div class="px-6 sm:px-8 py-5 border-b border-gray-100 flex items-center justify-between">
             <div>
                 <button
                     type="button"
                     wire:click="kembaliKeKelas"
                     class="inline-flex items-center text-xs text-gray-500 hover:text-brand-teal mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     Kembali ke Daftar Kelas
@@ -183,9 +181,10 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
                     Form Kehadiran {{ $selectedKelas }}
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
-                    Pilih status kehadiran siswa. Perubahan akan tersimpan secara otomatis.
+                    Pilih status kehadiran siswa pada kelas {{ $selectedKelas }}. Perubahan akan tersimpan otomatis.
                 </p>
             </div>
+            
             {{-- Tahun Ajaran Badge (read-only context info) --}}
             @php
                 $activeTahun = collect($tahunOptions)->firstWhere('id', $selectedTahunAjaranId);
@@ -203,58 +202,72 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
             @endif
         </div>
 
-        {{-- Filter Toolbar --}}
-        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-4">
-                {{-- Tanggal --}}
+        {{-- ========================================================= --}}
+        {{-- TOOLBAR --}}
+        {{-- ========================================================= --}}
+        <x-organisms.table-toolbar
+            onFilter="filterAction"
+            onRefresh="loadData">
+            <x-slot:pagination>
+                {{ count($records) }} siswa
+            </x-slot:pagination>
+        </x-organisms.table-toolbar>
+
+        {{-- ========================================================= --}}
+        {{-- FILTER --}}
+        {{-- ========================================================= --}}
+        @if($showFilters)
+            <div class="px-6 py-3 border-b border-gray-100 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
+                
                 <div class="flex items-center gap-2">
-                    <label class="text-sm font-semibold text-gray-700">Tanggal:</label>
-                    <input type="date" wire:model.live="selectedTanggal" class="text-sm border-gray-300 rounded-md shadow-sm focus:border-brand-teal focus:ring-brand-teal py-1.5">
+                    <span class="text-xs text-gray-500 font-medium">
+                        Tanggal:
+                    </span>
+                    <input type="date" wire:model.live="selectedTanggal" class="text-xs border border-gray-300 rounded px-2 py-1 focus:border-brand-teal focus:ring-brand-teal bg-white cursor-pointer hover:border-brand-teal transition">
+                </div>
+                
+                <div class="h-5 w-px bg-gray-300 mx-1 hidden sm:block"></div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-xs text-gray-500 font-medium mr-1">
+                        Status:
+                    </span>
+                    <button wire:click="$set('filterStatus', '')"
+                        class="px-3 py-1 rounded-full text-[11px] font-medium transition-all
+                            {{ $filterStatus === '' ? 'bg-gray-700 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100' }}">
+                        Semua
+                    </button>
+                    <button wire:click="$set('filterStatus', 'Hadir')"
+                        class="px-3 py-1 rounded-full text-[11px] font-medium transition-all
+                            {{ $filterStatus === 'Hadir' ? 'bg-green-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-400' }}">
+                        Hadir
+                    </button>
+                    <button wire:click="$set('filterStatus', 'Izin')"
+                        class="px-3 py-1 rounded-full text-[11px] font-medium transition-all
+                            {{ $filterStatus === 'Izin' ? 'bg-yellow-500 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-yellow-50 hover:border-yellow-400' }}">
+                        Izin
+                    </button>
+                    <button wire:click="$set('filterStatus', 'Sakit')"
+                        class="px-3 py-1 rounded-full text-[11px] font-medium transition-all
+                            {{ $filterStatus === 'Sakit' ? 'bg-blue-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-400' }}">
+                        Sakit
+                    </button>
+                    <button wire:click="$set('filterStatus', 'Alpha')"
+                        class="px-3 py-1 rounded-full text-[11px] font-medium transition-all
+                            {{ $filterStatus === 'Alpha' ? 'bg-red-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-400' }}">
+                        Tanpa Keterangan
+                    </button>
                 </div>
 
-                {{-- Filter Status --}}
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-semibold text-gray-700">Status:</label>
-                    <div class="flex items-center gap-1.5">
-                        <button wire:click="$set('filterStatus', '')"
-                            class="px-3 py-1 rounded-full text-xs font-medium transition-all
-                                {{ $filterStatus === '' ? 'bg-gray-700 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100' }}">
-                            Semua
-                        </button>
-                        <button wire:click="$set('filterStatus', 'Hadir')"
-                            class="px-3 py-1 rounded-full text-xs font-medium transition-all
-                                {{ $filterStatus === 'Hadir' ? 'bg-green-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-400' }}">
-                            Hadir
-                        </button>
-                        <button wire:click="$set('filterStatus', 'Izin')"
-                            class="px-3 py-1 rounded-full text-xs font-medium transition-all
-                                {{ $filterStatus === 'Izin' ? 'bg-yellow-500 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-yellow-50 hover:border-yellow-400' }}">
-                            Izin
-                        </button>
-                        <button wire:click="$set('filterStatus', 'Sakit')"
-                            class="px-3 py-1 rounded-full text-xs font-medium transition-all
-                                {{ $filterStatus === 'Sakit' ? 'bg-blue-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-400' }}">
-                            Sakit
-                        </button>
-                        <button wire:click="$set('filterStatus', 'Alpha')"
-                            class="px-3 py-1 rounded-full text-xs font-medium transition-all
-                                {{ $filterStatus === 'Alpha' ? 'bg-red-600 text-white shadow' : 'bg-white border border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-400' }}">
-                            Tanpa Keterangan
-                        </button>
-                    </div>
-                </div>
+                @if($filterStatus || $search || $selectedTanggal != date('Y-m-d'))
+                    <button
+                        wire:click="resetFilter"
+                        class="ml-auto text-xs text-brand-teal hover:underline font-medium">
+                        Reset Semua
+                    </button>
+                @endif
             </div>
-
-            {{-- Search --}}
-            <div class="w-full sm:w-64">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-atoms.icon variant="search" class="text-gray-400" size="sm" />
-                    </div>
-                    <input type="text" wire:model.live="search" placeholder="Cari Siswa..." class="block w-full pl-10 pr-3 py-1.5 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-brand-teal focus:border-brand-teal sm:text-sm transition duration-150 ease-in-out">
-                </div>
-            </div>
-        </div>
+        @endif
 
         {{-- Flash Message --}}
         <div class="px-4 py-2">

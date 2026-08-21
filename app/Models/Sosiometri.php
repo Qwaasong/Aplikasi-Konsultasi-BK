@@ -24,11 +24,11 @@ class Sosiometri extends Model
     ];
 
     public const PERTANYAAN = [
-        'Q1' => 'Siapa teman di kelas ini yang paling kamu inginkan untuk menjadi teman satu kelompok belajar?',
-        'Q2' => 'Siapa teman yang paling tidak kamu harapkan berada dalam satu kelompok belajar denganmu?',
-        'Q3' => 'Jika kamu sedang memiliki masalah pribadi dan ingin bercerita, siapa teman di kelompok ini yang paling kamu percayai?',
-        'Q4' => 'Siapa teman yang paling jarang kamu ajak mengobrol atau berinteraksi saat waktu istirahat?',
-        'Q5' => 'Jika kelompok ini harus memilih seorang ketua untuk memimpin proyek baru, siapa yang akan kamu pilih?',
+        'Q1' => 'Siapa teman di kelas ini yang paling kamu inginkan untuk menjadi teman satu kelompok belajar? (sebutkan 1-3 nama)',
+        'Q2' => 'Siapa teman yang paling tidak kamu harapkan berada dalam satu kelompok belajar denganmu? (sebutkan 1-3 nama)',
+        'Q3' => 'Jika kamu sedang memiliki masalah pribadi dan ingin bercerita, siapa teman di kelompok ini yang paling kamu percayai? (sebutkan 1-3 nama)',
+        'Q4' => 'Siapa teman yang paling jarang kamu ajak mengobrol atau berinteraksi saat waktu istirahat? (sebutkan 1-3 nama)',
+        'Q5' => 'Jika kelompok ini harus memilih seorang ketua untuk memimpin proyek baru, siapa yang akan kamu pilih? (sebutkan 1-3 nama)',
     ];
 
     /**
@@ -56,7 +56,8 @@ class Sosiometri extends Model
         foreach (self::PERTANYAAN as $key => $pertanyaan) {
             $dipilih = $respons
                 ->where('pertanyaan', $key)
-                ->map(fn ($r) => $r->siswaDipilih?->nama)
+                ->sortBy('urutan')
+                ->map(fn ($r) => $r->nama_dipilih ?? $r->siswaDipilih?->nama ?? '')
                 ->filter()
                 ->values()
                 ->all();

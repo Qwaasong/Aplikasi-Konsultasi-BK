@@ -8,6 +8,7 @@ use App\Services\Asesmen\DcmService;
 use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
@@ -31,6 +32,9 @@ class Index extends Component
     public int $step = 1;
 
     public ?int $editingId = null;
+
+    #[Url]
+    public ?int $edit = null;
 
     public string $search = '';
     public string $searchSiswa = '';
@@ -82,8 +86,32 @@ class Index extends Component
             ->sortBy(fn ($student) => $student->nama ?? '')
             ->values();
 
+        $this->jawaban = $this->initializeJawaban();
+
         $this->loadData();
         $this->loadFilterOptions();
+
+        if ($this->edit) {
+            $record = app(DcmService::class)->findById($this->edit);
+            if ($record) {
+                // Determine 'tingkat' from 'kelas_label'
+                $kelas = explode(' ', $record->siswa?->kelas_label ?? '')[0];
+                if (in_array($kelas, ['X', 'XI', 'XII'])) {
+                    $this->pilihTingkat($kelas);
+                }
+                $this->loadDcm($this->edit);
+            }
+            $this->edit = null;
+        }
+    }
+
+    private function initializeJawaban(): array
+    {
+        $jawaban = [];
+        foreach (array_keys(Dcm::SECTIONS) as $section) {
+            $jawaban[$section] = [];
+        }
+        return $jawaban;
     }
 
     public function loadData(): void
@@ -139,10 +167,11 @@ class Index extends Component
 
         $this->reset([
             'siswa_id',
-            'jawaban',
             'kesimpulan',
             'catatan',
         ]);
+
+        $this->jawaban = $this->initializeJawaban();
 
         $this->step = 1;
         $this->showStudentModal = false;
@@ -167,10 +196,19 @@ class Index extends Component
         }
 
         $this->editingId = $id;
-        $this->siswa_id = $record->siswa_id;
+        $this->siswa_id = (int) $record->siswa_id;
         $this->tanggal = optional($record->tanggal)->format('Y-m-d');
 
-        $this->jawaban = $record->jawaban ?? [];
+        // Pastikan struktur jawaban lengkap per-section
+        $loadedJawaban = $record->jawaban ?? [];
+        $jawaban = $this->initializeJawaban();
+        foreach (array_keys(Dcm::SECTIONS) as $section) {
+            if (isset($loadedJawaban[$section]) && is_array($loadedJawaban[$section])) {
+                $jawaban[$section] = $loadedJawaban[$section];
+            }
+        }
+        $this->jawaban = $jawaban;
+
         $this->kesimpulan = $record->kesimpulan;
         $this->catatan = $record->catatan;
         $this->step = 1;

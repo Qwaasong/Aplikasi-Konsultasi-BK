@@ -7,6 +7,7 @@ use App\Services\Asesmen\SosiometriService;
 use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -47,6 +48,9 @@ class Index extends Component
     public ?string $pickerFor = null;
 
     public ?int $editingId = null;
+
+    #[Url]
+    public ?int $edit = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -123,6 +127,20 @@ class Index extends Component
         $this->loadData();
 
         $this->loadFilterOptions();
+
+        if ($this->edit) {
+            // Find the class string of the student first so we don't end up on a blank list
+            $record = app(SosiometriService::class)->findById($this->edit);
+            if ($record) {
+                // Determine 'tingkat' from 'kelas_label' (e.g. 'X RPL 1' -> 'X')
+                $kelas = explode(' ', $record->siswa?->kelas_label ?? '')[0];
+                if (in_array($kelas, ['X', 'XI', 'XII'])) {
+                    $this->pilihTingkat($kelas);
+                }
+                $this->loadSosiometri($this->edit);
+            }
+            $this->edit = null;
+        }
     }
 
     /*
@@ -227,14 +245,17 @@ class Index extends Component
         $this->loadData();
     }
 
-        public function nextStep(): void
+    public function nextStep(): void
     {
         $this->validate([
             'siswa_id' => 'required|integer',
-            'judul' => 'required|string|max:255',
-            'instruksi' => 'nullable|string',
-            'jumlah_pilihan' => 'required|integer|min:1|max:10',
         ]);
+
+        // Set judul default jika kosong
+        if (empty($this->judul)) {
+            $this->judul = 'Sosiometri';
+        }
+        $this->jumlah_pilihan = 3;
 
         $this->step = 2;
     }
@@ -387,12 +408,15 @@ class Index extends Component
         $this->pertanyaanJawaban = [];
 
         foreach (\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan) {
-            $this->pertanyaanJawaban[$key] = $record->respons
+            $names = $record->respons
                 ->where('pertanyaan', $key)
-                ->map(fn ($r) => $r->siswa_dipilih_id)
+                ->sortBy('urutan')
+                ->map(fn ($r) => $r->nama_dipilih ?? $r->siswaDipilih?->nama ?? '')
                 ->filter()
                 ->values()
                 ->all();
+            
+            $this->pertanyaanJawaban[$key] = implode(', ', $names);
         }
 
 
@@ -507,18 +531,21 @@ class Index extends Component
     {
         $sosiometri->respons()->delete();
 
-        $limit = max(1, (int) $this->jumlah_pilihan);
-
         foreach (\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan) {
-            $ids = array_slice($this->pertanyaanJawaban[$key] ?? [], 0, $limit);
+            $rawInput = $this->pertanyaanJawaban[$key] ?? '';
+            $names = array_filter(array_map('trim', explode(',', $rawInput)));
+            $names = array_slice($names, 0, 3); // limit to 3
 
-            foreach (array_values($ids) as $urutan => $siswaDipilihId) {
+            foreach (array_values($names) as $urutan => $nama) {
+                if ($nama === '') continue;
+
                 $sosiometri->respons()->create([
-                    'siswa_dipilih_id' => (int) $siswaDipilihId,
+                    'siswa_dipilih_id' => null,
+                    'nama_dipilih'     => $nama,
                     'siswa_pemilih_id' => (int) $this->siswa_id,
-                    'urutan' => $urutan + 1,
-                    'alasan' => '',
-                    'pertanyaan' => $key,
+                    'urutan'           => $urutan + 1,
+                    'alasan'           => '',
+                    'pertanyaan'       => $key,
                 ]);
             }
         }

@@ -290,256 +290,46 @@
 
                     </div>
                                         {{-- =================================================
-                        JUDUL SOSIOMETRI
+                        PERTANYAAN SOSIOMETRI
                     ================================================== --}}
 
-                    <div class="mb-6">
-
-
-                        <x-atoms.input-label
-                            for="judul"
-                            size="sm"
-                        >
-
-                            Judul Sosiometri
-
-                        </x-atoms.input-label>
-
-
-
-
-                        <x-atoms.text-input
-
-                            id="judul"
-
-                            wire:model.live="judul"
-
-                            placeholder="Contoh: Pemilihan Teman Kelompok"
-
-                        />
-
-
-
-
-                        <p class="text-xs text-gray-400 mt-2">
-
-                            Berikan nama atau tema untuk instrumen sosiometri yang dibuat.
-
-                        </p>
-
-
-
-
-                        @error('judul')
-
-                            <span class="text-red-500 text-[13px] font-medium mt-2 block">
-
-                                {{ $message }}
-
-                            </span>
-
-                        @enderror
-
-
-
-                    </div>
-
-
-
-
-
-                    {{-- =================================================
-                        INSTRUKSI
-                    ================================================== --}}
-
-
-                    <div class="mb-6">
-
-
-                        <x-atoms.input-label
-                            for="instruksi"
-                            size="sm"
-                        >
-
-                            Instruksi Pengisian
-
-                        </x-atoms.input-label>
-
-
-
-
-
-                        <textarea
-
-                            id="instruksi"
-
-                            wire:model.live="instruksi"
-
-                            rows="5"
-
-                            class="w-full border border-gray-200 rounded-md
-                                p-4 text-[14px]
-                                text-gray-900
-                                placeholder:text-gray-400
-                                focus:outline-none
-                                focus:border-primary
-                                focus:ring-1
-                                focus:ring-primary
-                                resize-none shadow-sm
-                                leading-relaxed"
-
-                            placeholder="Contoh: Pilih teman yang paling nyaman bekerja sama dalam kelompok."
-
-                        ></textarea>
-
-
-
-
-
-                        <p class="text-xs text-gray-400 mt-2">
-
-                            Instruksi akan ditampilkan kepada siswa saat mengisi sosiometri.
-
-                        </p>
-
-
-
-
-                        @error('instruksi')
-
-                            <span class="text-red-500 text-[13px] font-medium mt-2 block">
-
-                                {{ $message }}
-
-                            </span>
-
-                        @enderror
-
-
-
-                    </div>
-
-
-
-
-
-
-                    {{-- =================================================
-                        JUMLAH PILIHAN
-                    ================================================== --}}
-
-
-                    <div class="bg-bg-light border border-gray-200 rounded-xl p-5 mb-6">
-
-
-
-                        <x-atoms.input-label
-
-                            for="jumlah_pilihan"
-
-                            size="sm"
-
-                        >
-
-                            Jumlah Teman Yang Dipilih
-
-                        </x-atoms.input-label>
-
-
-
-
-
-                        <x-atoms.text-input
-
-                            id="jumlah_pilihan"
-
-                            type="number"
-
-                            min="1"
-
-                            max="10"
-
-                            wire:model.live="jumlah_pilihan"
-
-                        />
-
-
-
-
-
-                        <div class="flex items-start gap-3 mt-4">
-
-
-                            <div class="w-9 h-9 rounded-full bg-icon-bg flex items-center justify-center shrink-0">
-
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="2"
-                                    stroke="currentColor"
-                                    class="w-5 h-5 text-primary"
-                                >
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M12 9v3.75m0 3h.008v.008H12v-.008ZM10.5 3.75h3l7.5 13H3l7.5-13Z"
-                                    />
-
-                                </svg>
-
+                    <div class="space-y-5">
+
+                        @foreach(\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan)
+
+                            @php
+                                $qNum = substr($key, 1);
+                            @endphp
+
+                            <div class="rounded-xl border border-gray-200 bg-white p-4">
+
+                                <p class="text-[13px] font-semibold text-gray-800 leading-snug mb-3">
+                                    <span class="text-primary font-bold mr-1">{{ $qNum }}.</span>
+                                    {{ $pertanyaan }}
+                                    <span class="text-red-500 ml-0.5">*</span>
+                                </p>
+
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            wire:model.lazy="pertanyaanJawaban.{{ $key }}"
+                                            placeholder="Tulis nama teman, pisahkan dengan koma (contoh: Romi, Yusuf)"
+                                            class="w-full border border-gray-200 rounded-md px-3 py-2 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                                        >
+                                    </div>
+                                </div>
 
                             </div>
 
-
-
-                            <div>
-
-
-                                <p class="text-[13px] font-semibold text-gray-700">
-
-                                    Pengaturan Pilihan
-
-                                </p>
-
-
-
-                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">
-
-                                    Tentukan jumlah teman yang dapat dipilih oleh siswa.
-                                    Nilai maksimal yang diperbolehkan adalah 10 pilihan.
-
-                                </p>
-
-
-                            </div>
-
-
-                        </div>
-
-
-
-
-
-                        @error('jumlah_pilihan')
-
-                            <span class="text-red-500 text-[13px] font-medium mt-2 block">
-
-                                {{ $message }}
-
-                            </span>
-
-                        @enderror
-
-
+                        @endforeach
 
                     </div>
 
-                                    {{-- =================================================
-                    STEP 2
-                ================================================== --}}
+                </div>
+                {{-- END STEP 1 --}}
+
+
 
                 <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
 
@@ -649,17 +439,21 @@
                             @foreach(\App\Models\Sosiometri::PERTANYAAN as $key => $pertanyaan)
 
                                 @php
-                                    $selectedIds = $pertanyaanJawaban[$key] ?? [];
-                                    $selectedNames = collect($students)->whereIn('id', $selectedIds)->pluck('nama')->all();
+                                    $rawInput = $pertanyaanJawaban[$key] ?? '';
+                                    $selectedNames = array_filter(array_map('trim', explode(',', $rawInput)));
                                 @endphp
 
                                 <div class="px-5 py-4">
 
-                                    <x-atoms.input-label for="pertanyaanJawaban-{{ $key }}" size="sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <x-atoms.input-label for="pertanyaanJawaban-{{ $key }}" size="sm" class="mb-0">
+                                            {{ $key }}. {{ $pertanyaan }}
+                                        </x-atoms.input-label>
 
-                                        {{ $key }}. {{ $pertanyaan }}
-
-                                    </x-atoms.input-label>
+                                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-600 shrink-0 ml-3">
+                                            {{ count($selectedNames) }} Pilihan
+                                        </span>
+                                    </div>
 
                                     <div class="flex flex-wrap gap-2 mt-3">
                                         @forelse($selectedNames as $name)
@@ -668,18 +462,10 @@
                                             </span>
                                         @empty
                                             <span class="text-xs text-gray-400">
-                                                Belum ada pilihan.
+                                                Tidak ada jawaban.
                                             </span>
                                         @endforelse
                                     </div>
-
-                                    <button
-                                        type="button"
-                                        wire:click="openQuestionPicker('{{ $key }}')"
-                                        class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors"
-                                    >
-                                        Pilih Siswa ({{ count($selectedIds) }}/{{ $jumlah_pilihan }})
-                                    </button>
 
                                 </div>
 

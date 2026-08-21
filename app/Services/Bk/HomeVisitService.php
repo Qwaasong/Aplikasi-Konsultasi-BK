@@ -2,9 +2,12 @@
 
 namespace App\Services\Bk;
 
+use App\Exceptions\AuthorizationException;
+use App\Models\HomeVisit;
 use App\Models\KasusBk;
 use App\Models\KategoriKasus;
 use App\Repositories\Contracts\Bk\HomeVisitRepositoryInterface;
+use App\Services\User\PegawaiService;
 use Illuminate\Support\Collection;
 
 class HomeVisitService
@@ -28,30 +31,29 @@ class HomeVisitService
             ->get();
     }
 
-    public function findById(int $id): ?\App\Models\HomeVisit
+    public function findById(int $id): ?HomeVisit
     {
         return $this->repo->findById($id);
     }
 
-    public function create(array $data): \App\Models\HomeVisit
+    public function create(array $data): HomeVisit
     {
         $gurubkId = $this->resolveGurubkId();
 
         $siswaId = $data['siswa_id'] ?? null;
         unset($data['siswa_id']);
 
-        // Selalu buat kasus BK baru
-        if ($siswaId) {
+        if ($siswaId && empty($data['kasus_id'])) {
             $kasus = KasusBk::create([
-                'siswa_id'      => $siswaId,
-                'guru_bk_id'    => $gurubkId,
-                'kategori_id'   => KategoriKasus::inRandomOrder()->value('id'),
-                'penanganan'    => $data['penanganan'] ?? 'Kunjungan Rumah',
-                'uraian_masalah'=> $data['uraian_masalah'] ?? '-',
+                'siswa_id' => $siswaId,
+                'guru_bk_id' => $gurubkId,
+                'kategori_id' => KategoriKasus::inRandomOrder()->value('id'),
+                'penanganan' => $data['penanganan'] ?? 'Kunjungan Rumah',
+                'uraian_masalah' => $data['uraian_masalah'] ?? '-',
                 'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
                 'tanggal_mulai' => $data['tanggal_kunjungan'] ?? now()->toDateString(),
-                'status'        => 'Open',
-                'prioritas'     => 'Sedang',
+                'status' => 'Open',
+                'prioritas' => 'Sedang',
             ]);
 
             $data['kasus_id'] = $kasus->id;
@@ -65,7 +67,7 @@ class HomeVisitService
         return $this->repo->create($data);
     }
 
-    public function update(int $id, array $data): \App\Models\HomeVisit
+    public function update(int $id, array $data): HomeVisit
     {
         $record = $this->repo->findById($id);
 
@@ -74,9 +76,9 @@ class HomeVisitService
         // Simpan penanganan/uraian_masalah/tindak_lanjut ke kasus_bk
         if ($record->kasus_id) {
             KasusBk::where('id', $record->kasus_id)->update([
-                'penanganan'    => $data['penanganan'] ?? null,
+                'penanganan' => $data['penanganan'] ?? null,
                 'uraian_masalah' => $data['uraian_masalah'] ?? null,
-                'tindak_lanjut'  => $data['tindak_lanjut'] ?? null,
+                'tindak_lanjut' => $data['tindak_lanjut'] ?? null,
             ]);
         }
 
@@ -102,25 +104,25 @@ class HomeVisitService
     {
         $query = $this->repo->query();
 
-        if (!empty($filters['guru_bk_id'])) {
+        if (! empty($filters['guru_bk_id'])) {
             $query->where('guru_bk_id', $filters['guru_bk_id']);
         }
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $keyword = $filters['search'];
-            $query->whereHas('kasus.siswa.user', fn($q) => $q->where('nama', 'like', "%{$keyword}%"));
+            $query->whereHas('kasus.siswa.user', fn ($q) => $q->where('nama', 'like', "%{$keyword}%"));
         }
 
-        if (!empty($filters['kelas'])) {
-            $query->whereHas('kasus.siswa', fn($q) => $q->whereHas('kelas', fn($q2) => $q2->where('nama_kelas', $filters['kelas'])));
+        if (! empty($filters['kelas'])) {
+            $query->whereHas('kasus.siswa', fn ($q) => $q->whereHas('kelas', fn ($q2) => $q2->where('nama_kelas', $filters['kelas'])));
         }
 
-        if (!empty($filters['jurusan'])) {
-            $query->whereHas('kasus.siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
+        if (! empty($filters['jurusan'])) {
+            $query->whereHas('kasus.siswa.kelas.jurusan', fn ($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }
 
-        if (!empty($filters['jenis_kelamin'])) {
-            $query->whereHas('kasus.siswa.user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        if (! empty($filters['jenis_kelamin'])) {
+            $query->whereHas('kasus.siswa.user', fn ($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
         }
 
         return $query->latest('tanggal_kunjungan')->get();
@@ -140,9 +142,10 @@ class HomeVisitService
     private function resolveGurubkId(): int
     {
         $pegawai = app(PegawaiService::class)->getCurrentPegawai();
-        if (!$pegawai) {
-            throw new \App\Exceptions\AuthorizationException('mengakses data pegawai/guru BK');
+        if (! $pegawai) {
+            throw new AuthorizationException('mengakses data pegawai/guru BK');
         }
+
         return $pegawai->id;
     }
 }

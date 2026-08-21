@@ -9,6 +9,7 @@ use App\Services\ImportExportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class PegawaiService
@@ -46,15 +47,15 @@ class PegawaiService
         $this->ensureNipUnique($data['nip']);
 
         $user = User::create([
-            'nama'            => $data['nama'],
-            'username'        => $data['username'] ?? strtolower(str_replace(' ', '', $data['nama'])),
-            'email'           => $data['email'],
-            'jenis_kelamin'   => $data['jenis_kelamin'],
-            'no_hp'           => $data['no_hp'] ?? '-',
-            'foto'            => '',
-            'password'        => bcrypt('password'),
-            'role'            => $data['role'] ?? 'pegawai',
-            'status'          => $data['status'] ?? 'aktif',
+            'nama' => $data['nama'],
+            'username' => $data['username'] ?? strtolower(str_replace(' ', '', $data['nama'])),
+            'email' => $data['email'],
+            'jenis_kelamin' => $data['jenis_kelamin'],
+            'no_hp' => $data['no_hp'] ?? '-',
+            'foto' => '',
+            'password' => Hash::make($data['password'] ?? 'password'),
+            'role' => $data['role'] ?? 'pegawai',
+            'status' => $data['status'] ?? 'aktif',
         ]);
 
         return $this->pegawaiRepository->create([
@@ -73,17 +74,17 @@ class PegawaiService
         }
 
         $pegawai->user->update([
-            'nama'          => $data['nama'],
-            'email'         => $data['email'],
+            'nama' => $data['nama'],
+            'email' => $data['email'],
             'jenis_kelamin' => $data['jenis_kelamin'],
-            'no_hp'         => $data['no_hp'],
-            'role'          => $data['role'],
-            'status'        => $data['status'],
+            'no_hp' => $data['no_hp'],
+            'role' => $data['role'],
+            'status' => $data['status'],
         ]);
 
         return $this->pegawaiRepository->update($id, [
-            'nip'      => $data['nip'],
-            'jabatan'  => $data['jabatan'],
+            'nip' => $data['nip'],
+            'jabatan' => $data['jabatan'],
         ]);
     }
 
@@ -100,16 +101,16 @@ class PegawaiService
     {
         $query = Pegawai::with('user');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $keyword = $filters['search'];
             $query->where(function ($q) use ($keyword) {
-                $q->whereHas('user', fn($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
+                $q->whereHas('user', fn ($q2) => $q2->where('nama', 'like', "%{$keyword}%"))
                     ->orWhere('nip', 'like', "%{$keyword}%")
                     ->orWhere('jabatan', 'like', "%{$keyword}%");
             });
         }
 
-        if (!empty($filters['jabatan'])) {
+        if (! empty($filters['jabatan'])) {
             $query->where('jabatan', $filters['jabatan']);
         }
 
@@ -128,7 +129,7 @@ class PegawaiService
     /**
      * Ambil pegawai untuk user yang sedang login.
      */
-    public function getCurrentPegawai(): ?\App\Models\Pegawai
+    public function getCurrentPegawai(): ?Pegawai
     {
         return $this->pegawaiRepository->findByUserId(auth()->id());
     }
@@ -225,6 +226,7 @@ class PegawaiService
 
             if ($nip === '' || $nama === '' || $email === '' || $jabatan === '') {
                 $errors[] = "Baris {$lineNumber}: kolom nip, nama, email, dan jabatan wajib diisi.";
+
                 continue;
             }
 
@@ -233,8 +235,9 @@ class PegawaiService
                 'p', 'pr', 'perempuan', 'wanita', 'w' => 'P',
                 default => null,
             };
-            if (!$jenisKelamin) {
+            if (! $jenisKelamin) {
                 $errors[] = "Baris {$lineNumber}: jenis kelamin \"{$row['jenis_kelamin']}\" tidak valid.";
+
                 continue;
             }
 
@@ -251,7 +254,7 @@ class PegawaiService
 
             $status = in_array($statusRaw, ['aktif', 'nonaktif']) ? $statusRaw : 'aktif';
 
-            DB::transaction(function () use ($nip, $nama, $email, $jenisKelamin, $noHp, $role, $status, $normalizedJabatan, $lineNumber, &$errors, &$imported) {
+            DB::transaction(function () use ($nip, $nama, $email, $jenisKelamin, $noHp, $role, $status, $normalizedJabatan, &$errors, &$imported) {
                 $existingPegawai = Pegawai::where('nip', $nip)->first();
 
                 if ($existingPegawai) {
@@ -269,7 +272,7 @@ class PegawaiService
                 } else {
                     $user = User::create([
                         'nama' => $nama,
-                        'username' => strtolower(str_replace(' ', '', $nama)) . '_' . substr($nip, -4),
+                        'username' => strtolower(str_replace(' ', '', $nama)).'_'.substr($nip, -4),
                         'email' => $email,
                         'jenis_kelamin' => $jenisKelamin,
                         'no_hp' => $noHp,

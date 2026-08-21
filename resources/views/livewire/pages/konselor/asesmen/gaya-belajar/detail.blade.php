@@ -485,14 +485,26 @@ new #[Layout('layouts.app', ['title' => 'Detail Gaya Belajar - Bimbingan Konseli
                         <div class="space-y-2">
 
                             @foreach($group['questions'] as $i => $pertanyaan)
+                                @php
+                                    $ansGroup = $record->jawaban[$group['name']] ?? [];
+                                    $isChecked = !empty($ansGroup[$i]);
+                                @endphp
 
-                                <div class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2">
+                                <div class="flex items-start gap-3 rounded-lg border {{ $isChecked ? 'border-primary bg-primary/5' : 'border-gray-100 bg-gray-50/60' }} px-3 py-2 transition-colors">
 
-                                    <span class="shrink-0 w-5 h-5 mt-0.5 rounded border border-gray-300 bg-white"></span>
+                                    @if($isChecked)
+                                        <span class="shrink-0 w-5 h-5 mt-0.5 rounded border border-primary bg-primary text-white flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    @else
+                                        <span class="shrink-0 w-5 h-5 mt-0.5 rounded border border-gray-300 bg-white"></span>
+                                    @endif
 
-                                    <span class="text-sm text-gray-700 leading-6">
+                                    <span class="text-sm {{ $isChecked ? 'text-primary font-medium' : 'text-gray-700' }} leading-6">
 
-                                        <span class="font-bold text-gray-900 mr-1">
+                                        <span class="font-bold {{ $isChecked ? 'text-primary' : 'text-gray-900' }} mr-1">
 
                                             {{ $i + 1 }}.
 

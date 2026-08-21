@@ -41,11 +41,19 @@ class PeminatanService
 
     public function create(array $data): Peminatan
     {
+        $data['pilihan1'] = $data['pilihan1'] ?? '';
+        $data['pilihan2'] = $data['pilihan2'] ?? '';
+        $data['pilihan3'] = $data['pilihan3'] ?? '';
+
         return $this->repo->create($data);
     }
 
     public function update(int $id, array $data): Peminatan
     {
+        $data['pilihan1'] = $data['pilihan1'] ?? '';
+        $data['pilihan2'] = $data['pilihan2'] ?? '';
+        $data['pilihan3'] = $data['pilihan3'] ?? '';
+
         $this->repo->update($id, $data);
 
         return $this->repo->findById($id);
