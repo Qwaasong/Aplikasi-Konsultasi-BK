@@ -5,7 +5,7 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
 use App\Services\Bk\KonferensiKasusService;
-use App\Services\LampiranService;
+use App\Services\Bimbingan\LampiranService;
 
 new class extends Component {
     use WithFileUploads;
@@ -115,7 +115,7 @@ new class extends Component {
     public function selectedKasus()
     {
         if (!$this->kasus_id) return null;
-        return app(\App\Services\KonferensiKasusService::class)
+        return app(KonferensiKasusService::class)
             ->getKasusOptions()
             ->firstWhere('id', (int) $this->kasus_id);
     }
@@ -230,7 +230,7 @@ new class extends Component {
             'peran_peserta' => $p['peran_peserta'],
         ], $this->peserta);
 
-        $lampiranService = app(\App\Services\LampiranService::class);
+        $lampiranService = app(LampiranService::class);
 
         $result = $this->editingId
             ? $updateHandler->handle($data, ['id' => $this->editingId, 'peserta_data' => $pesertaData])

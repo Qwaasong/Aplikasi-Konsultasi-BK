@@ -12,7 +12,7 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Siswa'])] class extends Ind
     <x-organisms.header action="create">
         <x-slot:search>
             <x-molecules.search-input model="search" />
-            </x-slot>
+        </x-slot>
         <x-slot:actions>
             <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
                 <x-atoms.icon variant="template" size="md" /> Template
@@ -23,7 +23,8 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Siswa'])] class extends Ind
             <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
                 <x-atoms.icon variant="download" size="md" /> Export
             </button>
-            Tambah User Siswa
+        </x-slot:actions>
+        Tambah User Siswa
     </x-organisms.header>
 
     <x-organisms.table-toolbar onFilter="filterAction" onRefresh="$refresh">

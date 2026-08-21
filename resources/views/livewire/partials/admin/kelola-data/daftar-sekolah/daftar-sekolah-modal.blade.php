@@ -9,9 +9,7 @@ new class extends Component
 {
     use WithFileUploads;
 
-    public bool $show = false;
     public bool $editMode = false;
-
     public ?int $sekolahId = null;
 
     public string $nama_sekolah = '';
@@ -37,7 +35,7 @@ new class extends Component
         $this->resetForm();
 
         $this->editMode = false;
-        $this->show = true;
+        $this->dispatch('open-modal', 'form-sekolah');
     }
 
     #[On('edit-sekolah')]
@@ -56,7 +54,7 @@ new class extends Component
         $this->email = $record->email;
 
         $this->editMode = true;
-        $this->show = true;
+        $this->dispatch('open-modal', 'form-sekolah');
     }
 
     public function save()
@@ -95,7 +93,7 @@ new class extends Component
     {
         $this->resetForm();
 
-        $this->show = false;
+        $this->dispatch('close-modal', 'form-sekolah');
     }
 
     private function resetForm()
@@ -117,141 +115,83 @@ new class extends Component
 
 ?>
 
-<div>
-
-@if($show)
-
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-xl">
+<x-shared.modal name="form-sekolah" maxWidth="xl">
+    <div class="flex flex-col h-full max-h-[80vh]">
 
         {{-- Header --}}
-        <div class="px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold">
+        <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+            <h2 class="text-base font-bold text-gray-900 leading-tight">
                 {{ $editMode ? 'Edit Sekolah' : 'Tambah Sekolah' }}
             </h2>
+            <p class="text-xs text-gray-500 mt-0.5">
+                {{ $editMode ? 'Perbarui data sekolah' : 'Catat data sekolah baru' }}
+            </p>
         </div>
 
         {{-- Body --}}
-        <div class="p-6 space-y-5">
+        <div class="px-6 py-4 overflow-y-auto modal-scroll grow" style="scrollbar-width: thin;">
+            <div class="space-y-5">
 
-            {{-- Nama Sekolah --}}
-            <div>
+                {{-- Nama Sekolah --}}
+                <div>
+                    <x-atoms.input-label for="nama_sekolah" size="sm">Nama Sekolah <span class="text-red-500">*</span></x-atoms.input-label>
+                    <x-atoms.text-input id="nama_sekolah" wire:model="nama_sekolah" size="md" placeholder="e.g., SMK Negeri 1 Jakarta" />
+                    @error('nama_sekolah')
+                        <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                <label class="block text-sm font-medium mb-2">
-                    Nama Sekolah
-                </label>
+                {{-- Alamat --}}
+                <div>
+                    <x-atoms.input-label for="alamat" size="sm">Alamat <span class="text-red-500">*</span></x-atoms.input-label>
+                    <textarea id="alamat" wire:model="alamat" rows="3" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="e.g., Jl. Budi Utomo No.7"></textarea>
+                    @error('alamat')
+                        <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                <input
-                    type="text"
-                    wire:model="nama_sekolah"
-                    class="w-full rounded-lg border-gray-300">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {{-- Telepon --}}
+                    <div>
+                        <x-atoms.input-label for="telepon" size="sm">Telepon</x-atoms.input-label>
+                        <x-atoms.text-input id="telepon" wire:model="telepon" size="md" placeholder="e.g., 021-3844444" />
+                        @error('telepon')
+                            <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                @error('nama_sekolah')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                    {{-- Email --}}
+                    <div>
+                        <x-atoms.input-label for="email" size="sm">Email</x-atoms.input-label>
+                        <x-atoms.text-input id="email" type="email" wire:model="email" size="md" placeholder="e.g., info@smkn1jakarta.sch.id" />
+                        @error('email')
+                            <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-            </div>
-
-            {{-- Alamat --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Alamat
-                </label>
-
-                <textarea
-                    wire:model="alamat"
-                    rows="3"
-                    class="w-full rounded-lg border-gray-300"></textarea>
-
-                @error('alamat')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
-            {{-- Telepon --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Telepon
-                </label>
-
-                <input
-                    type="text"
-                    wire:model="telepon"
-                    class="w-full rounded-lg border-gray-300">
-
-                @error('telepon')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                {{-- Logo --}}
+                <div>
+                    <x-atoms.input-label for="logo" size="sm">Logo Sekolah</x-atoms.input-label>
+                    <input id="logo" type="file" wire:model="logo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                    @error('logo')
+                        <p class="text-red-500 text-[13px] font-medium mt-1.5 block">{{ $message }}</p>
+                    @enderror
+                </div>
 
             </div>
-
-            {{-- Email --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    wire:model="email"
-                    class="w-full rounded-lg border-gray-300">
-
-                @error('email')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
-            {{-- Logo --}}
-            <div>
-
-                <label class="block text-sm font-medium mb-2">
-                    Logo Sekolah
-                </label>
-
-                <input
-                    type="file"
-                    wire:model="logo"
-                    class="w-full rounded-lg border-gray-300">
-
-                @error('logo')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-
-            </div>
-
         </div>
 
         {{-- Footer --}}
-        <div class="px-6 py-4 border-t flex justify-end gap-3">
-
-            <button
-                wire:click="close"
-                class="px-4 py-2 rounded-lg border">
-
+        <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end shrink-0 gap-3">
+            <x-atoms.button variant="secondary" wire:click="close">
                 Batal
+            </x-atoms.button>
 
-            </button>
-
-            <button
-                wire:click="save"
-                class="px-4 py-2 rounded-lg bg-brand-teal text-white">
-
+            <x-atoms.button wire:click="save">
                 {{ $editMode ? 'Simpan Perubahan' : 'Tambah Sekolah' }}
-
-            </button>
-
+            </x-atoms.button>
         </div>
 
     </div>
-
-</div>
-
-@endif
-
-</div>
+</x-shared.modal>
