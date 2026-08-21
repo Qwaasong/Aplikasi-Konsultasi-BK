@@ -47,8 +47,6 @@ class Index extends Component
 
     public bool $showStudentModal = false;
 
-    public int $step = 1;
-
     public ?int $editingId = null;
 
     /*
@@ -87,23 +85,13 @@ class Index extends Component
 
     public $tanggal = '';
 
-    public $pilihan1 = '';
-
-    public $pilihan2 = '';
-
-    public $pilihan3 = '';
-
     public $hasil = '';
 
     public $catatan = '';
 
     public array $jawaban = [];
 
-    public $files = [];
 
-    public $newFiles = [];
-
-    public $existingFiles = [];
 
     // ── IMPORT / EXPORT STATE ─────────────────────────
     public bool $showImportModal = false;
@@ -120,8 +108,18 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
 
+    private function initializeJawaban(): array
+    {
+        $jawaban = [];
+        foreach (Peminatan::SECTIONS as $section) {
+            $jawaban[$section] = [];
+        }
+        return $jawaban;
+    }
+
     public function mount(): void
     {
+        $this->jawaban = $this->initializeJawaban();
 
         $this->records = collect();
 
@@ -309,15 +307,6 @@ class Index extends Component
             optional($record->tanggal)
                 ->format('Y-m-d');
 
-        $this->pilihan1 =
-            $record->pilihan1;
-
-        $this->pilihan2 =
-            $record->pilihan2;
-
-        $this->pilihan3 =
-            $record->pilihan3;
-
         $this->hasil =
             $record->hasil;
 
@@ -326,8 +315,6 @@ class Index extends Component
 
         $this->jawaban =
             $record->jawaban ?? [];
-
-        $this->step = 1;
 
         $this->dispatch(
             'open-modal',
@@ -350,12 +337,6 @@ class Index extends Component
 
             'tanggal' => 'required|date',
 
-            'pilihan1' => 'required|string',
-
-            'pilihan2' => 'nullable|string',
-
-            'pilihan3' => 'nullable|string',
-
             'hasil' => 'nullable|string',
 
             'catatan' => 'nullable|string',
@@ -372,9 +353,6 @@ class Index extends Component
 
             'siswa_id' => $this->siswa_id,
             'tanggal' => $this->tanggal,
-            'pilihan1' => $this->pilihan1,
-            'pilihan2' => $this->pilihan2,
-            'pilihan3' => $this->pilihan3,
             'jawaban' => $this->jawaban,
             'hasil' => $dominant[0] !== '' ? $dominant[0] : ($this->hasil ?: ''),
             'catatan' => $this->catatan,
@@ -451,30 +429,16 @@ class Index extends Component
 
             'siswa_id',
 
-            'pilihan1',
-
-            'pilihan2',
-
-            'pilihan3',
-
             'hasil',
 
             'catatan',
 
-            'jawaban',
-
-            'files',
-
-            'newFiles',
-
-            'existingFiles',
-
         ]);
+
+        $this->jawaban = $this->initializeJawaban();
 
         $this->tanggal =
             now()->format('Y-m-d');
-
-        $this->step = 1;
 
         $this->editingId = null;
 
@@ -535,57 +499,6 @@ class Index extends Component
     public function goToDetail($id)
     {
         return redirect()->route('konselor.asesmen.tes-bakat-minat.detail', $id);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | STEP
-    |--------------------------------------------------------------------------
-    */
-
-    public function nextStep(): void
-    {
-        $this->validate([
-            'siswa_id' => 'required|integer',
-            'tanggal' => 'required|date',
-            'pilihan1' => 'required|string',
-            'jawaban' => 'nullable|array',
-        ]);
-
-        $this->step = 2;
-    }
-
-    public function previousStep(): void
-    {
-        $this->step = 1;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | FILE UPLOAD
-    |--------------------------------------------------------------------------
-    */
-
-    public function updatedNewFiles(): void
-    {
-        $this->validate([
-            'newFiles.*' => 'file|max:12288|mimes:pdf,jpg,jpeg,png,docx',
-        ]);
-
-        $this->files = array_merge($this->files ?? [], $this->newFiles);
-        $this->newFiles = [];
-    }
-
-    public function removeFile(int $index): void
-    {
-        unset($this->files[$index]);
-        $this->files = array_values($this->files);
-    }
-
-    public function removeExistingFile(int $index): void
-    {
-        unset($this->existingFiles[$index]);
-        $this->existingFiles = array_values($this->existingFiles);
     }
 
     /*

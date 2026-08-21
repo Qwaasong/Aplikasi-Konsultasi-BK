@@ -207,54 +207,7 @@ new #[Layout('layouts.app', ['title' => 'Detail Bakat Minat - Bimbingan Konselin
     ==================================================== --}}
     <div class="lg:col-span-2 space-y-6">
 
-        {{-- Pilihan Bakat Minat --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-            <h3 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-5">
-                Pilihan Bakat Minat
-            </h3>
-
-            <div class="space-y-4">
-
-                <div class="flex justify-between items-center">
-
-                    <span class="text-gray-500">
-                        Pilihan Pertama
-                    </span>
-
-                    <span class="font-semibold text-gray-900">
-                        {{ $record->pilihan1 ?: '-' }}
-                    </span>
-
-                </div>
-
-                <div class="flex justify-between items-center">
-
-                    <span class="text-gray-500">
-                        Pilihan Kedua
-                    </span>
-
-                    <span class="font-semibold text-gray-900">
-                        {{ $record->pilihan2 ?: '-' }}
-                    </span>
-
-                </div>
-
-                <div class="flex justify-between items-center">
-
-                    <span class="text-gray-500">
-                        Pilihan Ketiga
-                    </span>
-
-                    <span class="font-semibold text-gray-900">
-                        {{ $record->pilihan3 ?: '-' }}
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
 
 
         {{-- Hasil Tes --}}
@@ -602,56 +555,7 @@ new #[Layout('layouts.app', ['title' => 'Detail Bakat Minat - Bimbingan Konselin
 
                 </div>
 
-                <div>
 
-                    <p class="text-xs uppercase tracking-wider text-gray-400 mb-2">
-                        Prioritas Pilihan
-                    </p>
-
-                    <div class="space-y-2">
-
-                        <div
-                            class="flex justify-between items-center
-                                   rounded-lg bg-gray-50 px-3 py-2"
-                        >
-                            <span class="text-gray-500 text-sm">
-                                Pilihan 1
-                            </span>
-
-                            <span class="font-semibold text-gray-900">
-                                {{ $record->pilihan1 ?: '-' }}
-                            </span>
-                        </div>
-
-                        <div
-                            class="flex justify-between items-center
-                                   rounded-lg bg-gray-50 px-3 py-2"
-                        >
-                            <span class="text-gray-500 text-sm">
-                                Pilihan 2
-                            </span>
-
-                            <span class="font-semibold text-gray-900">
-                                {{ $record->pilihan2 ?: '-' }}
-                            </span>
-                        </div>
-
-                        <div
-                            class="flex justify-between items-center
-                                   rounded-lg bg-gray-50 px-3 py-2"
-                        >
-                            <span class="text-gray-500 text-sm">
-                                Pilihan 3
-                            </span>
-
-                            <span class="font-semibold text-gray-900">
-                                {{ $record->pilihan3 ?: '-' }}
-                            </span>
-                        </div>
-
-                    </div>
-
-                </div>
 
             </div>
 

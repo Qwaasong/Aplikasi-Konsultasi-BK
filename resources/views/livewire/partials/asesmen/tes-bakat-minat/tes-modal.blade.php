@@ -31,23 +31,9 @@
             >
 
                 {{-- =================================================
-                    STEP 1
+                    FORM BODY
                 ================================================== --}}
-                <div class="{{ $step === 1 ? 'block' : 'hidden' }}">
-
-                    {{-- PROGRESS --}}
-                    <div class="mb-6">
-
-                        <p class="text-[14px] font-bold text-primary mb-2.5">
-                            Langkah 1 Dari 2
-                        </p>
-
-                        <div class="flex gap-2.5">
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-                            <div class="h-2.5 w-1/2 bg-gray-200/80 rounded-full"></div>
-                        </div>
-
-                    </div>
+                <div>
 
 
                     {{-- =================================================
@@ -177,80 +163,7 @@
                     </div>
 
 
-                    {{-- =================================================
-                        ASPEK TES BAKAT MINAT
-                    ================================================== --}}
-                    <div class="mb-6">
 
-                        <x-atoms.input-label for="pilihan1" size="sm">
-                            Pilihan Peminatan Pertama
-                        </x-atoms.input-label>
-
-                        <select
-                            wire:model="pilihan1"
-                            class="w-full rounded-md border border-gray-200 shadow-sm px-4 py-3 text-sm focus:border-primary focus:ring-primary">
-
-                            <option value="">Pilih Jurusan</option>
-
-                            @foreach($jurusanOptions as $jurusan)
-                                <option value="{{ $jurusan }}">
-                                    {{ $jurusan }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                        @error('pilihan1')
-                            <span class="text-red-500 text-[13px]">
-                                {{ $message }}
-                            </span>
-                        @enderror
-
-                    </div>
-
-                    <div class="mb-6">
-
-                        <x-atoms.input-label for="pilihan2" size="sm">
-                            Pilihan Peminatan Kedua
-                        </x-atoms.input-label>
-
-                        <select
-                            wire:model="pilihan2"
-                            class="w-full rounded-md border border-gray-200 shadow-sm px-4 py-3 text-sm focus:border-primary focus:ring-primary">
-
-                            <option value="">Pilih Jurusan</option>
-
-                            @foreach($jurusanOptions as $jurusan)
-                                <option value="{{ $jurusan }}">
-                                    {{ $jurusan }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    <div class="mb-6">
-
-                        <x-atoms.input-label for="pilihan3" size="sm">
-                            Pilihan Peminatan Ketiga
-                        </x-atoms.input-label>
-
-                        <select
-                            wire:model="pilihan3"
-                            class="w-full rounded-md border border-gray-200 shadow-sm px-4 py-3 text-sm focus:border-primary focus:ring-primary">
-
-                            <option value="">Pilih Jurusan</option>
-
-                            @foreach($jurusanOptions as $jurusan)
-                                <option value="{{ $jurusan }}">
-                                    {{ $jurusan }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                    </div>
 
                     {{-- =================================================
                         DAFTAR PERNYATAAN BAKAT MINAT (8 KECERDASAN)
@@ -410,243 +323,24 @@
                 </div>
 
 
-                {{-- =================================================
-                    STEP 2 - UPLOAD FILE
-                ================================================== --}}
-                <div class="{{ $step === 2 ? 'block' : 'hidden' }}">
-
-                    <div class="mb-6">
-
-                        <p class="text-[14px] font-bold text-primary mb-2.5">
-                            Langkah 2 Dari 2
-                        </p>
-
-                        <div class="flex gap-2.5">
-
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-
-                            <div class="h-2.5 w-1/2 bg-primary rounded-full"></div>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- UPLOAD --}}
-                    <div class="mb-6">
-
-                        <label class="block text-[14px] font-bold text-gray-700 mb-2">
-                            Pilih File Tambahan
-                        </label>
-
-                        <div
-                            x-data="{ isDropping: false }"
-                            x-on:dragover.prevent="isDropping = true"
-                            x-on:dragleave.prevent="isDropping = false"
-                            x-on:drop.prevent="
-                                isDropping = false;
-                                $refs.fileInput.files = $event.dataTransfer.files;
-                                $refs.fileInput.dispatchEvent(new Event('change'));
-                            "
-                            x-on:click="$refs.fileInput.click()"
-                            class="bg-bg-light border-2 py-16 px-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#e9f3f5] transition-colors border-dashed rounded-xl"
-                            :class="isDropping
-                                ? 'bg-[#e9f3f5] border-primary'
-                                : 'border-icon-bg/40'"
-                        >
-
-                            <input
-                                type="file"
-                                wire:model="newFiles"
-                                multiple
-                                x-ref="fileInput"
-                                class="hidden"
-                            >
-
-                            <div class="w-[84px] h-[84px] bg-icon-bg/90 rounded-full flex items-center justify-center mb-5">
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="w-10 h-10 text-primary"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M12 16.5V9.75m0 0l-3 3m3-3l3 3M6.75 19.5h10.5A2.25 2.25 0 0019.5 17.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5A2.25 2.25 0 006.75 19.5z"
-                                    />
-                                </svg>
-
-                            </div>
-
-                            <p class="text-[14px] font-bold text-gray-700">
-                                Klik untuk memilih file
-                            </p>
-
-                            <p class="text-[12px] text-gray-400 mt-1">
-                                atau tarik dan lepaskan file di sini
-                            </p>
-
-                            <p class="text-[11px] text-gray-400 mt-3">
-                                Maksimal 5 file • PDF, JPG, PNG, DOCX • Maks. 12 MB/file
-                            </p>
-
-                        </div>
-
-                        @error('newFiles.*')
-                            <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
-                                {{ $message }}
-                            </span>
-                        @enderror
-
-                    </div>
-
-
-                    {{-- FILE BARU --}}
-                    @if(count($files) > 0)
-
-                        <div class="mb-6">
-
-                            <p class="text-[14px] font-bold text-gray-700 mb-3">
-                                File yang Dipilih
-                            </p>
-
-                            <div class="flex flex-col gap-2">
-
-                                @foreach($files as $index => $file)
-
-                                    <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
-
-                                        <div class="flex items-center gap-3 min-w-0">
-
-                                            <div class="w-9 h-9 bg-icon-bg rounded-lg flex items-center justify-center shrink-0">
-
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
-                                                    class="w-5 h-5 text-primary"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A2.625 2.625 0 0112 5.625v-1.5A3.375 3.375 0 008.625.75H6.75A3.375 3.375 0 003.375 4.125v15.75A3.375 3.375 0 006.75 23.25h9.375a3.375 3.375 0 003.375-3.375v-5.625z"
-                                                    />
-                                                </svg>
-
-                                            </div>
-
-                                            <span class="text-[13px] text-gray-700 truncate">
-                                                {{ $file->getClientOriginalName() }}
-                                            </span>
-
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            wire:click="removeFile({{ $index }})"
-                                            class="text-gray-400 hover:text-red-500 p-2 shrink-0"
-                                        >
-                                            &times;
-                                        </button>
-
-                                    </div>
-
-                                @endforeach
-
-                            </div>
-
-                        </div>
-
-                    @endif
-
-
-                    {{-- FILE LAMA --}}
-                    @if($editingId && count($existingFiles) > 0)
-
-                        <div class="mb-6">
-
-                            <p class="text-[14px] font-bold text-gray-700 mb-3">
-                                File yang Sudah Tersimpan
-                            </p>
-
-                            <div class="flex flex-col gap-2">
-
-                                @foreach($existingFiles as $index => $file)
-
-                                    <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
-
-                                        <span class="text-[13px] text-gray-700 truncate">
-                                            {{ basename($file) }}
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            wire:click="removeExistingFile({{ $index }})"
-                                            class="text-gray-400 hover:text-red-500 p-2"
-                                        >
-                                            &times;
-                                        </button>
-
-                                    </div>
-
-                                @endforeach
-
-                            </div>
-
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-
             {{-- =====================================================
                 FOOTER
             ====================================================== --}}
-            <div class="bg-bg-light px-7 py-5 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl">
+            <div class="bg-bg-light px-7 py-5 border-t border-gray-100 flex justify-end shrink-0 rounded-b-xl gap-3">
 
-                {{-- STEP 1 --}}
-                <div class="{{ $step === 1 ? 'flex' : 'hidden' }} gap-3">
+                <x-atoms.button
+                    variant="secondary"
+                    size="md"
+                    x-on:click="show = false"
+                >
+                    Batal
+                </x-atoms.button>
 
-                    <x-atoms.button
-                        variant="secondary"
-                        size="md"
-                        x-on:click="show = false"
-                    >
-                        Batal
-                    </x-atoms.button>
+                <x-atoms.button wire:click="save">
+                    {{ $editingId ? 'Perbarui Asesmen' : 'Simpan Asesmen' }}
+                </x-atoms.button>
 
-                    <x-atoms.button wire:click="nextStep">
-                        Langkah Terakhir : Upload File
-                    </x-atoms.button>
-
-                </div>
-
-
-                {{-- STEP 2 --}}
-                <div class="{{ $step === 2 ? 'flex' : 'hidden' }} gap-3">
-
-                    <x-atoms.button
-                        variant="secondary"
-                        size="md"
-                        wire:click="previousStep"
-                    >
-                        Kembali
-                    </x-atoms.button>
-
-                    <x-atoms.button wire:click="save">
-                        {{ $editingId ? 'Perbarui AKPD' : 'Simpan AKPD' }}
-                    </x-atoms.button>
-
-                </div>
+            </div>
 
             </div>
 

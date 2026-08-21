@@ -118,7 +118,7 @@ new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] cla
                 <div class="mt-6">
                     <x-atoms.detail-link
                         text="Lihat Detail"
-                        href="asesmen/tes-bakat-minat/detail" />
+                        href="{{ route('konselor.asesmen.tes-bakat-minat.index') }}" />
                 </div>
 
             </div>
