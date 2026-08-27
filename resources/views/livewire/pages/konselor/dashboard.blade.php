@@ -4,42 +4,6 @@ use App\Livewire\Konselor\Dashboard;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app', ['title' => 'Dashboard - Bimbingan Konseling'])] class extends Dashboard {
-
-    public array $bakatMinatData = [
-        ['label' => 'Kecerdasan Linguistik', 'value' => 12],
-        ['label' => 'Kecerdasan Logis Matematik', 'value' => 9],
-        ['label' => 'Kecerdasan Visual Spasial', 'value' => 13],
-        ['label' => 'Kecerdasan Musikal', 'value' => 15],
-        ['label' => 'Kecerdasan Interpersonal', 'value' => 11],
-        ['label' => 'Kecerdasan Intrapersonal', 'value' => 8],
-        ['label' => 'Kecerdasan Kinestetik', 'value' => 10],
-        ['label' => 'Kecerdasan Naturalis', 'value' => 5],
-    ];
-
-    public array $gayaBelajarData = [
-        ['label' => 'Visual', 'value' => 280],
-        ['label' => 'Auditorial', 'value' => 150],
-        ['label' => 'Kinestetik', 'value' => 180],
-    ];
-
-    public array $akpdData = [
-        'Pribadi' => [
-            'ya' => 25,
-            'tidak' => 15,
-        ],
-        'Sosial' => [
-            'ya' => 20,
-            'tidak' => 20,
-        ],
-        'Belajar' => [
-            'ya' => 14,
-            'tidak' => 26,
-        ],
-        'Karir' => [
-            'ya' => 10,
-            'tidak' => 30,
-        ],
-    ];
 }; ?>
 
 <div class="py-12">
