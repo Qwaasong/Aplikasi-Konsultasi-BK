@@ -29,6 +29,16 @@ class SiswaService
         return $this->siswaRepository->countSiswa();
     }
 
+    public function getCountsByTingkat(): array
+    {
+        return collect([10 => 'X', 11 => 'XI', 12 => 'XII'])->mapWithKeys(fn (string $tingkat, int $kelas) => [
+            'kelas_'.$kelas => DataSiswa::whereHas(
+                'kelas',
+                fn ($query) => $query->where('tingkat', $tingkat)
+            )->count(),
+        ])->all();
+    }
+
     public function getPaginated(array $filters = []): LengthAwarePaginator
     {
         return $this->siswaRepository->getPaginated($filters);
