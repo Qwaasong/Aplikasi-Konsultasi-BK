@@ -34,8 +34,7 @@ state([
                     request()->routeIs('konselor.kunjungan-rumah.*') ||
                     request()->routeIs('konselor.alih-tangan-kasus.*') ||
                     request()->routeIs('konselor.konferensi-kasus.*') ||
-                    request()->routeIs('konselor.pengunduran-diri.*') ||
-                    request()->routeIs('konselor.peminatan.*'),
+                    request()->routeIs('konselor.pengunduran-diri.*'),
 
                 'variants' => 'consultation',
 
@@ -103,13 +102,6 @@ state([
                         'url' => route('konselor.pengunduran-diri.index'),
                         'active' => request()->routeIs('konselor.pengunduran-diri.*'),
                         'variants' => 'logout',
-                    ],
-
-                    [
-                        'label' => 'Peminatan',
-                        'url' => route('konselor.peminatan.index'),
-                        'active' => request()->routeIs('konselor.peminatan.*'),
-                        'variants' => 'target',
                     ],
 
                 ],
