@@ -106,7 +106,7 @@ class Index extends Component
         $this->selectAll = false;
     }
 
-    // ── IMPORT (GOOGLE FORMS KOMULATIF RECORD) ──────
+    // ── IMPORT ──────────────────────────────────────
 
     public function openImport(): void
     {
@@ -126,14 +126,14 @@ class Index extends Component
     {
         $this->validate();
 
-        $result = $service->importGformFromFile($this->importFile);
+        $result = $service->importFromFile($this->importFile);
 
         $this->importedCount = $result['imported'];
         $this->importErrors = $result['errors'];
 
         if (empty($this->importErrors)) {
             $this->showImportModal = false;
-            session()->flash('success', "{$this->importedCount} data komulatif record berhasil diimport.");
+            session()->flash('success', "{$this->importedCount} data siswa berhasil diimport.");
         }
     }
 
@@ -141,7 +141,7 @@ class Index extends Component
 
     public function openExport(SiswaService $service): void
     {
-        $this->exportPreviewCount = $service->getGformExportCount();
+        $this->exportPreviewCount = $service->getExportCount();
         $this->showExportModal = true;
     }
 
@@ -154,18 +154,18 @@ class Index extends Component
     {
         $this->showExportModal = false;
 
-        return $ies->streamCsv('data-komulatif-record-'.date('Ymd-His').'.csv', $service->getGformTemplateHeaders(), $service->exportGformRows());
+        return $ies->streamCsv('data-siswa-'.date('Ymd-His').'.csv', $service->getTemplateHeaders(), $service->exportRows());
     }
 
     public function exportExcel(SiswaService $service, ImportExportService $ies): StreamedResponse
     {
         $this->showExportModal = false;
 
-        return $ies->streamExcelExport('data-komulatif-record-'.date('Ymd-His').'.xlsx', $service->getGformTemplateHeaders(), $service->exportGformRows());
+        return $ies->streamExcelExport('data-siswa-'.date('Ymd-His').'.xlsx', $service->getTemplateHeaders(), $service->exportRows());
     }
 
     public function downloadTemplate(SiswaService $service, ImportExportService $ies): StreamedResponse
     {
-        return $ies->streamExcelTemplate('template-komulatif-record.xlsx', $service->getGformTemplateHeaders(), []);
+        return $ies->streamExcelTemplate('template-data-siswa.xlsx', $service->getTemplateHeaders(), $service->getTemplateSampleRows());
     }
 }
