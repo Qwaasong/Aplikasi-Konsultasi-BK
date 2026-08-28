@@ -21,8 +21,8 @@ new #[Layout('layouts.guest')] class extends Register {}; ?>
                     placeholder="Masukkan username" wire:model="username" :error="$errors->first('username')" />
 
                 {{-- Email --}}
-                <x-molecules.input-field label="Email" id="email" type="email" name="email" size="md"
-                    placeholder="Masukkan email" wire:model="email" :error="$errors->first('email')" />
+                <x-molecules.input-field label="Email (@siswa.smkn9malang.sch.id)" id="email" type="email" name="email" size="md"
+                    placeholder="contoh@siswa.smkn9malang.sch.id" wire:model="email" :error="$errors->first('email')" />
 
                 {{-- Grid: No HP + Jenis Kelamin --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
