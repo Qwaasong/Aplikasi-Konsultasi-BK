@@ -14,6 +14,33 @@ state([
 
         $menus = [];
 
+        // Siswa
+        if ($role === 'siswa') {
+            $menus[] = [
+                'label' => 'Profil Saya',
+                'url' => route('siswa.profile'),
+                'active' => request()->routeIs('siswa.profile'),
+                'variants' => 'user',
+                'children' => [],
+            ];
+
+            $menus[] = [
+                'label' => 'Absensi',
+                'url' => route('siswa.absensi'),
+                'active' => request()->routeIs('siswa.absensi'),
+                'variants' => 'attendance',
+                'children' => [],
+            ];
+
+            $menus[] = [
+                'label' => 'Asesmen',
+                'url' => route('siswa.asesmen'),
+                'active' => request()->routeIs('siswa.asesmen'),
+                'variants' => 'assessment',
+                'children' => [],
+            ];
+        }
+
         // Guru BK
         if ($role === 'guru_bk') {
 

@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\DataSiswa;
+use App\Models\Kehadiran;
+use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
@@ -22,6 +25,79 @@ class ProfileTest extends TestCase
             ->assertSeeVolt('profile.update-profile-information-form')
             ->assertSeeVolt('profile.update-password-form')
             ->assertSeeVolt('profile.delete-user-form');
+    }
+
+    public function test_student_profile_uses_shared_app_layout_with_sidebar(): void
+    {
+        $user = User::factory()->siswa()->create();
+        DataSiswa::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->get('/siswa/profile');
+
+        $response
+            ->assertOk()
+            ->assertSee('Halaman Siswa')
+            ->assertSee('Profil Saya');
+    }
+
+    public function test_student_can_submit_attendance_from_siswa_portal(): void
+    {
+        $user = User::factory()->siswa()->create();
+        $siswa = DataSiswa::factory()->create(['user_id' => $user->id]);
+        TahunAjaran::factory()->create(['status_aktif' => true, 'tahun' => '2026/2027', 'semester' => 'Ganjil']);
+
+        $this->actingAs($user);
+
+        $component = Volt::test('pages.siswa.absensi')
+            ->set('tanggal', '2026-08-30')
+            ->set('status', 'Hadir')
+            ->call('saveAbsensi');
+
+        $component->assertHasNoErrors();
+
+        $this->assertDatabaseHas('kehadiran', [
+            'siswa_id' => $siswa->id,
+            'status' => 'Hadir',
+            'tanggal_kehadiran' => '2026-08-30',
+        ]);
+    }
+
+    public function test_student_attendance_page_lists_recent_history(): void
+    {
+        $user = User::factory()->siswa()->create();
+        $siswa = DataSiswa::factory()->create(['user_id' => $user->id]);
+        $tahunAjaran = TahunAjaran::factory()->create(['status_aktif' => true, 'tahun' => '2026/2027', 'semester' => 'Ganjil']);
+
+        Kehadiran::factory()->create([
+            'siswa_id' => $siswa->id,
+            'tahun_ajaran_id' => $tahunAjaran->id,
+            'tanggal_kehadiran' => '2026-08-28',
+            'status' => 'Izin',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->get('/siswa/absensi');
+
+        $response
+            ->assertOk()
+            ->assertSee('Histori Absensi')
+            ->assertSee('2026-08-28')
+            ->assertSee('Izin');
+    }
+
+    public function test_student_assessment_page_shows_cards_without_landing_redirect(): void
+    {
+        $user = User::factory()->siswa()->create();
+        DataSiswa::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->get('/siswa/asesmen');
+
+        $response
+            ->assertOk()
+            ->assertSee('AKPD')
+            ->assertSee('https://forms.gle/EiEaJS2VYU6k6AeV8')
+            ->assertDontSee('/asesmen/akpd');
     }
 
     public function test_profile_information_can_be_updated(): void

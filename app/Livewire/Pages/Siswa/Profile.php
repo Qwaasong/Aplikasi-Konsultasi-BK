@@ -7,8 +7,10 @@ use App\Models\KeluargaSiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app', ['title' => 'Profil Siswa - Bimbingan Konseling'])]
 class Profile extends Component
 {
     public ?DataSiswa $siswa = null;
