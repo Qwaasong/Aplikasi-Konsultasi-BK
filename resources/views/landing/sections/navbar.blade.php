@@ -12,7 +12,7 @@
             <div class="navbar-brand-text">
 
                 <span class="navbar-brand-title">
-                    Aplikasi BK Skanawa
+                    BK Skanawa
                 </span>
 
                 <span class="navbar-brand-subtitle">

@@ -15,6 +15,8 @@ if(auth()->check()){
 
         'guru_bk' => 'Halaman Konselor',
 
+        'siswa' => 'Halaman Siswa',
+
         default => 'Dashboard',
 
     };

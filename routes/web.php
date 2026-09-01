@@ -112,7 +112,9 @@ Route::middleware(['auth', 'role:guru_bk'])->group(function () {
 
 // Siswa
 Route::middleware(['auth', 'role:siswa'])->group(function () {
-    Route::get('/siswa/profile', fn() => view('landing.siswa.profile'))->name('siswa.profile');
+    Volt::route('/siswa/profile', 'pages.siswa.profile')->name('siswa.profile');
+    Volt::route('/siswa/absensi', 'pages.siswa.absensi')->name('siswa.absensi');
+    Volt::route('/siswa/asesmen', 'pages.siswa.asesmen')->name('siswa.asesmen');
 });
 
 require __DIR__.'/auth.php';
