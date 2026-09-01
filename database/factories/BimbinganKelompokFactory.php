@@ -15,8 +15,6 @@ class BimbinganKelompokFactory extends Factory
     public function definition(): array
     {
         return [
-            'guru_bk_id' => Pegawai::factory()->guruBk(),
-            'tahun_ajaran_id' => TahunAjaran::factory()->aktif(),
             'kasus_id' => KasusBk::factory(),
             'tanggal_layanan' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
         ];

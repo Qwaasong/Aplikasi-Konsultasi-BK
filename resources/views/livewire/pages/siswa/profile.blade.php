@@ -85,7 +85,23 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <x-molecules.input-field label="No. HP" id="p-nohp" type="text" name="no_hp" wire:model="no_hp" :error="$errors->first('no_hp')" />
+                            <div>
+                                <x-atoms.input-label for="p-kelas" size="md">Kelas</x-atoms.input-label>
+                                <select id="p-kelas" wire:model="kelas_id" class="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-dark focus:border-brand-dark transition duration-150 px-4 py-2 text-sm">
+                                    <option value="">Pilih kelas</option>
+                                    @foreach($this->getKelasOptions() as $kelas)
+                                        <option value="{{ $kelas->id }}">{{ $kelas->nama_kelas }}</option>
+                                    @endforeach
+                                </select>
+                                @error('kelas_id')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <x-molecules.input-field label="Agama" id="p-agama" type="text" name="agama" wire:model="agama" :error="$errors->first('agama')" />
+                            <x-molecules.input-field label="Asal SMP" id="p-asalsmp" type="text" name="asal_smp" wire:model="asal_smp" :error="$errors->first('asal_smp')" />
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -104,7 +120,18 @@
                             <x-molecules.input-field label="Bakat" id="p-bakat" type="text" name="bakat" wire:model="bakat" :error="$errors->first('bakat')" />
                         </div>
 
-                        <x-molecules.input-field label="Rencana Setelah Lulus" id="p-rencana" type="text" name="rencana_lulus" wire:model="rencana_lulus" :error="$errors->first('rencana_lulus')" />
+                        <div>
+                            <x-atoms.input-label for="p-rencana" size="md">Rencana Setelah Lulus</x-atoms.input-label>
+                            <select id="p-rencana" wire:model="rencana_lulus" class="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-dark focus:border-brand-dark transition duration-150 px-4 py-2 text-sm">
+                                <option value="">Pilih rencana setelah lulus</option>
+                                @foreach($this->getRencanaLulusOptions() as $opsi)
+                                    <option value="{{ $opsi }}">{{ $opsi }}</option>
+                                @endforeach
+                            </select>
+                            @error('rencana_lulus')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
                         <div>
                             <x-atoms.input-label for="p-alamat" size="md">Alamat Lengkap</x-atoms.input-label>

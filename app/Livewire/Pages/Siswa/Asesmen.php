@@ -30,7 +30,12 @@ class Asesmen extends Component
                 'description' => 'Angket Kebutuhan Peserta Didik untuk mengetahui kebutuhan dan perkembangan diri.',
                 'route' => 'https://forms.gle/EiEaJS2VYU6k6AeV8',
                 'badge' => 'Kebutuhan',
-                'label' => 'AKPD - Kelas X',
+                'label' => 'Pilih Kelas AKPD',
+                'options' => [
+                    ['label' => 'Kelas X', 'route' => 'https://forms.gle/EiEaJS2VYU6k6AeV8'],
+                    ['label' => 'Kelas XI', 'route' => 'https://forms.gle/xNyicyELono4yn9Z7'],
+                    ['label' => 'Kelas XII', 'route' => 'https://forms.gle/s5K1thgso3C673DS6'],
+                ],
             ],
             [
                 'title' => 'Gaya Belajar',

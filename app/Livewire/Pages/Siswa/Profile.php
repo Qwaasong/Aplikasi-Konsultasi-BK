@@ -3,7 +3,9 @@
 namespace App\Livewire\Pages\Siswa;
 
 use App\Models\DataSiswa;
+use App\Models\Kelas;
 use App\Models\KeluargaSiswa;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -22,6 +24,7 @@ class Profile extends Component
     public string $nama = '';
     public string $email = '';
     public string $no_hp = '';
+    public ?int $kelas_id = null;
     public string $alamat = '';
     public string $tempat_lahir = '';
     public string $tgl_lahir = '';
@@ -78,6 +81,7 @@ class Profile extends Component
         $this->nama = $user->nama ?? '';
         $this->email = $user->email ?? '';
         $this->no_hp = $user->no_hp ?? '';
+        $this->kelas_id = $this->siswa->kelas_id;
         $this->alamat = $this->siswa->alamat ?? '';
         $this->tempat_lahir = $this->siswa->tempat_lahir ?? '';
         $this->tgl_lahir = $this->siswa->tgl_lahir?->format('Y-m-d') ?? '';
@@ -118,6 +122,16 @@ class Profile extends Component
         }
     }
 
+    public function getKelasOptions(): Collection
+    {
+        return Kelas::orderBy('nama_kelas')->get();
+    }
+
+    public function getRencanaLulusOptions(): array
+    {
+        return ['Bekerja', 'Kuliah', 'Menikah'];
+    }
+
     public function updateProfil(): void
     {
         $user = Auth::user();
@@ -126,6 +140,7 @@ class Profile extends Component
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'no_hp' => ['nullable', 'string', 'max:20'],
+            'kelas_id' => ['required', 'exists:kelas,id'],
             'alamat' => ['nullable', 'string'],
             'tempat_lahir' => ['nullable', 'string', 'max:100'],
             'tgl_lahir' => ['nullable', 'date'],
@@ -135,7 +150,7 @@ class Profile extends Component
             'agama' => ['nullable', 'string', 'max:50'],
             'hobi' => ['nullable', 'string', 'max:200'],
             'bakat' => ['nullable', 'string', 'max:200'],
-            'rencana_lulus' => ['nullable', 'string', 'max:200'],
+            'rencana_lulus' => ['nullable', 'in:Bekerja,Kuliah,Menikah'],
         ]);
 
         $user->update([
@@ -145,6 +160,7 @@ class Profile extends Component
         ]);
 
         $this->siswa->update([
+            'kelas_id' => $this->kelas_id,
             'alamat' => $this->alamat,
             'tempat_lahir' => $this->tempat_lahir,
             'tgl_lahir' => $this->tgl_lahir ?: null,

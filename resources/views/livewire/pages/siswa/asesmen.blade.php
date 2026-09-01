@@ -20,10 +20,14 @@
                 $isExternalLink = str_starts_with($item['route'] ?? '', 'http');
             @endphp
 
-            <a
-                href="{{ $item['route'] }}"
-                @if($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
-                class="group block h-full bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            @if(empty($item['options']))
+                <a
+                    href="{{ $item['route'] }}"
+                    @if($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
+                    class="group block h-full bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            @else
+                <div class="group block h-full bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            @endif
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-2.5 rounded-xl bg-[#086375]/10 text-[#086375]">
                         <x-atoms.icon variant="assessment" size="md" color="#086375" />
@@ -38,11 +42,25 @@
                     {{ $item['description'] }}
                 </p>
 
-                <div class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#086375] group-hover:text-[#064a5e]">
-                    <span>{{ $item['label'] }}</span>
-                    <x-atoms.icon variant="arrow-right" size="sm" color="#086375" />
+                @if(!empty($item['options']))
+                    <div class="mt-5 grid grid-cols-3 gap-2">
+                        @foreach($item['options'] as $option)
+                            <a href="{{ $option['route'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-2 py-2 rounded-lg bg-[#086375] text-white text-xs font-semibold hover:bg-[#064a5e] transition">
+                                {{ $option['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#086375] group-hover:text-[#064a5e]">
+                        <span>{{ $item['label'] }}</span>
+                        <x-atoms.icon variant="arrow-right" size="sm" color="#086375" />
+                    </div>
+                @endif
+            @if(empty($item['options']))
+                </a>
+            @else
                 </div>
-            </a>
+            @endif
         @endforeach
     </div>
 </div>

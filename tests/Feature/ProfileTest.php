@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\DataSiswa;
 use App\Models\Kehadiran;
+use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -86,6 +87,25 @@ class ProfileTest extends TestCase
             ->assertSee('Izin');
     }
 
+    public function test_student_can_choose_their_own_class_from_profile(): void
+    {
+        $user = User::factory()->siswa()->create();
+        $kelasA = Kelas::factory()->create(['nama_kelas' => 'X-1', 'tingkat' => 10]);
+        $kelasB = Kelas::factory()->create(['nama_kelas' => 'XI-2', 'tingkat' => 11]);
+        $siswa = DataSiswa::factory()->create(['user_id' => $user->id, 'kelas_id' => null]);
+
+        $this->actingAs($user);
+
+        $component = Volt::test('pages.siswa.profile')
+            ->set('kelas_id', $kelasB->id)
+            ->call('updateProfil');
+
+        $component->assertHasNoErrors();
+        $siswa->refresh();
+
+        $this->assertSame($kelasB->id, $siswa->kelas_id);
+    }
+
     public function test_student_assessment_page_shows_cards_without_landing_redirect(): void
     {
         $user = User::factory()->siswa()->create();
@@ -97,6 +117,10 @@ class ProfileTest extends TestCase
             ->assertOk()
             ->assertSee('AKPD')
             ->assertSee('https://forms.gle/EiEaJS2VYU6k6AeV8')
+            ->assertSee('Kelas XI')
+            ->assertSee('https://forms.gle/xNyicyELono4yn9Z7')
+            ->assertSee('Kelas XII')
+            ->assertSee('https://forms.gle/s5K1thgso3C673DS6')
             ->assertDontSee('/asesmen/akpd');
     }
 

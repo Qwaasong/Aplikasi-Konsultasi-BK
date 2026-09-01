@@ -16,8 +16,6 @@ class BimbinganIndividuFactory extends Factory
     {
         return [
             'kasus_id' => KasusBk::factory(),
-            'guru_bk_id' => Pegawai::factory()->guruBk(),
-            'tahun_ajaran_id' => TahunAjaran::factory()->aktif(),
             'tanggal_layanan' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
         ];
     }
