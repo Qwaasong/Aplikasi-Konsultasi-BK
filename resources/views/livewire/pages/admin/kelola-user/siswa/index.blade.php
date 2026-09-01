@@ -249,19 +249,19 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Siswa'])] class extends Ind
     </div>
 
     {{-- ═══════════════════════════════════════════ --}}
-    {{-- MODAL IMPORT KOMULATIF RECORD              --}}
+    {{-- MODAL IMPORT DATA SISWA                    --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
         <x-shared.modal name="import-siswa" :show="true" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                    <h2 class="text-base font-bold text-gray-900">Import Komulatif Record</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Format: CSV, XLS, atau XLSX — maks 5 MB. Siswa dicocokkan via Nama + Kelas; bila belum ada, otomatis dibuat.</p>
+                    <h2 class="text-base font-bold text-gray-900">Import Data Siswa</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Format: CSV, XLS, atau XLSX — maks 5 MB. Siswa dicocokkan via NIS; bila belum ada, otomatis dibuat.</p>
                 </div>
                 <div class="px-6 py-5 space-y-4">
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
                         <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
-                        <code class="block">Timestamp | KELAS | TAHUN PELAJARAN | NAMA LENGKAP | JENIS KELAMIN | TEMPAT, TANGGAL LAHIR | ASAL SMP | AGAMA | ALAMAT RUMAH (RT, RW) | FOTO DIRI / SELFIE | NAMA LENGKAP AYAH / WALI | ... | AKUN MEDIA SOSIAL</code>
+                        <code class="block">nis | nama | email | no_hp | jenis_kelamin | status | kelas | jurusan | periode_ajaran | alamat | tempat_lahir | tgl_lahir | ... | kendaraan_ke_sekolah</code>
                     </div>
                     <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
                         <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">
@@ -300,13 +300,13 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Siswa'])] class extends Ind
     @endif
 
     {{-- ═══════════════════════════════════════════ --}}
-    {{-- MODAL EXPORT KOMULATIF RECORD              --}}
+    {{-- MODAL EXPORT DATA SISWA                    --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
         <x-shared.modal name="export-siswa" :show="true" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                    <h2 class="text-base font-bold text-gray-900">Export Komulatif Record</h2>
+                    <h2 class="text-base font-bold text-gray-900">Export Data Siswa</h2>
                     <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
                 </div>
                 <div class="px-6 py-5 space-y-4">

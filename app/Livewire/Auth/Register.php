@@ -35,7 +35,7 @@ class Register extends Component
         $this->validate([
             'nama' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'lowercase', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'ends_with:@siswa.smkn9malang.sch.id'],
             'no_hp' => ['required', 'string', 'max:20'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'role' => ['required', 'string', 'in:guru_bk,admin,siswa'],
