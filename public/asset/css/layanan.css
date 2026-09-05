@@ -179,9 +179,9 @@
     text-align:justify;
 }
 
-/* ==========================================
+/* 
    IMPORTANCE
-========================================== */
+ */
 
 .importance-section{
 
@@ -297,9 +297,9 @@
     color:var(--text-light);
 }
 
-/* ==========================================
+/* 
    SERVICES
-========================================== */
+ */
 
 .service-list-section{
 
@@ -428,9 +428,9 @@
     color:var(--text-light);
 }
 
-/* ==========================================
+/* 
    ROLE
-========================================== */
+ */
 
 .role-section{
 
@@ -525,4 +525,492 @@
     line-height:1.9;
 
     color:var(--text-light);
+}
+
+/* 
+   TABLET
+   max-width: 1024px
+ */
+
+@media (max-width: 1024px) {
+
+    /* 
+       HERO
+     */
+
+    .service-hero-section {
+        min-height: auto;
+    }
+
+    .service-hero-left {
+        padding-left: 4rem;
+        padding-right: 2rem;
+    }
+
+    .service-hero-title {
+        font-size: 2.4rem;
+    }
+
+    .service-hero-description {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+
+    .service-hero-right {
+        height: 650px;
+    }
+
+
+    /* 
+       ABOUT
+     */
+
+    .service-about-content {
+        grid-template-columns: 400px 1fr;
+        gap: 3rem;
+    }
+
+    .service-about-gallery {
+        width: 360px;
+        height: 460px;
+    }
+
+    .service-about-gallery img {
+        width: 160px;
+        height: 220px;
+    }
+
+    .gallery-1 {
+        left: 0;
+    }
+
+    .gallery-2 {
+        left: 170px;
+        top: 160px;
+    }
+
+    .gallery-3 {
+        left: 0;
+        top: 290px;
+    }
+
+    .service-about-text p {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+
+
+    /* 
+       IMPORTANCE
+     */
+
+    .importance-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+
+    /* 
+       SERVICES
+     */
+
+    .service-item {
+        padding: 1.5rem;
+    }
+
+
+    /* 
+       ROLE
+     */
+
+    .role-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+}
+
+
+/* 
+   MOBILE
+   max-width: 768px
+ */
+
+@media (max-width: 768px) {
+
+    .service-hero-section {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    /* 
+       HERO LEFT
+     */
+
+    .service-hero-left {
+        width: 100%;
+        padding: 70px 0;
+        order: 1;
+    }
+
+    .service-hero-left .container {
+        width: 90%;
+    }
+
+    .service-hero-content {
+        max-width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .service-hero-title {
+        font-size: 2.1rem;
+        line-height: 1.25;
+        margin-bottom: 1.25rem;
+    }
+
+    .service-hero-description {
+        font-size: .95rem;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+
+    .service-hero-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+
+    /* 
+       HERO IMAGE
+     */
+
+    .service-hero-right {
+        width: 100%;
+        height: 400px;
+        min-height: 0;
+        order: 2;
+    }
+
+
+    /* 
+       ABOUT
+     */
+
+    .service-about-section {
+        padding: 65px 0;
+    }
+
+    .service-about-header {
+        margin-bottom: 3rem;
+    }
+
+    .service-about-title {
+        font-size: 1.9rem;
+        line-height: 1.35;
+    }
+
+    .service-about-content {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    .service-about-gallery {
+        width: 100%;
+        max-width: 430px;
+        height: 400px;
+        margin: 0 auto;
+    }
+
+    .service-about-gallery img {
+        width: 170px;
+        height: 230px;
+        border-radius: 16px;
+    }
+
+    .gallery-1 {
+        top: 20px;
+        left: 0;
+    }
+
+    .gallery-2 {
+        top: 120px;
+        left: auto;
+        right: 0;
+    }
+
+    .gallery-3 {
+        top: 210px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .service-about-gallery img:hover {
+        transform: translateY(-6px);
+    }
+
+    .gallery-3:hover {
+        transform: translateX(-50%) translateY(-6px);
+    }
+
+    .service-about-text {
+        gap: 1.5rem;
+    }
+
+    .service-about-text p {
+        font-size: .95rem;
+        line-height: 1.8;
+        text-align: left;
+    }
+
+
+    /* 
+       IMPORTANCE
+     */
+
+    .importance-section {
+        padding: 65px 0;
+    }
+
+    .importance-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .importance-title {
+        font-size: 1.9rem;
+        line-height: 1.35;
+    }
+
+    .importance-subtitle {
+        font-size: .95rem;
+        line-height: 1.8;
+    }
+
+    .importance-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .importance-card {
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
+    }
+
+    .importance-icon {
+        width: 65px;
+        height: 65px;
+        margin-bottom: 1rem;
+    }
+
+    .importance-icon i {
+        font-size: 1.6rem;
+    }
+
+    .importance-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .importance-card p {
+        font-size: .85rem;
+        line-height: 1.7;
+    }
+
+
+    /* 
+       SERVICE LIST
+     */
+
+    .service-list-section {
+        padding: 65px 0;
+    }
+
+    .service-list-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .service-list-title {
+        font-size: 1.9rem;
+        line-height: 1.35;
+    }
+
+    .service-list-subtitle {
+        font-size: .95rem;
+        line-height: 1.8;
+    }
+
+    .service-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.75rem 1.25rem;
+        gap: 1rem;
+    }
+
+    .service-item-icon {
+        width: 65px;
+        height: 65px;
+    }
+
+    .service-item-icon i {
+        font-size: 1.6rem;
+    }
+
+    .service-item-content h3 {
+        font-size: 1.15rem;
+    }
+
+    .service-item-content p {
+        font-size: .9rem;
+        line-height: 1.75;
+    }
+
+
+    /* 
+       ROLE
+     */
+
+    .role-section {
+        padding: 65px 0;
+    }
+
+    .role-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .role-title {
+        font-size: 1.9rem;
+        line-height: 1.35;
+    }
+
+    .role-subtitle {
+        font-size: .95rem;
+        line-height: 1.8;
+    }
+
+    .role-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .role-card {
+        min-height: 280px;
+        padding: 1.5rem;
+    }
+
+    .role-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .role-card p {
+        font-size: .9rem;
+        line-height: 1.75;
+    }
+
+}
+
+
+/* 
+   SMALL MOBILE
+   max-width: 576px
+ */
+
+@media (max-width: 576px) {
+
+    /* 
+       HERO
+     */
+
+    .service-hero-left {
+        padding: 55px 0;
+    }
+
+    .service-hero-title {
+        font-size: 1.8rem;
+    }
+
+    .service-hero-description {
+        font-size: .9rem;
+    }
+
+    .service-hero-actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .service-hero-actions a {
+        width: 100%;
+        max-width: 230px;
+    }
+
+    .service-hero-right {
+        height: 300px;
+    }
+
+
+    /* 
+       ABOUT GALLERY
+     */
+
+    .service-about-gallery {
+        height: 340px;
+        max-width: 330px;
+    }
+
+    .service-about-gallery img {
+        width: 135px;
+        height: 190px;
+    }
+
+    .gallery-1 {
+        top: 15px;
+        left: 0;
+    }
+
+    .gallery-2 {
+        top: 85px;
+        right: 0;
+    }
+
+    .gallery-3 {
+        top: 170px;
+    }
+
+
+    /* 
+       IMPORTANCE
+     */
+
+    .importance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .importance-card {
+        padding: 1.75rem 1.25rem;
+    }
+
+
+    /* 
+       SERVICE LIST
+     */
+
+    .service-item {
+        padding: 1.5rem 1.25rem;
+    }
+
+
+    /* 
+       ROLE
+     */
+
+    .role-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-card {
+        min-height: auto;
+    }
+
 }
