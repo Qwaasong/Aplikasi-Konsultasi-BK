@@ -9,29 +9,59 @@ $title = 'Dashboard';
 
 if(auth()->check()){
 
-    $title = match(auth()->user()->role){
+$title = match(auth()->user()->role){
 
-        'admin' => 'Halaman Admin',
+'admin' => 'Halaman Admin',
 
-        'guru_bk' => 'Halaman Konselor',
+'guru_bk' => 'Halaman Konselor',
 
-        'siswa' => 'Halaman Siswa',
+'siswa' => 'Halaman Siswa',
 
-        default => 'Dashboard',
+default => 'Dashboard',
 
-    };
+};
 
 }
 
 @endphp
 
-<aside x-data="{
-    open: localStorage.getItem('sidebar') === 'true',
-    ready: false
-}" x-init="$nextTick(() => ready = true)" @mouseenter="open = true; localStorage.setItem('sidebar', 'true')"
-    @mouseleave="open = false; localStorage.setItem('sidebar', 'false')"
-    :class="[open ? 'w-64' : 'w-20', ready ? 'transition-all duration-200 ease-out' : '']"
-    class="group bg-white border-r border-gray-200 flex flex-col justify-between z-20 shadow-lg absolute h-full md:relative flex-shrink-0">
+<aside
+    x-data="{
+        open: localStorage.getItem('sidebar') === 'true',
+        ready: false
+    }"
+
+    x-init="$nextTick(() => {
+        ready = true;
+    })"
+
+    @mouseenter="
+        open = true;
+        localStorage.setItem('sidebar', 'true');
+    "
+
+    @mouseleave="
+        open = false;
+        localStorage.setItem('sidebar', 'false');
+    "
+
+    :class="[
+        open ? 'w-64' : 'w-20',
+        ready ? 'transition-all duration-200 ease-out' : ''
+    ]"
+
+    class="
+        group
+        bg-white
+        border-r border-gray-200
+        flex flex-col
+        justify-between
+        z-20
+        shadow-lg
+        relative
+        h-full
+        flex-shrink-0
+    ">
 
     <div class="flex flex-col flex-1 min-h-0 w-full">
 

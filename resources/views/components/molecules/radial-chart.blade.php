@@ -22,14 +22,14 @@ $colors = [
 
 <div class="w-full">
 
-    <div class="relative w-full h-[280px] max-w-[380px] mx-auto">
+    <div class="relative w-full h-[230px] sm:h-[260px] lg:h-[280px] max-w-[380px] mx-auto">
         <canvas
             data-radial-chart
             data-labels='@json($labels)'
             data-values='@json($values)'></canvas>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4">
+    <div class="flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 mt-4">
 
         @foreach ($labels as $index => $label)
         <div class="flex items-center gap-2 text-sm text-gray-600">
