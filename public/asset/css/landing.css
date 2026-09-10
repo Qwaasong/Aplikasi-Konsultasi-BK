@@ -396,25 +396,30 @@ section{
 }
 
 .about-image.image-1{
-    width: 320px;
-}
-
-.about-image.image-2{
-    width: 200px;
+    width: 210px;
 
     position: absolute;
 
-    top: 110px;
+    top: -10px;
+    left: 0;
+}
+
+.about-image.image-2{
+    width: 210px;
+
+    position: absolute;
+
+    top: 80px;
     right: 0;
 }
 
 .about-image.image-3{
-    width: 260px;
+    width: 220px;
 
     position: absolute;
 
-    left: 40px;
-    bottom: 40px;
+    left: 140px;
+    bottom: -10px;
 }
 
 .about-image img{

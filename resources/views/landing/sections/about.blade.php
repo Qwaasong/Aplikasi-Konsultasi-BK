@@ -16,15 +16,15 @@
             <div class="about-images">
 
                 <div class="about-image image-1" data-aos="fade-right" data-aos-delay="150">
-                    <img src="{{ asset('asset/image/about/about-1.jpg') }}" alt="Kegiatan BK 1">
+                    <img src="{{ asset('asset/image/about/kegiatan-1.png') }}" alt="Kegiatan BK 1">
                 </div>
 
                 <div class="about-image image-2" data-aos="fade-right" data-aos-delay="300">
-                    <img src="{{ asset('asset/image/about/about-2.jpg') }}" alt="Kegiatan BK 2">
+                    <img src="{{ asset('asset/image/about/kegiatan-2.png') }}" alt="Kegiatan BK 2">
                 </div>
 
                 <div class="about-image image-3" data-aos="fade-right" data-aos-delay="450">
-                    <img src="{{ asset('asset/image/about/about-3.jpg') }}" alt="Kegiatan BK 3">
+                    <img src="{{ asset('asset/image/about/kegiatan-3.png') }}" alt="Kegiatan BK 3">
                 </div>
 
             </div>
