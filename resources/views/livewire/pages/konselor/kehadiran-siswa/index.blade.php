@@ -34,27 +34,38 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
 
         </div>
 
-        <div class="w-full sm:w-auto grid grid-cols-2 sm:flex items-center gap-2">
+        <div class="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-2">
+
+            {{-- Template --}}
             <button
                 wire:click="downloadTemplate"
+                title="Download Template"
+                aria-label="Download Template"
                 class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="template" size="md" />
-                <span>Template</span>
+                <span class="hidden sm:inline">Template</span>
             </button>
 
+            {{-- Import --}}
             <button
                 wire:click="openImport"
-                class=" page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                title="Import Data"
+                aria-label="Import Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="upload" size="md" />
-                <span>Import</span>
+                <span class="hidden sm:inline">Import</span>
             </button>
 
+            {{-- Export --}}
             <button
                 wire:click="openExport"
-                class=" page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                title="Export Data"
+                aria-label="Export Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="download" size="md" />
-                <span>Export</span>
+                <span class="hidden sm:inline">Export</span>
             </button>
+
         </div>
 
     </header>

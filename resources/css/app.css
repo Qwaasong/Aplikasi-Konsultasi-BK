@@ -55,17 +55,17 @@
      * Header action button
      */
     .page-header-action {
-        @apply flex-1 sm:flex-none
-               inline-flex
-               items-center
-               justify-center
-               gap-1.5
-               px-3 sm:px-4
-               py-2
-               text-sm
-               font-semibold
-               rounded-md
-               whitespace-nowrap;
+    @apply w-full sm:w-auto
+           inline-flex
+           items-center
+           justify-center
+           gap-1.5
+           px-0 sm:px-4
+           py-2
+           text-sm
+           font-semibold
+           rounded-md
+           whitespace-nowrap;
     }
 
 }

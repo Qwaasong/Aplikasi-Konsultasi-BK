@@ -31,23 +31,46 @@ new #[Layout('layouts.app', ['title' => 'Rekap Absensi Siswa'])] class extends I
 
         </div>
 
-        <div class="w-full sm:w-auto grid grid-cols-2 sm:flex items-center gap-2">
-            <button wire:click="downloadTemplate" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+        <div class="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-2">
+
+            {{-- Template --}}
+            <button
+                wire:click="downloadTemplate"
+                title="Download Template"
+                aria-label="Download Template"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="template" size="md" />
-                Template
+                <span class="hidden sm:inline">Template</span>
             </button>
-            <button wire:click="openImport" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+
+            {{-- Import --}}
+            <button
+                wire:click="openImport"
+                title="Import Data"
+                aria-label="Import Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="upload" size="md" />
-                Import
+                <span class="hidden sm:inline">Import</span>
             </button>
-            <button wire:click="openExport" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+
+            {{-- Export --}}
+            <button
+                wire:click="openExport"
+                title="Export Data"
+                aria-label="Export Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="download" size="md" />
-                Export
+                <span class="hidden sm:inline">Export</span>
             </button>
-            <x-atoms.button wire:click="create" class="col-span-2 sm:col-span-1 w-full sm:w-auto">
+
+            {{-- Tambah --}}
+            <x-atoms.button
+                wire:click="create"
+                class="col-span-3 sm:col-span-1 w-full sm:w-auto">
                 <x-atoms.icon variant="plus" size="md" />
-                Tambah
+                <span class="sm:inline">Tambah</span>
             </x-atoms.button>
+
         </div>
 
     </header>
