@@ -5,7 +5,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6 items-center">
 
     {{-- Chart --}}
-    <div class="lg:col-span-5 relative w-full h-[300px]">
+    <div class="lg:col-span-5 relative w-full h-[280px] sm:h-[300px] lg:h-[320px]">
         <canvas
             data-akpd-chart
             data-data='@json($data)'

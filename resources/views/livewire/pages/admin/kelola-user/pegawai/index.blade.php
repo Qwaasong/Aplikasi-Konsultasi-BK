@@ -9,26 +9,53 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Pegawai'])] class extends I
     x-on:click="if ($event.target.closest('button[wire\\:click^=\'edit\'], button[wire\\:click=\'create\']')) loading = true"
     x-on:open-modal.window="loading = false" x-on:close-modal.window="loading = false">
 
-    <header class="h-20 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
-        <x-molecules.search-input model="search" />
+    <header class="w-full min-h-20 border-b border-gray-200 bg-white shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-0">
+        <div class="w-full sm:flex-1 sm:min-w-0">
 
-        <div class="flex items-center gap-2">
-            <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+            <x-molecules.search-input model="search" />
+
+        </div>
+
+        <div class="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-2">
+
+            {{-- Template --}}
+            <button
+                wire:click="downloadTemplate"
+                title="Download Template"
+                aria-label="Download Template"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="template" size="md" />
-                Template
+                <span class="hidden sm:inline">Template</span>
             </button>
-            <button wire:click="openImport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+
+            {{-- Import --}}
+            <button
+                wire:click="openImport"
+                title="Import Data"
+                aria-label="Import Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="upload" size="md" />
-                Import
+                <span class="hidden sm:inline">Import</span>
             </button>
-            <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+
+            {{-- Export --}}
+            <button
+                wire:click="openExport"
+                title="Export Data"
+                aria-label="Export Data"
+                class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
                 <x-atoms.icon variant="download" size="md" />
-                Export
+                <span class="hidden sm:inline">Export</span>
             </button>
-            <x-atoms.button wire:click="create">
+
+            {{-- Tambah Pegawai --}}
+            <x-atoms.button
+                wire:click="create"
+                class="col-span-3 sm:col-span-1 w-full sm:w-auto">
                 <x-atoms.icon variant="plus" size="md" />
                 Tambah User Pegawai
             </x-atoms.button>
+
         </div>
     </header>
 
@@ -40,129 +67,129 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Pegawai'])] class extends I
 
     {{-- Baris Filter --}}
     @if($showFilters)
-        <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600">
+    <div class="px-6 sm:px-8 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-4 text-sm text-gray-600">
 
-            <span class="text-gray-500 text-xs font-medium">
-                Filter Data:
-            </span>
+        <span class="text-gray-500 text-xs font-medium">
+            Filter Data:
+        </span>
 
-            <select
-                wire:model.live="filterJabatan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5 w-40 bg-white">
+        <select
+            wire:model.live="filterJabatan"
+            class="text-xs border border-gray-200 rounded px-2 py-1.5 w-40 bg-white">
 
-                <option value="">Semua Jabatan</option>
+            <option value="">Semua Jabatan</option>
 
-                @foreach($jabatanOptions as $jabatan)
-                    <option value="{{ $jabatan }}">
-                        {{ $jabatan }}
-                    </option>
-                @endforeach
+            @foreach($jabatanOptions as $jabatan)
+            <option value="{{ $jabatan }}">
+                {{ $jabatan }}
+            </option>
+            @endforeach
 
-            </select>
+        </select>
 
-            @if($search || $filterJabatan)
+        @if($search || $filterJabatan)
 
-                <button
-                    wire:click="resetFilters"
-                    class="ml-auto text-xs text-brand-teal hover:underline">
+        <button
+            wire:click="resetFilters"
+            class="ml-auto text-xs text-brand-teal hover:underline">
 
-                    Reset Semua
+            Reset Semua
 
-                </button>
+        </button>
 
-            @endif
+        @endif
 
-        </div>
+    </div>
     @endif
 
     {{-- Indikator jumlah yang dipilih --}}
     @if(count($selected) > 0)
-        <div class="px-6 py-2 bg-teal-50 border-b border-teal-100 flex justify-between items-center text-sm">
-            <span class="text-xs font-medium text-brand-teal">{{ count($selected) }} data dipilih</span>
-            <button wire:click="$set('selected', [])" class="text-xs text-gray-500 hover:text-gray-700">Batal Pilih</button>
-        </div>
+    <div class="px-6 py-2 bg-teal-50 border-b border-teal-100 flex justify-between items-center text-sm">
+        <span class="text-xs font-medium text-brand-teal">{{ count($selected) }} data dipilih</span>
+        <button wire:click="$set('selected', [])" class="text-xs text-gray-500 hover:text-gray-700">Batal Pilih</button>
+    </div>
     @endif
 
     <div class="px-4 py-2">
         <x-shared.flash-message />
     </div>
 
-    <x-organisms.data-table 
-    :headers="[
+    <x-organisms.data-table
+        :headers="[
         '',
         'NIP',
         'Nama Pegawai',
         'Jabatan',
         'Aksi'
     ]"
-    empty="Belum ada data pegawai.">
+        empty="Belum ada data pegawai.">
 
-@foreach($records as $record)
+        @foreach($records as $record)
 
-<tr
-    wire:key="pegawai-{{ $record->id }}"
-    class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer
+        <tr
+            wire:key="pegawai-{{ $record->id }}"
+            class="group border-b border-gray-100 transition-all duration-200 h-12 relative cursor-pointer
         hover:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]
         hover:z-10 hover:rounded-md
         {{ in_array($record->id, $selected) ? 'bg-teal-50/50' : 'bg-white' }}">
 
-    {{-- Checkbox --}}
-    <td
-        class="w-16 text-center align-middle rounded-l-md py-2"
-        onclick="event.stopPropagation()">
+            {{-- Checkbox --}}
+            <td
+                class="w-16 text-center align-middle rounded-l-md py-2"
+                onclick="event.stopPropagation()">
 
-        <input
-            type="checkbox"
-            value="{{ $record->id }}"
-            wire:model.live="selected"
-            class="w-4 h-4 rounded border-gray-300 text-brand-teal focus:ring-brand-teal accent-brand-teal cursor-pointer">
+                <input
+                    type="checkbox"
+                    value="{{ $record->id }}"
+                    wire:model.live="selected"
+                    class="w-4 h-4 rounded border-gray-300 text-brand-teal focus:ring-brand-teal accent-brand-teal cursor-pointer">
 
-    </td>
+            </td>
 
-    {{-- NIP --}}
-    <td class="px-4 py-2 font-medium text-gray-700 text-xs">
+            {{-- NIP --}}
+            <td class="px-4 py-2 font-medium text-gray-700 text-xs">
 
-        {{ $record->nip }}
+                {{ $record->nip }}
 
-    </td>
+            </td>
 
-    {{-- Nama --}}
-    <td class="px-4 py-2 font-semibold text-gray-900">
+            {{-- Nama --}}
+            <td class="px-4 py-2 font-semibold text-gray-900">
 
-        {{ $record->user?->nama }}
+                {{ $record->user?->nama }}
 
-    </td>
+            </td>
 
-    {{-- Jabatan --}}
-    <td class="px-4 py-2 text-xs">
+            {{-- Jabatan --}}
+            <td class="px-4 py-2 text-xs">
 
-        <span class="px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                <span class="px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
 
-            {{ $record->jabatan }}
+                    {{ $record->jabatan }}
 
-        </span>
+                </span>
 
-    </td>
+            </td>
 
-    {{-- Aksi --}}
-    <td class="px-4 py-2 text-right relative rounded-r-md">
+            {{-- Aksi --}}
+            <td class="px-4 py-2 text-right relative rounded-r-md">
 
-        <x-molecules.table-action :id="$record->id">
+                <x-molecules.table-action :id="$record->id">
 
-            <x-slot:edit>
-                <span class="sr-only">Edit</span>
-            </x-slot>
+                    <x-slot:edit>
+                        <span class="sr-only">Edit</span>
+                        </x-slot>
 
-            <x-slot:delete>
-                <span class="sr-only">Delete</span>
-            </x-slot>
+                        <x-slot:delete>
+                            <span class="sr-only">Delete</span>
+                            </x-slot>
 
-        </x-molecules.table-action>
+                </x-molecules.table-action>
 
-    </td>
+            </td>
 
-</tr>
-@endforeach
+        </tr>
+        @endforeach
     </x-organisms.data-table>
 
     <livewire:partials.admin.kelola-user.pegawai.pegawai-modal />
@@ -171,85 +198,85 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Pegawai'])] class extends I
     {{-- MODAL IMPORT PEGAWAI                        --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-        <x-shared.modal name="import-pegawai" :show="true" maxWidth="md">
-            <div class="flex flex-col">
-                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                    <h2 class="text-base font-bold text-gray-900">Import Data Pegawai</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Format: CSV, XLS, atau XLSX — maks 5 MB. File Excel otomatis dikonversi ke CSV.</p>
-                </div>
-                <div class="px-6 py-5 space-y-4">
-                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
-                        <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
-                        <code class="block">nip | nama | email | no_hp | jenis_kelamin | jabatan | role | status</code>
-                        <p class="mt-1 text-blue-500">NIP unik. Role: admin, guru_bk, guru, pegawai. Password default: password</p>
-                    </div>
-                    <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
-                        <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">
-                        <p class="text-sm font-medium text-gray-600">Klik atau tarik file ke sini</p>
-                        <p class="text-xs text-gray-400 mt-1">CSV, XLS, XLSX — maks 5 MB</p>
-                        @if($importFile)
-                            <p class="mt-3 text-xs font-semibold text-brand-teal">✓ {{ $importFile->getClientOriginalName() }}</p>
-                        @endif
-                    </div>
-                    @error('importFile')
-                        <p class="text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                    @if($importedCount > 0)
-                        <div class="bg-green-50 border border-green-100 rounded-lg px-4 py-2 text-sm text-green-700">✓ Berhasil memproses {{ $importedCount }} baris data.</div>
-                    @endif
-                    @if(!empty($importErrors))
-                        <div class="bg-red-50 border border-red-100 rounded-lg px-4 py-2 text-xs text-red-700 max-h-40 overflow-y-auto">
-                            <p class="font-semibold mb-1">Baris yang gagal:</p>
-                            <ul class="list-disc pl-4 space-y-0.5">
-                                @foreach($importErrors as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
-                    <x-atoms.button variant="secondary" wire:click="$set('showImportModal', false)">Batal</x-atoms.button>
-                    <x-atoms.button wire:click="processImport" :disabled="!$importFile">
-                        <span wire:loading.remove wire:target="processImport">Proses Import</span>
-                        <span wire:loading wire:target="processImport">Memproses...</span>
-                    </x-atoms.button>
-                </div>
+    <x-shared.modal name="import-pegawai" :show="true" maxWidth="md">
+        <div class="flex flex-col">
+            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                <h2 class="text-base font-bold text-gray-900">Import Data Pegawai</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Format: CSV, XLS, atau XLSX — maks 5 MB. File Excel otomatis dikonversi ke CSV.</p>
             </div>
-        </x-shared.modal>
+            <div class="px-6 py-5 space-y-4">
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
+                    <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
+                    <code class="block">nip | nama | email | no_hp | jenis_kelamin | jabatan | role | status</code>
+                    <p class="mt-1 text-blue-500">NIP unik. Role: admin, guru_bk, guru, pegawai. Password default: password</p>
+                </div>
+                <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
+                    <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">
+                    <p class="text-sm font-medium text-gray-600">Klik atau tarik file ke sini</p>
+                    <p class="text-xs text-gray-400 mt-1">CSV, XLS, XLSX — maks 5 MB</p>
+                    @if($importFile)
+                    <p class="mt-3 text-xs font-semibold text-brand-teal">✓ {{ $importFile->getClientOriginalName() }}</p>
+                    @endif
+                </div>
+                @error('importFile')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+                @enderror
+                @if($importedCount > 0)
+                <div class="bg-green-50 border border-green-100 rounded-lg px-4 py-2 text-sm text-green-700">✓ Berhasil memproses {{ $importedCount }} baris data.</div>
+                @endif
+                @if(!empty($importErrors))
+                <div class="bg-red-50 border border-red-100 rounded-lg px-4 py-2 text-xs text-red-700 max-h-40 overflow-y-auto">
+                    <p class="font-semibold mb-1">Baris yang gagal:</p>
+                    <ul class="list-disc pl-4 space-y-0.5">
+                        @foreach($importErrors as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+            </div>
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+                <x-atoms.button variant="secondary" wire:click="$set('showImportModal', false)">Batal</x-atoms.button>
+                <x-atoms.button wire:click="processImport" :disabled="!$importFile">
+                    <span wire:loading.remove wire:target="processImport">Proses Import</span>
+                    <span wire:loading wire:target="processImport">Memproses...</span>
+                </x-atoms.button>
+            </div>
+        </div>
+    </x-shared.modal>
     @endif
 
     {{-- ═══════════════════════════════════════════ --}}
     {{-- MODAL EXPORT PEGAWAI                        --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-        <x-shared.modal name="export-pegawai" :show="true" maxWidth="md">
-            <div class="flex flex-col">
-                <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
-                    <h2 class="text-base font-bold text-gray-900">Export Data Pegawai</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
-                </div>
-                <div class="px-6 py-5 space-y-4">
-                    <div class="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-lg px-4 py-3">
-                        <div>
-                            <p class="text-xs text-gray-500">Data yang akan di-export</p>
-                            <p class="text-2xl font-bold text-brand-teal leading-tight">{{ $exportPreviewCount ?? 0 }} <span class="text-sm font-normal text-gray-500">pegawai</span></p>
-                        </div>
+    <x-shared.modal name="export-pegawai" :show="true" maxWidth="md">
+        <div class="flex flex-col">
+            <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
+                <h2 class="text-base font-bold text-gray-900">Export Data Pegawai</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
+            </div>
+            <div class="px-6 py-5 space-y-4">
+                <div class="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-lg px-4 py-3">
+                    <div>
+                        <p class="text-xs text-gray-500">Data yang akan di-export</p>
+                        <p class="text-2xl font-bold text-brand-teal leading-tight">{{ $exportPreviewCount ?? 0 }} <span class="text-sm font-normal text-gray-500">pegawai</span></p>
                     </div>
                 </div>
-                <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
-                    <x-atoms.button variant="secondary" wire:click="$set('showExportModal', false)">Batal</x-atoms.button>
-                    <x-atoms.button wire:click="exportCsv" :disabled="($exportPreviewCount ?? 0) === 0">
-                        <span wire:loading.remove wire:target="exportCsv">Download CSV</span>
-                        <span wire:loading wire:target="exportCsv">Menyiapkan...</span>
-                    </x-atoms.button>
-                    <x-atoms.button wire:click="exportExcel" :disabled="($exportPreviewCount ?? 0) === 0">
-                        <span wire:loading.remove wire:target="exportExcel">Download Excel</span>
-                        <span wire:loading wire:target="exportExcel">Menyiapkan...</span>
-                    </x-atoms.button>
-                </div>
             </div>
-        </x-shared.modal>
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+                <x-atoms.button variant="secondary" wire:click="$set('showExportModal', false)">Batal</x-atoms.button>
+                <x-atoms.button wire:click="exportCsv" :disabled="($exportPreviewCount ?? 0) === 0">
+                    <span wire:loading.remove wire:target="exportCsv">Download CSV</span>
+                    <span wire:loading wire:target="exportCsv">Menyiapkan...</span>
+                </x-atoms.button>
+                <x-atoms.button wire:click="exportExcel" :disabled="($exportPreviewCount ?? 0) === 0">
+                    <span wire:loading.remove wire:target="exportExcel">Download Excel</span>
+                    <span wire:loading wire:target="exportExcel">Menyiapkan...</span>
+                </x-atoms.button>
+            </div>
+        </div>
+    </x-shared.modal>
     @endif
 
     <!-- Skeleton Loading Modal Overlay -->

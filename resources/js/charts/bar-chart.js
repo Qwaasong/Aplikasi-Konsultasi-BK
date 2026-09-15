@@ -26,6 +26,9 @@ const initializeBarCharts = () => {
         const labels = JSON.parse(canvas.dataset.labels || '[]');
         const values = JSON.parse(canvas.dataset.values || '[]');
 
+        // Mobile menggunakan horizontal bar chart
+        const isMobile = window.innerWidth < 640;
+
         new Chart(canvas, {
             type: 'bar',
 
@@ -52,6 +55,10 @@ const initializeBarCharts = () => {
                 responsive: true,
                 maintainAspectRatio: false,
 
+                // Mobile: horizontal
+                // Desktop: vertical
+                indexAxis: isMobile ? 'y' : 'x',
+
                 plugins: {
                     legend: {
                         display: false,
@@ -73,85 +80,75 @@ const initializeBarCharts = () => {
                 },
 
                 scales: {
+                    // ==========================================
+                    // SUMBU X
+                    // ==========================================
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0,
+                            color: '#64748B',
+                            padding: 8,
+
+                            font: {
+                                size: 12,
+                            },
+                        },
+
+                        title: {
+                            display: isMobile,
+                            text: 'Jumlah Siswa',
+
+                            color: '#475569',
+
+                            font: {
+                                size: 12,
+                                weight: '500',
+                            }
+                        },
+
+                        grid: {
+                            color: '#E5E7EB',
+                        },
+
+                        border: {
+                            display: false,
+                        }
+                    },
+
+                    // ==========================================
+                    // SUMBU Y
+                    // ==========================================
                     y: {
                         beginAtZero: true,
 
                         ticks: {
-                        precision: 0,
-                        color: '#64748B',
-                        padding: 8,
-                    },
-
-                    title: {
-                        display: true,
-                        text: 'Jumlah Siswa',
-
-                        color: '#475569',
-
-                        font: {
-                            size: 12,
-                            weight: '500',
-                        }
-                    },
-
-                    grid: {
-                        color: '#E5E7EB',
-                    },
-
-                    border: {
-                        display: false,
-                    }
-                },
-
-                    x: {
-                        ticks: {
                             color: '#475569',
-
-                            autoSkip: false,
-
-                            maxRotation: 0,
-                            minRotation: 0,
-
                             padding: 8,
 
                             font: {
                                 size: 12,
                             },
 
+                            // Desktop tidak membutuhkan label kategori
+                            // di sumbu Y karena kategori berada di X.
                             callback: function (value) {
-                                const label = this.getLabelForValue(value);
-
-                                const words = label.split(' ');
-                                const lines = [];
-
-                                let currentLine = '';
-
-                                words.forEach((word) => {
-                                    const testLine = currentLine
-                                        ? `${currentLine} ${word}`
-                                        : word;
-
-                                    if (testLine.length > 15) {
-                                        if (currentLine) {
-                                            lines.push(currentLine);
-                                        }
-
-                                        currentLine = word;
-                                    } else {
-                                        currentLine = testLine;
-                                    }
-                                });
-
-                                if (currentLine) {
-                                    lines.push(currentLine);
+                                if (isMobile) {
+                                    return this.getLabelForValue(value);
                                 }
 
-                                return lines;
+                                return value;
                             }
                         },
 
-                        grid: {
+                        title: {
                             display: false,
+                        },
+
+                        grid: {
+                            display: !isMobile,
+                            color: '#E5E7EB',
                         },
 
                         border: {
