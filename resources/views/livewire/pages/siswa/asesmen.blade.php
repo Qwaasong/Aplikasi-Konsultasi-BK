@@ -43,6 +43,10 @@
                             </a>
                         @endforeach
                     </div>
+                @elseif($item['title'] === 'AKPD')
+                    <div class="mt-5 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-700">
+                        Data kelas siswa belum tersedia. Hubungi guru BK.
+                    </div>
                 @else
                     <div class="mt-5">
                         <a

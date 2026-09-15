@@ -3,6 +3,7 @@
 namespace App\Livewire\Konselor\KehadiranSiswa;
 
 use App\Models\DataSiswa;
+use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Services\ImportExportService;
 use App\Services\Siswa\KehadiranService;
@@ -58,39 +59,21 @@ class Index extends Component
     }
 
     /**
-     * Mengambil daftar kelas
+     * Mengambil seluruh daftar kelas dari master kelas.
      */
     public function loadKelas(): void
     {
-        $service = app(KehadiranService::class);
-
-        // Fetch options using existing service logic or distinct from students
-        $records = $service->getFiltered([
-            'search' => null,
-            'kelas' => null,
-            'status' => null,
-            'tanggal' => null,
-            'tahun' => null,
-        ]);
-
-        $optionsFromKehadiran = $records
-            ->map(fn ($item) => $item->siswa?->kelas_label)
+        $this->kelasOptions = Kelas::query()
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
+            ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
             ->filter()
             ->unique()
-            ->sort()
             ->values()
             ->toArray();
-
-        // Also fetch from DataSiswa to show all classes even if no attendance
-        $optionsFromSiswa = DataSiswa::with('kelas')->get()
-            ->map(fn ($item) => $item->kelas_label)
-            ->filter(fn ($label) => $label !== '-')
-            ->unique()
-            ->sort()
-            ->values()
-            ->toArray();
-
-        $this->kelasOptions = array_values(array_unique(array_merge($optionsFromKehadiran, $optionsFromSiswa)));
     }
 
     /**
@@ -181,6 +164,10 @@ class Index extends Component
      */
     public function pilihKelas(string $kelas): void
     {
+        if (! in_array($kelas, $this->kelasOptions, true)) {
+            return;
+        }
+
         $this->selectedKelas = $kelas;
         $this->search = '';
         $this->loadData();

@@ -136,14 +136,15 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
 
         @elseif(count($kelasOptions) > 0)
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
 
             @foreach($kelasOptions as $kelas)
 
             <button
                 type="button"
-                wire:click="pilihKelas('{{ addslashes($kelas) }}')"
-                class="group text-left bg-white border border-gray-200 rounded-xl p-6
+            wire:key="kehadiran-kelas-{{ md5($kelas) }}"
+            wire:click="pilihKelas(@js($kelas))"
+            class="group w-full min-w-0 text-left bg-white border border-gray-200 rounded-xl p-5 sm:p-6
                                    shadow-sm transition-all duration-200
                                    hover:border-brand-teal hover:shadow-md
                                    hover:-translate-y-0.5">
@@ -154,7 +155,7 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
                             Kelas
                         </p>
-                        <h3 class="mt-2 text-lg font-semibold text-gray-800
+                        <h3 class="mt-2 text-base sm:text-lg font-semibold text-gray-800 break-words
                                                group-hover:text-brand-teal">
                             {{ $kelas }}
                         </h3>

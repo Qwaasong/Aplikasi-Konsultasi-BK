@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\RekapAbsensi;
 
+use App\Models\Kelas;
 use App\Services\ImportExportService;
 use App\Services\Siswa\KehadiranService;
 use Livewire\Attributes\Validate;
@@ -48,25 +49,19 @@ class Index extends Component
     }
 
     /**
-     * Mengambil daftar kelas dari data kehadiran.
+     * Mengambil seluruh daftar kelas dari master kelas.
      */
     public function loadKelas(): void
     {
-        $service = app(KehadiranService::class);
-
-        $records = $service->getFiltered([
-            'search' => null,
-            'kelas' => null,
-            'status' => null,
-            'tanggal' => null,
-            'tahun' => null,
-        ]);
-
-        $this->kelasOptions = $records
-            ->map(fn ($item) => $item->siswa?->kelas_label)
+        $this->kelasOptions = Kelas::query()
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
+            ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
             ->filter()
             ->unique()
-            ->sort()
             ->values()
             ->toArray();
     }
@@ -105,6 +100,10 @@ class Index extends Component
      */
     public function pilihKelas(string $kelas): void
     {
+        if (! in_array($kelas, $this->kelasOptions, true)) {
+            return;
+        }
+
         $this->selectedKelas = $kelas;
 
         $this->search = '';
