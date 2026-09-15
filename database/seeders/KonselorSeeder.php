@@ -17,8 +17,8 @@ class KonselorSeeder extends Seeder
     {
         $konselor = [
             [
-                'nama'          => 'Danny',
-                'username'      => 'pak.danny',
+                'nama'          => 'Dani',
+                'username'      => 'pak.dani',
                 'email'         => 'danny@sekolah.sch.id',
                 'jenis_kelamin' => 'L',
                 'no_hp'         => '081200000001',
