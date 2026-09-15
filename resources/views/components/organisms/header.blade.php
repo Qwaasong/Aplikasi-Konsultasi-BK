@@ -30,11 +30,21 @@
             w-full
             sm:w-auto
             flex
-            items-center
-            gap-2
+            flex-col
+            sm:flex-row
+            items-end
+            sm:items-center
+            gap-3
+            sm:gap-2
             sm:justify-end
         "
     >
+
+        @if(isset($actions))
+            <div class="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-2">
+                {{ $actions }}
+            </div>
+        @endif
 
         @if(!empty($action))
 
