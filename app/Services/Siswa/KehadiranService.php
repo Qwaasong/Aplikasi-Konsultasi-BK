@@ -150,6 +150,37 @@ class KehadiranService
         return $this->getFiltered($filters)->count();
     }
 
+    /**
+     * Returns rows grouped by kelas: ['Kelas X RPL 1' => [rows...], ...]
+     */
+    public function exportRowsPerKelas(array $filters = []): array
+    {
+        $records = $this->getFiltered($filters);
+        $grouped = [];
+
+        foreach ($records as $record) {
+            $kelasLabel = $record->siswa?->kelas_label ?? 'Tidak Ada Kelas';
+            $grouped[$kelasLabel][] = [
+                'nis'               => $record->siswa?->nis ?? '',
+                'nama'              => $record->siswa->user->nama ?? '',
+                'email'             => $record->siswa?->user?->email ?? '',
+                'no_hp'             => $record->siswa?->user?->no_hp ?? '',
+                'jenis_kelamin'     => $record->siswa?->jenis_kelamin ?? '',
+                'kelas'             => $kelasLabel,
+                'jurusan'           => $record->siswa?->jurusan_label ?? '',
+                'tanggal_kehadiran' => optional($record->tanggal_kehadiran)->format('Y-m-d'),
+                'status'            => $record->status,
+                'tahun_ajaran'      => $record->tahunAjaran?->tahun ?? '',
+                'semester'          => $record->tahunAjaran?->semester ?? '',
+            ];
+        }
+
+        // Sort sheets alphabetically by kelas name
+        ksort($grouped);
+
+        return $grouped;
+    }
+
     public function getTemplateHeaders(): array
     {
         return [

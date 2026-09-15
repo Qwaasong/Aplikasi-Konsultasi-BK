@@ -271,6 +271,23 @@ class Index extends Component
         return $ies->streamExcelExport('kehadiran-' . date('Ymd-His') . '.xlsx', $service->getTemplateHeaders(), $rows);
     }
 
+    public function exportExcelPerKelas(KehadiranService $service, ImportExportService $ies): StreamedResponse
+    {
+        $sheets = $service->exportRowsPerKelas([
+            'tahun' => $this->selectedTahunAjaranId
+                ? \App\Models\TahunAjaran::find($this->selectedTahunAjaranId)?->tahun
+                : null,
+        ]);
+
+        $this->showExportModal = false;
+
+        return $ies->streamExcelExportPerSheet(
+            'rekap-kehadiran-per-kelas-' . date('Ymd-His') . '.xlsx',
+            $service->getTemplateHeaders(),
+            $sheets
+        );
+    }
+
     // ── TEMPLATE ─────────────────────────────
 
     public function downloadTemplate(KehadiranService $service, ImportExportService $ies): StreamedResponse
