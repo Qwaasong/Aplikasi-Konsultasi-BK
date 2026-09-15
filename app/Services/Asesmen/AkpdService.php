@@ -3,6 +3,7 @@
 namespace App\Services\Asesmen;
 
 use App\Models\Akpd;
+use App\Models\Kelas;
 use App\Repositories\Contracts\Asesmen\AkpdRepositoryInterface;
 use App\Services\ImportExportService;
 use Illuminate\Http\UploadedFile;
@@ -96,6 +97,16 @@ class AkpdService
     // IMPORT / EXPORT
     // ===========================
 
+
+        public function getKelasOptions(string $tingkat): array
+        {
+            return Kelas::query()
+                ->where('tingkat', $tingkat)
+                ->orderBy('nama_kelas')
+                ->pluck('nama_kelas')
+                ->values()
+                ->all();
+        }
     public function importFromFile(UploadedFile $file): array
     {
         $rows = $this->importExportService->parseUploadedFile($file);

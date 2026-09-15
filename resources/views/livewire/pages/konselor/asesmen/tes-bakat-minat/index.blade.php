@@ -137,7 +137,11 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
         </div>
 
 
-    {{-- Tabel data (setelah pilih tingkat) --}}
+    {{-- Pilih kelas --}}
+    @elseif(!$selectedKelas)
+        @include('livewire.partials.asesmen.class-selector', ['assessmentName' => 'Tes Bakat Minat'])
+
+    {{-- Tabel data (setelah pilih kelas) --}}
     @else
 
         {{-- Header Kelas --}}
@@ -145,7 +149,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
 
             <button
                 type="button"
-                wire:click="kembaliKeTingkat"
+                wire:click="kembaliKeKelas"
                 class="inline-flex items-center text-xs text-gray-500
                        hover:text-brand-teal mb-2">
 
@@ -169,7 +173,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                Tes Bakat Minat Kelas {{ $selectedTingkat }}
+                Tes Bakat Minat Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -317,7 +321,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
             'Kelas',
             'Aksi'
         ]"
-        empty="Belum ada data Tes Bakat Minat untuk kelas {{ $selectedTingkat }}."
+        empty="Belum ada data Tes Bakat Minat untuk kelas {{ $selectedKelas }}."
     >
 
         @forelse($records as $record)

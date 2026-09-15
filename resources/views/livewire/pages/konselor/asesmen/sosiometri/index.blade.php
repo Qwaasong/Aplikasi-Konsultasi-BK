@@ -137,7 +137,11 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Sosiometri - Bimbingan Konselin
         </div>
 
 
-    {{-- Tabel data (setelah pilih tingkat) --}}
+    {{-- Pilih kelas --}}
+    @elseif(!$selectedKelas)
+        @include('livewire.partials.asesmen.class-selector', ['assessmentName' => 'Sosiometri'])
+
+    {{-- Tabel data (setelah pilih kelas) --}}
     @else
 
         {{-- Header Kelas --}}
@@ -145,7 +149,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Sosiometri - Bimbingan Konselin
 
             <button
                 type="button"
-                wire:click="kembaliKeTingkat"
+                wire:click="kembaliKeKelas"
                 class="inline-flex items-center text-xs text-gray-500
                        hover:text-brand-teal mb-2">
 
@@ -169,7 +173,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Sosiometri - Bimbingan Konselin
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                Sosiometri Kelas {{ $selectedTingkat }}
+                Sosiometri Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -317,7 +321,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Sosiometri - Bimbingan Konselin
             'Kelas',
             'Aksi'
         ]"
-        empty="Belum ada data Sosiometri untuk kelas {{ $selectedTingkat }}."
+        empty="Belum ada data Sosiometri untuk kelas {{ $selectedKelas }}."
     >
 
         @forelse($records as $record)

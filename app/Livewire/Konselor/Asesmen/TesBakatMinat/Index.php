@@ -4,6 +4,7 @@ namespace App\Livewire\Konselor\Asesmen\TesBakatMinat;
 
 use App\Models\DataSiswa;
 use App\Models\Jurusan;
+use App\Models\Kelas;
 use App\Models\Peminatan;
 use App\Services\Asesmen\PeminatanService;
 use App\Services\ImportExportService;
@@ -70,8 +71,10 @@ class Index extends Component
     public string $filterJurusan = '';
 
     public ?string $selectedTingkat = null;
+    public ?string $selectedKelas = null;
 
     public array $kelasOptions = [];
+    public array $tingkatKelasOptions = [];
 
     public array $jurusanOptions = [];
 
@@ -183,15 +186,40 @@ class Index extends Component
         $this->filterJurusan = '';
 
         $this->loadData();
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = Kelas::query()->where('tingkat', $tingkat)
+            ->orderBy('nama_kelas')->pluck('nama_kelas')->values()->all();
     }
 
     public function kembaliKeTingkat(): void
     {
         $this->selectedTingkat = null;
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = [];
         $this->search = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
 
+        $this->records = collect();
+    }
+
+    public function pilihKelas(string $kelas): void
+    {
+        if (! in_array($kelas, $this->tingkatKelasOptions, true)) {
+            return;
+        }
+
+        $this->selectedKelas = $kelas;
+        $this->filterKelas = $kelas;
+        $this->loadData();
+    }
+
+    public function kembaliKeKelas(): void
+    {
+        $this->selectedKelas = null;
+        $this->filterKelas = '';
+        $this->search = '';
+        $this->filterJurusan = '';
         $this->records = collect();
     }
 

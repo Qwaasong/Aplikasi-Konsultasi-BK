@@ -133,7 +133,11 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
         </div>
 
 
-    {{-- Tabel data (setelah pilih tingkat) --}}
+    {{-- Pilih kelas --}}
+    @elseif(!$selectedKelas)
+        @include('livewire.partials.asesmen.class-selector', ['assessmentName' => 'DCM'])
+
+    {{-- Tabel data (setelah pilih kelas) --}}
     @else
 
         {{-- Header Kelas --}}
@@ -141,7 +145,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
 
             <button
                 type="button"
-                wire:click="kembaliKeTingkat"
+                wire:click="kembaliKeKelas"
                 class="inline-flex items-center text-xs text-gray-500
                        hover:text-brand-teal mb-2">
 
@@ -165,7 +169,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                DCM Kelas {{ $selectedTingkat }}
+                DCM Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -275,7 +279,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
     {{-- Data Table --}}
     <x-organisms.data-table
         :headers="['Tanggal', 'Siswa', 'Kelas', 'Aksi']"
-        empty="Belum ada data DCM untuk kelas {{ $selectedTingkat }}.">
+        empty="Belum ada data DCM untuk kelas {{ $selectedKelas }}.">
 
         @forelse($records as $record)
 

@@ -141,7 +141,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Gaya Belajar - Bimbingan Konsel
 
             <button
                 type="button"
-                wire:click="kembaliKeTingkat"
+                wire:click="kembaliKeKelas"
                 class="inline-flex items-center text-xs text-gray-500
                        hover:text-brand-teal mb-2">
 
@@ -157,7 +157,6 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Gaya Belajar - Bimbingan Konsel
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M15 19l-7-7 7-7" />
-
                 </svg>
 
                 Kembali ke Daftar Kelas
@@ -165,7 +164,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Gaya Belajar - Bimbingan Konsel
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                Gaya Belajar Kelas {{ $selectedTingkat }}
+                Gaya Belajar Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -308,7 +307,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Gaya Belajar - Bimbingan Konsel
             'Aksi'
         ]"
 
-        empty="Belum ada data gaya belajar untuk kelas {{ $selectedTingkat }}."
+        empty="Belum ada data gaya belajar untuk kelas {{ $selectedKelas }}."
     >
 
         @forelse($records as $record)
