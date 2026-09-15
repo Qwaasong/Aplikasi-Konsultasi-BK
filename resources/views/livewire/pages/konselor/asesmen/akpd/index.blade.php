@@ -373,8 +373,8 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
                 <div class="px-6 py-5 space-y-4">
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
                         <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
-                        <code class="block">nis | tanggal | tahun_pelajaran | q01 | q02 | ... | q50</code>
-                        <p class="mt-1 text-blue-500">Nilai tiap soal: Ya / Tidak (case-insensitive). NIS + tanggal adalah kunci; import ulang akan memperbarui data yang sama.</p>
+                        <code class="block">Nama Siswa | Kelas | Timestamp | Tahun Pelajaran | 1. ... | 2. ... | ... | 50. ...</code>
+                        <p class="mt-1 text-blue-500">Nilai tiap soal: Ya / Tidak (case-insensitive). Siswa dicocokkan berdasarkan Nama Siswa dan Kelas; import ulang pada siswa dan tanggal yang sama akan memperbarui data.</p>
                     </div>
                     <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
                         <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">

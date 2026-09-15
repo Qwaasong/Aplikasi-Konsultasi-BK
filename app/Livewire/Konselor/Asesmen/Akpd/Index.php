@@ -21,6 +21,7 @@ class Index extends Component
 
     public bool $showFilters = false;
     public array $selected = [];
+    public bool $selectAll = false;
 
     public $students = [];
 
@@ -104,6 +105,44 @@ class Index extends Component
             'jurusan' => $this->filterJurusan,
             'tingkat' => $this->selectedTingkat,
         ]);
+
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
+    public function filterAction(): void
+    {
+        $this->showFilters = ! $this->showFilters;
+    }
+
+    public function resetFilters(): void
+    {
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+        $this->loadData();
+    }
+
+    public function updatedSelectAll(bool $value): void
+    {
+        $this->selected = $value
+            ? $this->records->pluck('id')->map(fn ($id) => (string) $id)->all()
+            : [];
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterKelas(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterJurusan(): void
+    {
+        $this->loadData();
     }
 
     public function pilihTingkat(string $tingkat): void
@@ -148,7 +187,7 @@ class Index extends Component
     public function nextStep(): void
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
+            'siswa_id' => 'required|integer|exists:data_siswa,id',
             'tanggal' => 'required|date',
             'tahun_pelajaran' => 'nullable|string|max:20',
         ]);
@@ -244,6 +283,13 @@ class Index extends Component
 
         $record = $service->findById($id);
 
+        if (! $record) {
+            session()->flash('error', 'Data AKPD tidak ditemukan.');
+            $this->loadData();
+
+            return;
+        }
+
         $this->editingId = $id;
 
         $this->siswa_id = $record->siswa_id;
@@ -310,7 +356,7 @@ class Index extends Component
     public function save(AkpdService $service): void
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
+            'siswa_id' => 'required|integer|exists:data_siswa,id',
             'tanggal' => 'required|date',
             'tahun_pelajaran' => 'nullable|string|max:20',
             'jawaban' => 'nullable|array',

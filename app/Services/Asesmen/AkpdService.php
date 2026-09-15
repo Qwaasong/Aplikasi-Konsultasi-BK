@@ -163,18 +163,33 @@ class AkpdService
         $imported = 0;
         $errors = [];
 
+        if ($rows === []) {
+            return [
+                'imported' => 0,
+                'errors' => ['File import kosong atau tidak memiliki baris data.'],
+            ];
+        }
+
         // Key header ternormalisasi untuk kolom identitas gform.
         $namaKey = $this->firstKey($rows[0] ?? [], ['nama_siswa', 'nama_lengkap', 'nama']);
         $kelasKey = $this->firstKey($rows[0] ?? [], ['kelas']);
         $timestampKey = $this->firstKey($rows[0] ?? [], ['timestamp']);
         $tahunKey = $this->firstKey($rows[0] ?? [], ['tahun_pelajaran']);
 
+        if ($namaKey === null || $kelasKey === null) {
+            return [
+                'imported' => 0,
+                'errors' => ['Header wajib tidak ditemukan. Gunakan kolom Nama Siswa dan Kelas.'],
+            ];
+        }
+
         foreach ($rows as $index => $row) {
             $lineNumber = $index + 2;
 
             $nama = trim((string) ($row[$namaKey] ?? ''));
             $kelas = trim((string) ($row[$kelasKey] ?? ''));
-            $tanggal = AsesmenImportHelper::parseTimestamp($row[$timestampKey] ?? null);
+            $timestamp = $timestampKey !== null ? ($row[$timestampKey] ?? null) : null;
+            $tanggal = AsesmenImportHelper::parseTimestamp($timestamp);
 
             if ($nama === '' || $kelas === '') {
                 $errors[] = "Baris {$lineNumber}: kolom Nama dan Kelas wajib diisi.";
@@ -194,7 +209,9 @@ class AkpdService
             }
 
             $data = [
-                'tahun_pelajaran' => AsesmenImportHelper::resolveTahunPelajaran($row[$tahunKey] ?? null),
+                'tahun_pelajaran' => AsesmenImportHelper::resolveTahunPelajaran(
+                    $tahunKey !== null ? ($row[$tahunKey] ?? null) : null
+                ),
             ];
 
             foreach (range(1, 50) as $no) {
@@ -228,7 +245,7 @@ class AkpdService
         foreach ($row as $key => $value) {
             $norm = trim((string) $key);
 
-            if (preg_match('/^\d+/', $norm, $m) === 1 && (int) $m[0] === $no) {
+            if (preg_match('/^(?:q)?(\d+)/i', $norm, $m) === 1 && (int) $m[1] === $no) {
                 return $value;
             }
         }
