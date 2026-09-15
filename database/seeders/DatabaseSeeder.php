@@ -13,7 +13,6 @@ class DatabaseSeeder extends Seeder
             KonselorSeeder::class,
             DataSiswaSeeder::class,
             KonsultasiSeeder::class,
-            FactorySeeder::class,
         ]);
     }
 }
