@@ -68,9 +68,16 @@ class Asesmen extends Component
             [
                 'title' => 'Sosiometri',
                 'description' => 'Menggambarkan hubungan sosial dan preferensi teman dalam kelompok.',
-                'route' => '#',
+                'route' => 'https://forms.gle/CnY4xW3XH1JfYsgy7',
                 'badge' => 'Sosial',
-                'label' => 'Segera hadir',
+                'label' => 'Mulai Tes',
+            ],
+            [
+                'title' => 'Komulatif Record',
+                'description' => 'Formulir pencatatan data komulatif peserta didik untuk melengkapi kebutuhan layanan BK.',
+                'route' => 'https://docs.google.com/forms/d/e/1FAIpQLSdualGVC376SQ2ErRu3AqQtCeJocFtkb6CVZWCO_7hS2IYAxg/viewform?usp=sharing&ouid=102322238715768057541',
+                'badge' => 'Data Siswa',
+                'label' => 'Isi Komulatif Record',
             ],
             [
                 'title' => 'Tes Bakat Minat',

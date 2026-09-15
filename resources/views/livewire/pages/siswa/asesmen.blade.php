@@ -10,7 +10,7 @@
         </div>
         <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
             <x-atoms.icon variant="assessment" size="sm" color="#086375" />
-            <span>5 Form Tersedia</span>
+            <span>{{ count($items) }} Form Tersedia</span>
         </div>
     </div>
 
