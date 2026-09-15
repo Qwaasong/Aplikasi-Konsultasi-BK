@@ -2,8 +2,9 @@
 
 use App\Livewire\Auth\Login;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
-new #[Layout('layouts.guest')] class extends Login {}; ?>
+new #[Layout('layouts.guest'), Title('Login')] class extends Login {}; ?>
 
 <div class="flex h-full w-full">
     {{-- Kolom Kiri: Form --}}

@@ -2,8 +2,9 @@
 
 use App\Livewire\Auth\Register;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
-new #[Layout('layouts.guest')] class extends Register {}; ?>
+new #[Layout('layouts.guest'), Title('Register')] class extends Register {}; ?>
 
 <div class="flex h-full w-full">
     {{-- Kolom Kiri: Form --}}
