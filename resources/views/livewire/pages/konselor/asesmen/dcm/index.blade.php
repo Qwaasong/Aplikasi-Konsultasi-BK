@@ -16,14 +16,17 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
         </x-slot:search>
 
         <x-slot:actions>
-            <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="template" size="md" /> Template
+            <button wire:click="downloadTemplate" title="Template" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="template" size="md" />
+                <span class="hidden sm:inline">Template</span>
             </button>
-            <button wire:click="openImport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="upload" size="md" /> Import
+            <button wire:click="openImport" title="Import" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="upload" size="md" />
+                <span class="hidden sm:inline">Import</span>
             </button>
-            <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="download" size="md" /> Export
+            <button wire:click="openExport" title="Export" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="download" size="md" />
+                <span class="hidden sm:inline">Export</span>
             </button>
         </x-slot:actions>
 
