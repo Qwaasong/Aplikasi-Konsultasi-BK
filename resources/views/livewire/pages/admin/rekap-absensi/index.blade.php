@@ -275,6 +275,15 @@ new #[Layout('layouts.app', ['title' => 'Rekap Absensi Siswa'])] class extends I
         </span>
 
 
+        {{-- Filter Bulan --}}
+        <input
+            type="month"
+            wire:model.live="filterBulan"
+            class="text-xs border rounded px-2 py-1"
+            title="Pilih bulan rekap"
+            aria-label="Filter bulan"
+        >
+
         {{-- Filter Status --}}
         <select
             wire:model.live="filterStatus"
@@ -323,7 +332,7 @@ new #[Layout('layouts.app', ['title' => 'Rekap Absensi Siswa'])] class extends I
         </select>
 
 
-        @if($filterStatus || $filterTahun || $search)
+        @if($filterBulan || $filterStatus || $filterTahun || $search)
 
         <button
             wire:click="resetFilter"
@@ -470,7 +479,7 @@ new #[Layout('layouts.app', ['title' => 'Rekap Absensi Siswa'])] class extends I
     {{-- MODAL IMPORT KEHADIRAN                      --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-    <x-shared.modal name="import-kehadiran" :show="true" maxWidth="md">
+    <x-shared.modal name="import-kehadiran" :show="true" model="showImportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Import Data Kehadiran</h2>
@@ -522,7 +531,7 @@ new #[Layout('layouts.app', ['title' => 'Rekap Absensi Siswa'])] class extends I
     {{-- MODAL EXPORT KEHADIRAN                      --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-    <x-shared.modal name="export-kehadiran" :show="true" maxWidth="md">
+    <x-shared.modal name="export-kehadiran" :show="true" model="showExportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Export Data Kehadiran</h2>

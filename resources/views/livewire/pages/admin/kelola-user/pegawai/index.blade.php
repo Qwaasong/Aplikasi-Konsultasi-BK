@@ -198,7 +198,7 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Pegawai'])] class extends I
     {{-- MODAL IMPORT PEGAWAI                        --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-    <x-shared.modal name="import-pegawai" :show="true" maxWidth="md">
+    <x-shared.modal name="import-pegawai" :show="true" model="showImportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Import Data Pegawai</h2>
@@ -250,7 +250,7 @@ new #[Layout('layouts.app', ['title' => 'Kelola Data Pegawai'])] class extends I
     {{-- MODAL EXPORT PEGAWAI                        --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-    <x-shared.modal name="export-pegawai" :show="true" maxWidth="md">
+    <x-shared.modal name="export-pegawai" :show="true" model="showExportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Export Data Pegawai</h2>

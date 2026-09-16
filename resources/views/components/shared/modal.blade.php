@@ -1,7 +1,8 @@
 @props([
     'name',
     'show' => false,
-    'maxWidth' => 'md'
+    'maxWidth' => 'md',
+    'model' => null,
 ])
 
 @php
@@ -17,7 +18,7 @@ $maxWidth = [
 
 <div
     x-data="{
-        show: @js($show),
+        show: @if($model) @entangle($model) @else @js($show) @endif,
         focusables() {
             // All focusable element types...
             let selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])'

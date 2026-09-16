@@ -18,6 +18,7 @@ class Index extends Component
 
     public string $filterStatus = '';
     public string $filterTanggal = '';
+    public string $filterBulan = '';
     public string $filterTahun = '';
 
     public bool $showFilters = false;
@@ -78,6 +79,7 @@ class Index extends Component
             'kelas' => $this->selectedKelas ?: null,
             'status' => $this->filterStatus ?: null,
             'tanggal' => $this->filterTanggal ?: null,
+            'bulan' => $this->filterBulan ?: null,
             'tahun' => $this->filterTahun ?: null,
         ];
 
@@ -109,6 +111,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadData();
@@ -124,6 +127,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->records = [];
@@ -134,6 +138,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadData();
@@ -144,6 +149,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadKelas();
@@ -176,6 +182,13 @@ class Index extends Component
     }
 
     public function updatedFilterTahun(): void
+    {
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
+    }
+
+    public function updatedFilterBulan(): void
     {
         if ($this->selectedKelas) {
             $this->loadData();
@@ -234,6 +247,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'status' => $this->filterStatus ?: null,
             'tahun' => $this->filterTahun ?: null,
+            'bulan' => $this->filterBulan ?: null,
         ]);
     }
 
@@ -244,6 +258,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'status' => $this->filterStatus ?: null,
             'tahun' => $this->filterTahun ?: null,
+            'bulan' => $this->filterBulan ?: null,
         ]);
 
         $this->showExportModal = false;

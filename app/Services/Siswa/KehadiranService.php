@@ -10,6 +10,7 @@ use App\Repositories\Contracts\Siswa\KehadiranRepositoryInterface;
 use App\Services\ImportExportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 
 class KehadiranService
 {
@@ -95,6 +96,15 @@ class KehadiranService
             $query->whereDate('tanggal_kehadiran', $filters['tanggal']);
         }
 
+        if (!empty($filters['bulan'])) {
+            [$year, $month] = array_pad(explode('-', (string) $filters['bulan'], 2), 2, null);
+
+            if (ctype_digit((string) $year) && ctype_digit((string) $month)) {
+                $query->whereYear('tanggal_kehadiran', (int) $year)
+                    ->whereMonth('tanggal_kehadiran', (int) $month);
+            }
+        }
+
         if (!empty($filters['tahun'])) {
             $query->whereHas('tahunAjaran', fn($q) => $q->where('tahun', $filters['tahun']));
         }
@@ -138,7 +148,9 @@ class KehadiranService
             'jenis_kelamin' => $record->siswa?->jenis_kelamin ?? '',
             'kelas' => $record->siswa?->kelas_label ?? '',
             'jurusan' => $record->siswa?->jurusan_label ?? '',
-            'tanggal_kehadiran' => optional($record->tanggal_kehadiran)->format('Y-m-d'),
+            'tanggal_kehadiran' => $record->tanggal_kehadiran
+                ? Carbon::parse($record->tanggal_kehadiran)->format('Y-m-d')
+                : '',
             'status' => $record->status,
             'tahun_ajaran' => $record->tahunAjaran?->tahun ?? '',
             'semester' => $record->tahunAjaran?->semester ?? '',

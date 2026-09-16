@@ -443,7 +443,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
     {{-- MODAL IMPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-        <x-shared.modal name="import-peminatan" :show="true" maxWidth="md">
+        <x-shared.modal name="import-peminatan" :show="true" model="showImportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Import Data Tes Bakat Minat</h2>
@@ -495,7 +495,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
     {{-- MODAL EXPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-        <x-shared.modal name="export-peminatan" :show="true" maxWidth="md">
+        <x-shared.modal name="export-peminatan" :show="true" model="showExportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Export Data Tes Bakat Minat</h2>

@@ -75,9 +75,60 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
     {{-- DAFTAR KELAS --}}
     {{-- ========================================================= --}}
 
-    @if(!$selectedKelas)
+    @if(!$selectedTingkat)
 
     <div class="px-6 sm:px-8 py-6">
+        <div class="mb-5">
+            <h2 class="text-base font-semibold text-gray-800">Pilih Tingkat</h2>
+            <p class="text-sm text-gray-500 mt-1">
+                Pilih tingkat kelas untuk mengelola kehadiran siswa.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach(['X', 'XI', 'XII'] as $tingkat)
+                <button
+                    type="button"
+                    wire:key="kehadiran-tingkat-{{ $tingkat }}"
+                    wire:click="pilihTingkat('{{ $tingkat }}')"
+                    class="group w-full text-left bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition-all duration-200 hover:border-brand-teal hover:shadow-md hover:-translate-y-0.5"
+                >
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Tingkat</p>
+                            <h3 class="mt-2 text-lg font-semibold text-gray-800 group-hover:text-brand-teal">
+                                Kelas {{ $tingkat }}
+                            </h3>
+                        </div>
+                        <div class="w-11 h-11 rounded-lg bg-teal-50 flex items-center justify-center text-brand-teal">
+                            <x-atoms.icon variant="book" size="md" />
+                        </div>
+                    </div>
+                    <div class="mt-5 flex items-center text-xs text-gray-400">
+                        Lihat Daftar Kelas
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </button>
+            @endforeach
+        </div>
+    </div>
+
+    @elseif(!$selectedKelas)
+
+    <div class="px-6 sm:px-8 py-6">
+
+        <button
+            type="button"
+            wire:click="kembaliKeTingkat"
+            class="inline-flex items-center text-xs text-gray-500 hover:text-brand-teal mb-5"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali ke Daftar Tingkat
+        </button>
 
         {{-- Selector Tahun Ajaran --}}
         <div class="mb-6 bg-teal-50 border border-teal-100 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -134,11 +185,11 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
             <p class="text-xs text-gray-400 mt-1">Daftar kelas akan muncul setelah tahun ajaran dipilih</p>
         </div>
 
-        @elseif(count($kelasOptions) > 0)
+        @elseif(count($tingkatKelasOptions) > 0)
 
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
 
-            @foreach($kelasOptions as $kelas)
+            @foreach($tingkatKelasOptions as $kelas)
 
             <button
                 type="button"
@@ -406,7 +457,7 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
     {{-- MODAL IMPORT KEHADIRAN                      --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-    <x-shared.modal name="import-kehadiran" :show="true" maxWidth="md">
+    <x-shared.modal name="import-kehadiran" :show="true" model="showImportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Import Data Kehadiran</h2>
@@ -458,13 +509,38 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
     {{-- MODAL EXPORT KEHADIRAN                      --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-    <x-shared.modal name="export-kehadiran" :show="true" maxWidth="md">
+    <x-shared.modal name="export-kehadiran" :show="true" model="showExportModal" maxWidth="md">
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Export Data Kehadiran</h2>
                 <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
             </div>
             <div class="px-6 py-5 space-y-4">
+                <div>
+                    <label for="exportKelas" class="block text-xs font-semibold text-gray-600 mb-1.5">Kelas</label>
+                    <select
+                        id="exportKelas"
+                        wire:model.live="exportKelas"
+                        class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:border-brand-teal focus:ring-brand-teal"
+                    >
+                        <option value="">Semua Kelas (Seluruh Siswa)</option>
+                        @foreach($kelasOptions as $kelas)
+                            <option value="{{ $kelas }}">{{ $kelas }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-gray-400">Pilih semua kelas untuk mengekspor seluruh data siswa.</p>
+                </div>
+
+                <div>
+                    <label for="exportBulan" class="block text-xs font-semibold text-gray-600 mb-1.5">Bulan Rekap</label>
+                    <input
+                        id="exportBulan"
+                        type="month"
+                        wire:model.live="exportBulan"
+                        class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:border-brand-teal focus:ring-brand-teal"
+                    >
+                </div>
+
                 <div class="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-lg px-4 py-3">
                     <div>
                         <p class="text-xs text-gray-500">Data yang akan di-export</p>

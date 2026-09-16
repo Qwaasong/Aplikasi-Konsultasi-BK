@@ -422,7 +422,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
     {{-- MODAL IMPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-        <x-shared.modal name="import-akpd" :show="true" maxWidth="md">
+        <x-shared.modal name="import-akpd" :show="true" model="showImportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Import Data AKPD</h2>
@@ -474,7 +474,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
     {{-- MODAL EXPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-        <x-shared.modal name="export-akpd" :show="true" maxWidth="md">
+        <x-shared.modal name="export-akpd" :show="true" model="showExportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Export Data AKPD</h2>

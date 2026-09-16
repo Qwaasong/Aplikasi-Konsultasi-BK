@@ -20,6 +20,7 @@ class Index extends Component
     public string $filterStatus = '';
 
     public ?string $selectedKelas = null;
+    public ?string $selectedTingkat = null;
     public string $selectedTanggal = '';
     public ?int $selectedTahunAjaranId = null;
 
@@ -27,6 +28,7 @@ class Index extends Component
 
     public array $records = [];
     public array $kelasOptions = [];
+    public array $tingkatKelasOptions = [];
     public array $tahunOptions = [];
     public array $attendance = [];
 
@@ -40,6 +42,8 @@ class Index extends Component
     // ── EXPORT STATE ─────────────────────────
     public bool $showExportModal = false;
     public int $exportPreviewCount = 0;
+    public string $exportKelas = '';
+    public string $exportBulan = '';
 
     public function mount(): void
     {
@@ -67,6 +71,27 @@ class Index extends Component
             ->whereNotNull('nama_kelas')
             ->where('nama_kelas', '<>', '')
             ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
+    }
+
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (! in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = Kelas::query()
+            ->where('tingkat', $tingkat)
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
             ->orderBy('nama_kelas')
             ->pluck('nama_kelas')
             ->map(static fn ($namaKelas) => trim((string) $namaKelas))
@@ -164,7 +189,7 @@ class Index extends Component
      */
     public function pilihKelas(string $kelas): void
     {
-        if (! in_array($kelas, $this->kelasOptions, true)) {
+        if (! in_array($kelas, $this->tingkatKelasOptions, true)) {
             return;
         }
 
@@ -179,6 +204,20 @@ class Index extends Component
     public function kembaliKeKelas(): void
     {
         $this->reset(['selectedKelas', 'records', 'attendance', 'search', 'filterStatus', 'showFilters']);
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->reset([
+            'selectedTingkat',
+            'selectedKelas',
+            'tingkatKelasOptions',
+            'records',
+            'attendance',
+            'search',
+            'filterStatus',
+            'showFilters',
+        ]);
         $this->loadKelas();
     }
 
@@ -233,6 +272,8 @@ class Index extends Component
 
     public function openExport(KehadiranService $service): void
     {
+        $this->exportKelas = $this->selectedKelas ?? '';
+        $this->exportBulan = date('Y-m');
         $this->refreshExportPreview($service);
         $this->showExportModal = true;
     }
@@ -245,15 +286,32 @@ class Index extends Component
     public function refreshExportPreview(KehadiranService $service): void
     {
         $this->exportPreviewCount = $service->getExportCount([
-            'kelas' => $this->selectedKelas,
+            'kelas' => $this->exportKelas ?: null,
+            'bulan' => $this->exportBulan ?: null,
         ]);
+    }
+
+    public function updatedExportKelas(): void
+    {
+        $this->refreshExportPreview(app(KehadiranService::class));
+    }
+
+    public function updatedExportBulan(): void
+    {
+        $this->refreshExportPreview(app(KehadiranService::class));
+    }
+
+    private function exportFilters(): array
+    {
+        return [
+            'kelas' => $this->exportKelas ?: null,
+            'bulan' => $this->exportBulan ?: null,
+        ];
     }
 
     public function exportCsv(KehadiranService $service, ImportExportService $ies): StreamedResponse
     {
-        $rows = $service->exportRows([
-            'kelas' => $this->selectedKelas,
-        ]);
+        $rows = $service->exportRows($this->exportFilters());
 
         $this->showExportModal = false;
 
@@ -262,9 +320,7 @@ class Index extends Component
 
     public function exportExcel(KehadiranService $service, ImportExportService $ies): StreamedResponse
     {
-        $rows = $service->exportRows([
-            'kelas' => $this->selectedKelas,
-        ]);
+        $rows = $service->exportRows($this->exportFilters());
 
         $this->showExportModal = false;
 
