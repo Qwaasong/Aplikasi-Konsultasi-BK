@@ -513,7 +513,7 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
         <div class="flex flex-col">
             <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 class="text-base font-bold text-gray-900">Export Data Kehadiran</h2>
-                <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV atau Excel</p>
+                <p class="text-xs text-gray-500 mt-0.5">Pilih format: CSV, Excel, atau Excel Per Kelas (sheet terpisah)</p>
             </div>
             <div class="px-6 py-5 space-y-4">
                 <div>
@@ -547,8 +547,12 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
                         <p class="text-2xl font-bold text-brand-teal leading-tight">{{ $exportPreviewCount ?? 0 }} <span class="text-sm font-normal text-gray-500">data</span></p>
                     </div>
                 </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-xs text-blue-700">
+                    <p class="font-semibold mb-1">💡 Export Per Kelas</p>
+                    <p>Pilih "Excel Per Kelas" untuk mendapatkan file dengan setiap kelas pada sheet yang berbeda.</p>
+                </div>
             </div>
-            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+            <div class="bg-bg-light px-6 py-4 border-t border-gray-100 flex flex-wrap justify-end gap-3 rounded-b-xl">
                 <x-atoms.button variant="secondary" wire:click="$set('showExportModal', false)">Batal</x-atoms.button>
                 <x-atoms.button wire:click="exportCsv" :disabled="($exportPreviewCount ?? 0) === 0">
                     <span wire:loading.remove wire:target="exportCsv">Download CSV</span>
@@ -557,6 +561,10 @@ new #[Layout('layouts.app', ['title' => 'Kehadiran Siswa - Bimbingan Konseling']
                 <x-atoms.button wire:click="exportExcel" :disabled="($exportPreviewCount ?? 0) === 0">
                     <span wire:loading.remove wire:target="exportExcel">Download Excel</span>
                     <span wire:loading wire:target="exportExcel">Menyiapkan...</span>
+                </x-atoms.button>
+                <x-atoms.button wire:click="exportExcelPerKelas" :disabled="($exportPreviewCount ?? 0) === 0" class="bg-emerald-600 hover:bg-emerald-700">
+                    <span wire:loading.remove wire:target="exportExcelPerKelas">Excel Per Kelas</span>
+                    <span wire:loading wire:target="exportExcelPerKelas">Menyiapkan...</span>
                 </x-atoms.button>
             </div>
         </div>
