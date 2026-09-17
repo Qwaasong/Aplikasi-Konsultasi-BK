@@ -70,6 +70,8 @@ class Index extends Component
 
     public string $filterJurusan = '';
 
+    public string $filterJenisKelamin = '';
+
     public ?string $selectedTingkat = null;
     public ?string $selectedKelas = null;
 
@@ -168,6 +170,7 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'jenis_kelamin' => $this->filterJenisKelamin,
             'tingkat' => $this->selectedTingkat,
 
         ]);
@@ -506,6 +509,11 @@ class Index extends Component
         $this->loadData();
     }
 
+    public function updatedFilterJenisKelamin(): void
+    {
+        $this->loadData();
+    }
+
     public function filterAction(): void
     {
 
@@ -522,6 +530,7 @@ class Index extends Component
         $this->filterKelas = '';
 
         $this->filterJurusan = '';
+        $this->filterJenisKelamin = '';
 
         $this->loadData();
 
@@ -640,6 +649,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'kelas' => $this->filterKelas ?: null,
             'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
             'tingkat' => $this->selectedTingkat ?: null,
         ];
     }

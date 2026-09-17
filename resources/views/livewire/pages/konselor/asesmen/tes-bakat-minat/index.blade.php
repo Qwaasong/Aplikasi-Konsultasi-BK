@@ -209,55 +209,22 @@ new #[Layout('layouts.app', ['title' => 'Asesmen Bakat Minat - Bimbingan Konseli
                 Filter Data:
             </span>
 
-            {{-- Filter Kelas --}}
+            {{-- Filter Gender --}}
             <select
-                wire:model.live="filterKelas"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5
-                       focus:outline-none focus:ring-1 focus:ring-brand-teal
-                       w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
-
-                <option value="">
-                    Semua Kelas
-                </option>
-
-                @foreach($kelasOptions ?? [] as $kelas)
-
-                    <option value="{{ $kelas }}">
-                        Kelas {{ $kelas }}
-                    </option>
-
-                @endforeach
-
-            </select>
-
-
-            {{-- Filter Jurusan --}}
-            <select
-                wire:model.live="filterJurusan"
+                wire:model.live="filterJenisKelamin"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5
                        focus:outline-none focus:ring-1 focus:ring-brand-teal
                        w-36 pr-8 flex-shrink-0 bg-white cursor-pointer">
-
-                <option value="">
-                    Semua Jurusan
-                </option>
-
-                @foreach($jurusanOptions ?? [] as $jurusan)
-
-                    <option value="{{ $jurusan }}">
-                        {{ $jurusan }}
-                    </option>
-
-                @endforeach
-
+                <option value="">Semua Gender</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
             </select>
 
 
             {{-- Reset --}}
             @if(
                 $search !== '' ||
-                $filterKelas !== '' ||
-                $filterJurusan !== ''
+                $filterJenisKelamin !== ''
             )
 
                 <button

@@ -99,6 +99,10 @@ class PeminatanService
             $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }
 
+        if (!empty($filters['jenis_kelamin'])) {
+            $query->whereHas('siswa.user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
+        }
+
         return $query->latest()->get();
     }
 
@@ -109,6 +113,7 @@ class PeminatanService
         return [
             'kelasOptions' => $all->pluck('siswa.kelas_label')->filter()->unique()->sort()->values()->toArray(),
             'jurusanOptions' => $all->pluck('siswa.jurusan_label')->filter()->unique()->sort()->values()->toArray(),
+            'jenisKelaminOptions' => $all->pluck('siswa.jenis_kelamin')->filter()->unique()->values()->toArray(),
         ];
     }
 
