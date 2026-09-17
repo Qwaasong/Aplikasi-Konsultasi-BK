@@ -99,7 +99,7 @@ class PeminatanService
             $query->whereHas('siswa.kelas.jurusan', fn($q) => $q->where('nama_jurusan', $filters['jurusan']));
         }
 
-        if (!empty($filters['jenis_kelamin'])) {
+        if (in_array($filters['jenis_kelamin'] ?? null, ['L', 'P'], true)) {
             $query->whereHas('siswa.user', fn($q) => $q->where('jenis_kelamin', $filters['jenis_kelamin']));
         }
 
