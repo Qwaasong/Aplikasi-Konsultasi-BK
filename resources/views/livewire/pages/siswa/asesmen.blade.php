@@ -10,7 +10,7 @@
         </div>
         <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
             <x-atoms.icon variant="assessment" size="sm" color="#086375" />
-            <span>5 Form Tersedia</span>
+            <span>{{ count($items) }} Form Tersedia</span>
         </div>
     </div>
 
@@ -36,12 +36,22 @@
                 </p>
 
                 @if(!empty($item['options']))
-                    <div class="mt-5 grid grid-cols-3 gap-2">
+                    <div class="mt-5">
                         @foreach($item['options'] as $option)
-                            <a href="{{ $option['route'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-2 py-2 rounded-xl bg-[#086375] text-white text-[11px] font-semibold shadow-sm hover:bg-[#064a5e] transition-all duration-200">
-                                {{ $option['label'] }}
+                            <a
+                                href="{{ $option['route'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#086375] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#064a5e] transition-all duration-200"
+                            >
+                                <span>{{ $item['label'] }}</span>
+                                <x-atoms.icon variant="arrow-right" size="sm" color="#ffffff" />
                             </a>
                         @endforeach
+                    </div>
+                @elseif($item['title'] === 'AKPD')
+                    <div class="mt-5 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-700">
+                        Data kelas siswa belum tersedia. Hubungi guru BK.
                     </div>
                 @else
                     <div class="mt-5">

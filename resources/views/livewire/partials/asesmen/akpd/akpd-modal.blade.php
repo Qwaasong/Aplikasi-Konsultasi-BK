@@ -206,10 +206,6 @@
                         />
 
                         @error('tahun_pelajaran')
-                                        <span wire:loading.remove wire:target="save">
-                                            {{ $editingId ? 'Perbarui' : 'Simpan' }}
-                                        </span>
-                                        <span wire:loading wire:target="save">Menyimpan...</span>
                             <span class="text-red-500 text-[13px] font-medium mt-1.5 block">
                                 {{ $message }}
                             </span>

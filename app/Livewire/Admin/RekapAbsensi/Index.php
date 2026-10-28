@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\RekapAbsensi;
 
+use App\Models\Kelas;
 use App\Services\ImportExportService;
 use App\Services\Siswa\KehadiranService;
 use Livewire\Attributes\Validate;
@@ -17,6 +18,7 @@ class Index extends Component
 
     public string $filterStatus = '';
     public string $filterTanggal = '';
+    public string $filterBulan = '';
     public string $filterTahun = '';
 
     public bool $showFilters = false;
@@ -48,25 +50,19 @@ class Index extends Component
     }
 
     /**
-     * Mengambil daftar kelas dari data kehadiran.
+     * Mengambil seluruh daftar kelas dari master kelas.
      */
     public function loadKelas(): void
     {
-        $service = app(KehadiranService::class);
-
-        $records = $service->getFiltered([
-            'search' => null,
-            'kelas' => null,
-            'status' => null,
-            'tanggal' => null,
-            'tahun' => null,
-        ]);
-
-        $this->kelasOptions = $records
-            ->map(fn ($item) => $item->siswa?->kelas_label)
+        $this->kelasOptions = Kelas::query()
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
+            ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
             ->filter()
             ->unique()
-            ->sort()
             ->values()
             ->toArray();
     }
@@ -83,6 +79,7 @@ class Index extends Component
             'kelas' => $this->selectedKelas ?: null,
             'status' => $this->filterStatus ?: null,
             'tanggal' => $this->filterTanggal ?: null,
+            'bulan' => $this->filterBulan ?: null,
             'tahun' => $this->filterTahun ?: null,
         ];
 
@@ -105,11 +102,16 @@ class Index extends Component
      */
     public function pilihKelas(string $kelas): void
     {
+        if (! in_array($kelas, $this->kelasOptions, true)) {
+            return;
+        }
+
         $this->selectedKelas = $kelas;
 
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadData();
@@ -125,6 +127,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->records = [];
@@ -135,6 +138,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadData();
@@ -145,6 +149,7 @@ class Index extends Component
         $this->search = '';
         $this->filterStatus = '';
         $this->filterTanggal = '';
+        $this->filterBulan = '';
         $this->filterTahun = '';
 
         $this->loadKelas();
@@ -177,6 +182,13 @@ class Index extends Component
     }
 
     public function updatedFilterTahun(): void
+    {
+        if ($this->selectedKelas) {
+            $this->loadData();
+        }
+    }
+
+    public function updatedFilterBulan(): void
     {
         if ($this->selectedKelas) {
             $this->loadData();
@@ -235,6 +247,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'status' => $this->filterStatus ?: null,
             'tahun' => $this->filterTahun ?: null,
+            'bulan' => $this->filterBulan ?: null,
         ]);
     }
 
@@ -245,6 +258,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'status' => $this->filterStatus ?: null,
             'tahun' => $this->filterTahun ?: null,
+            'bulan' => $this->filterBulan ?: null,
         ]);
 
         $this->showExportModal = false;

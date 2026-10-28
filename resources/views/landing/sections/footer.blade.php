@@ -43,10 +43,10 @@
 
                 <li class="footer-dropdown">
 
-                    <a href="#" class="footer-dropdown-toggle footer-link">
-                        Asesmen
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+                    <button type="button" class="footer-link footer-dropdown-toggle">
+                        <span>Asesmen</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
 
                     <ul class="footer-dropdown-menu">
 

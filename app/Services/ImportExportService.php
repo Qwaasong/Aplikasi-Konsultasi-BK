@@ -98,6 +98,53 @@ class ImportExportService
         return $this->streamExcel($filename, $headers, $rows);
     }
 
+    /**
+     * Export multi-sheet Excel: $sheets = ['SheetName' => [rows...]]
+     */
+    public function streamExcelExportPerSheet(string $filename, array $headers, array $sheets): StreamedResponse
+    {
+        return response()->streamDownload(function () use ($headers, $sheets) {
+            $spreadsheet = new Spreadsheet();
+            $first = true;
+
+            foreach ($sheets as $sheetName => $rows) {
+                if ($first) {
+                    $sheet = $spreadsheet->getActiveSheet();
+                    $first = false;
+                } else {
+                    $sheet = $spreadsheet->createSheet();
+                }
+
+                // Sanitize sheet name (max 31 chars, no special chars)
+                $sheet->setTitle(mb_substr(preg_replace('/[\\/\\\\\?\*\[\]:]/', '-', $sheetName), 0, 31));
+
+                // Write headers
+                foreach ($headers as $index => $header) {
+                    $column = Coordinate::stringFromColumnIndex($index + 1);
+                    $sheet->setCellValue("{$column}1", $header);
+                    $sheet->getStyle("{$column}1")->getFont()->setBold(true);
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+
+                // Write rows
+                $rowNumber = 2;
+                foreach ($rows as $row) {
+                    foreach ($this->mapRowToHeaders($row, $headers) as $index => $value) {
+                        $column = Coordinate::stringFromColumnIndex($index + 1);
+                        $sheet->setCellValue("{$column}{$rowNumber}", $value);
+                    }
+                    $rowNumber++;
+                }
+            }
+
+            $spreadsheet->setActiveSheetIndex(0);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
     private function parseCsv(UploadedFile $file): array
     {
         $rows = [];

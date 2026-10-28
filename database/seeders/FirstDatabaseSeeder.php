@@ -78,35 +78,53 @@ class FirstDatabaseSeeder extends Seeder
         // 4. BUAT JURUSAN (idempoten via kode_jurusan + sekolah_id unik)
         // ─────────────────────────────────────────
 
-        $rpl = Jurusan::firstOrCreate(
+        $rpl = Jurusan::updateOrCreate(
             ['sekolah_id' => $sekolah->id, 'kode_jurusan' => 1],
             ['nama_jurusan' => 'RPL']
         );
 
-        $tkj = Jurusan::firstOrCreate(
+        $tkj = Jurusan::updateOrCreate(
             ['sekolah_id' => $sekolah->id, 'kode_jurusan' => 2],
             ['nama_jurusan' => 'TKJ']
         );
 
-        $mm = Jurusan::firstOrCreate(
+        $anm = Jurusan::updateOrCreate(
             ['sekolah_id' => $sekolah->id, 'kode_jurusan' => 3],
-            ['nama_jurusan' => 'MM']
+            ['nama_jurusan' => 'ANM']
+        );
+
+        $tsm = Jurusan::updateOrCreate(
+            ['sekolah_id' => $sekolah->id, 'kode_jurusan' => 4],
+            ['nama_jurusan' => 'TSM']
+        );
+
+        $tei = Jurusan::updateOrCreate(
+            ['sekolah_id' => $sekolah->id, 'kode_jurusan' => 5],
+            ['nama_jurusan' => 'TEI']
         );
 
         // ─────────────────────────────────────────
         // 5. BUAT KELAS (idempoten via nama_kelas unik per jurusan)
         // ─────────────────────────────────────────
 
-        $tingkats = ['X', 'XI', 'XII'];
-        $jurusans = [$rpl, $tkj, $mm];
+        $kelasPerJurusan = [
+            $rpl->id => ['RPL 1', 'RPL 2'],
+            $anm->id => ['ANM 1', 'ANM 2'],
+            $tsm->id => ['TSM 1', 'TSM 2', 'TSM 3'],
+            $tei->id => ['TEI 1'],
+            $tkj->id => ['TKJ 1', 'TKJ 2'],
+        ];
 
-        foreach ($jurusans as $jurusan) {
-            foreach ($tingkats as $tingkat) {
-                $namaKelas = $tingkat . ' ' . $jurusan->nama_jurusan;
-                Kelas::firstOrCreate(
-                    ['jurusan_id' => $jurusan->id, 'nama_kelas' => $namaKelas],
-                    ['tingkat' => $tingkat]
-                );
+        foreach ($kelasPerJurusan as $jurusanId => $namaKelasPerJurusan) {
+            foreach (['X', 'XI', 'XII'] as $tingkat) {
+                foreach ($namaKelasPerJurusan as $namaKelas) {
+                    $namaKelas = $tingkat . ' ' . $namaKelas;
+
+                    Kelas::firstOrCreate(
+                        ['jurusan_id' => $jurusanId, 'nama_kelas' => $namaKelas],
+                        ['tingkat' => $tingkat]
+                    );
+                }
             }
         }
 

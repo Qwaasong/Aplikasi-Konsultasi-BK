@@ -16,14 +16,17 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
         </x-slot:search>
 
         <x-slot:actions>
-            <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="template" size="md" /> Template
+            <button wire:click="downloadTemplate" title="Template" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="template" size="md" />
+                <span class="hidden sm:inline">Template</span>
             </button>
-            <button wire:click="openImport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="upload" size="md" /> Import
+            <button wire:click="openImport" title="Import" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="upload" size="md" />
+                <span class="hidden sm:inline">Import</span>
             </button>
-            <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="download" size="md" /> Export
+            <button wire:click="openExport" title="Export" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="download" size="md" />
+                <span class="hidden sm:inline">Export</span>
             </button>
         </x-slot:actions>
 
@@ -134,6 +137,61 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
 
 
     {{-- Tabel data (setelah pilih tingkat) --}}
+    {{-- Pilih kelas --}}
+    @elseif(!$selectedKelas)
+
+        <div class="px-6 sm:px-8 py-6">
+            <button
+                type="button"
+                wire:click="kembaliKeKelas"
+                class="inline-flex items-center text-xs text-gray-500 hover:text-brand-teal mb-5"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Kembali ke Daftar Tingkat
+            </button>
+
+            <div class="mb-5">
+                <h2 class="text-base font-semibold text-gray-800">Pilih Kelas</h2>
+                <p class="text-sm text-gray-500 mt-1">Pilih kelas untuk melihat data AKPD tingkat {{ $selectedTingkat }}.</p>
+            </div>
+
+            @if(count($tingkatKelasOptions) > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    @foreach($tingkatKelasOptions as $kelas)
+                        <button
+                            type="button"
+                            wire:key="kelas-{{ $kelas }}"
+                            wire:click="pilihKelas(@js($kelas))"
+                            class="group text-left bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition-all duration-200 hover:border-brand-teal hover:shadow-md hover:-translate-y-0.5"
+                        >
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Kelas</p>
+                                    <h3 class="mt-2 text-lg font-semibold text-gray-800 group-hover:text-brand-teal">{{ $kelas }}</h3>
+                                </div>
+                                <div class="w-11 h-11 rounded-lg bg-teal-50 flex items-center justify-center text-brand-teal">
+                                    <x-atoms.icon variant="book" size="md" />
+                                </div>
+                            </div>
+                            <div class="mt-5 flex items-center text-xs text-gray-400">
+                                Lihat AKPD
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+            @else
+                <div class="border border-dashed border-gray-300 rounded-xl py-12 text-center">
+                    <p class="text-sm text-gray-500">Belum ada data kelas untuk tingkat {{ $selectedTingkat }}.</p>
+                </div>
+            @endif
+        </div>
+
+    {{-- Tabel data (setelah pilih kelas) --}}
     @else
 
         {{-- Header Kelas --}}
@@ -165,7 +223,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                AKPD Kelas {{ $selectedTingkat }}
+                AKPD Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -194,42 +252,21 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
                 Filter Data:
             </span>
 
-            {{-- Filter Kelas --}}
+            {{-- Filter Gender --}}
             <select
-                wire:model.live="filterKelas"
+                wire:model.live="filterJenisKelamin"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5
                        focus:outline-none focus:ring-1 focus:ring-brand-teal
-                       w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer"
+                       w-36 pr-8 flex-shrink-0 bg-white cursor-pointer"
             >
-                <option value="">Semua Kelas</option>
-
-                @foreach($kelasOptions ?? [] as $kelas)
-                    <option value="{{ $kelas }}">
-                        Kelas {{ $kelas }}
-                    </option>
-                @endforeach
-            </select>
-
-
-            {{-- Filter Jurusan --}}
-            <select
-                wire:model.live="filterJurusan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5
-                       focus:outline-none focus:ring-1 focus:ring-brand-teal
-                       w-32 pr-8 flex-shrink-0 bg-white cursor-pointer"
-            >
-                <option value="">Semua Jurusan</option>
-
-                @foreach($jurusanOptions ?? [] as $jurusan)
-                    <option value="{{ $jurusan }}">
-                        {{ $jurusan }}
-                    </option>
-                @endforeach
+                <option value="">Semua Gender</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
             </select>
 
 
             {{-- Reset Filter --}}
-            @if($search !== '' || $filterKelas !== '' || $filterJurusan !== '')
+            @if($search !== '' || $filterJenisKelamin !== '')
                 <button
                     wire:click="resetFilters"
                     class="text-xs text-brand-teal font-medium
@@ -280,7 +317,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
             'Kelas',
             'Aksi'
         ]"
-        empty="Belum ada data AKPD untuk kelas {{ $selectedTingkat }}.">
+            empty="Belum ada data AKPD untuk kelas {{ $selectedKelas }}.">
 
         @forelse($records as $record)
 
@@ -364,7 +401,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
     {{-- MODAL IMPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-        <x-shared.modal name="import-akpd" :show="true" maxWidth="md">
+        <x-shared.modal name="import-akpd" :show="true" model="showImportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Import Data AKPD</h2>
@@ -373,8 +410,8 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
                 <div class="px-6 py-5 space-y-4">
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
                         <p class="font-semibold mb-1">Kolom yang dibutuhkan:</p>
-                        <code class="block">nis | tanggal | tahun_pelajaran | q01 | q02 | ... | q50</code>
-                        <p class="mt-1 text-blue-500">Nilai tiap soal: Ya / Tidak (case-insensitive). NIS + tanggal adalah kunci; import ulang akan memperbarui data yang sama.</p>
+                        <code class="block">Nama Siswa | Kelas | Timestamp | Tahun Pelajaran | 1. ... | 2. ... | ... | 50. ...</code>
+                        <p class="mt-1 text-blue-500">Nilai tiap soal: Ya / Tidak (case-insensitive). Siswa dicocokkan berdasarkan Nama Siswa dan Kelas; import ulang pada siswa dan tanggal yang sama akan memperbarui data.</p>
                     </div>
                     <div x-data="{ dropping: false }" x-on:dragover.prevent="dropping = true" x-on:dragleave.prevent="dropping = false" x-on:drop.prevent="dropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))" x-on:click="$refs.fileInput.click()" class="border-2 border-dashed rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer transition-colors" :class="dropping ? 'border-brand-teal bg-bg-light' : 'border-gray-200 hover:bg-gray-50'">
                         <input type="file" wire:model="importFile" accept=".csv,.xlsx,.xls" x-ref="fileInput" class="hidden">
@@ -416,7 +453,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen AKPD - Bimbingan Konseling'])] 
     {{-- MODAL EXPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-        <x-shared.modal name="export-akpd" :show="true" maxWidth="md">
+        <x-shared.modal name="export-akpd" :show="true" model="showExportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Export Data AKPD</h2>

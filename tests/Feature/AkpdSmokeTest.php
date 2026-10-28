@@ -19,8 +19,9 @@ class AkpdSmokeTest extends TestCase
 
         $this->actingAs($konselor);
 
-        // Index: cards first, then the 4-column table after choosing a level.
+        // Index: choose a level, then a class, then render the 4-column table.
         $tingkat = $record->siswa?->kelas?->tingkat ?? 'X';
+        $kelas = $record->siswa?->kelas?->nama_kelas;
 
         $index = Volt::test('pages.konselor.asesmen.akpd.index')
             ->assertSee('Pilih Tingkat')
@@ -29,6 +30,9 @@ class AkpdSmokeTest extends TestCase
             ->assertSee('Kelas XII')
             ->assertDontSeeHtml('wire:click="goToDetail(' . $record->id . ')"')
             ->call('pilihTingkat', $tingkat)
+            ->assertSee('Pilih Kelas')
+            ->assertDontSee('Tanggal')
+            ->call('pilihKelas', $kelas)
             ->assertSee('Tanggal')
             ->assertSee('Siswa')
             ->assertSee('Kelas')

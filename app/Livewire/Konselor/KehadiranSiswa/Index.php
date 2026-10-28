@@ -3,6 +3,7 @@
 namespace App\Livewire\Konselor\KehadiranSiswa;
 
 use App\Models\DataSiswa;
+use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Services\ImportExportService;
 use App\Services\Siswa\KehadiranService;
@@ -19,6 +20,7 @@ class Index extends Component
     public string $filterStatus = '';
 
     public ?string $selectedKelas = null;
+    public ?string $selectedTingkat = null;
     public string $selectedTanggal = '';
     public ?int $selectedTahunAjaranId = null;
 
@@ -26,6 +28,7 @@ class Index extends Component
 
     public array $records = [];
     public array $kelasOptions = [];
+    public array $tingkatKelasOptions = [];
     public array $tahunOptions = [];
     public array $attendance = [];
 
@@ -39,6 +42,8 @@ class Index extends Component
     // ── EXPORT STATE ─────────────────────────
     public bool $showExportModal = false;
     public int $exportPreviewCount = 0;
+    public string $exportKelas = '';
+    public string $exportBulan = '';
 
     public function mount(): void
     {
@@ -58,39 +63,42 @@ class Index extends Component
     }
 
     /**
-     * Mengambil daftar kelas
+     * Mengambil seluruh daftar kelas dari master kelas.
      */
     public function loadKelas(): void
     {
-        $service = app(KehadiranService::class);
-
-        // Fetch options using existing service logic or distinct from students
-        $records = $service->getFiltered([
-            'search' => null,
-            'kelas' => null,
-            'status' => null,
-            'tanggal' => null,
-            'tahun' => null,
-        ]);
-
-        $optionsFromKehadiran = $records
-            ->map(fn ($item) => $item->siswa?->kelas_label)
+        $this->kelasOptions = Kelas::query()
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
+            ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
             ->filter()
             ->unique()
-            ->sort()
             ->values()
             ->toArray();
+    }
 
-        // Also fetch from DataSiswa to show all classes even if no attendance
-        $optionsFromSiswa = DataSiswa::with('kelas')->get()
-            ->map(fn ($item) => $item->kelas_label)
-            ->filter(fn ($label) => $label !== '-')
+    public function pilihTingkat(string $tingkat): void
+    {
+        if (! in_array($tingkat, ['X', 'XI', 'XII'], true)) {
+            return;
+        }
+
+        $this->selectedTingkat = $tingkat;
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = Kelas::query()
+            ->where('tingkat', $tingkat)
+            ->whereNotNull('nama_kelas')
+            ->where('nama_kelas', '<>', '')
+            ->orderBy('nama_kelas')
+            ->pluck('nama_kelas')
+            ->map(static fn ($namaKelas) => trim((string) $namaKelas))
+            ->filter()
             ->unique()
-            ->sort()
             ->values()
             ->toArray();
-
-        $this->kelasOptions = array_values(array_unique(array_merge($optionsFromKehadiran, $optionsFromSiswa)));
     }
 
     /**
@@ -181,6 +189,10 @@ class Index extends Component
      */
     public function pilihKelas(string $kelas): void
     {
+        if (! in_array($kelas, $this->tingkatKelasOptions, true)) {
+            return;
+        }
+
         $this->selectedKelas = $kelas;
         $this->search = '';
         $this->loadData();
@@ -192,6 +204,20 @@ class Index extends Component
     public function kembaliKeKelas(): void
     {
         $this->reset(['selectedKelas', 'records', 'attendance', 'search', 'filterStatus', 'showFilters']);
+    }
+
+    public function kembaliKeTingkat(): void
+    {
+        $this->reset([
+            'selectedTingkat',
+            'selectedKelas',
+            'tingkatKelasOptions',
+            'records',
+            'attendance',
+            'search',
+            'filterStatus',
+            'showFilters',
+        ]);
         $this->loadKelas();
     }
 
@@ -246,6 +272,8 @@ class Index extends Component
 
     public function openExport(KehadiranService $service): void
     {
+        $this->exportKelas = $this->selectedKelas ?? '';
+        $this->exportBulan = date('Y-m');
         $this->refreshExportPreview($service);
         $this->showExportModal = true;
     }
@@ -258,15 +286,32 @@ class Index extends Component
     public function refreshExportPreview(KehadiranService $service): void
     {
         $this->exportPreviewCount = $service->getExportCount([
-            'kelas' => $this->selectedKelas,
+            'kelas' => $this->exportKelas ?: null,
+            'bulan' => $this->exportBulan ?: null,
         ]);
+    }
+
+    public function updatedExportKelas(): void
+    {
+        $this->refreshExportPreview(app(KehadiranService::class));
+    }
+
+    public function updatedExportBulan(): void
+    {
+        $this->refreshExportPreview(app(KehadiranService::class));
+    }
+
+    private function exportFilters(): array
+    {
+        return [
+            'kelas' => $this->exportKelas ?: null,
+            'bulan' => $this->exportBulan ?: null,
+        ];
     }
 
     public function exportCsv(KehadiranService $service, ImportExportService $ies): StreamedResponse
     {
-        $rows = $service->exportRows([
-            'kelas' => $this->selectedKelas,
-        ]);
+        $rows = $service->exportRows($this->exportFilters());
 
         $this->showExportModal = false;
 
@@ -275,13 +320,28 @@ class Index extends Component
 
     public function exportExcel(KehadiranService $service, ImportExportService $ies): StreamedResponse
     {
-        $rows = $service->exportRows([
-            'kelas' => $this->selectedKelas,
-        ]);
+        $rows = $service->exportRows($this->exportFilters());
 
         $this->showExportModal = false;
 
         return $ies->streamExcelExport('kehadiran-' . date('Ymd-His') . '.xlsx', $service->getTemplateHeaders(), $rows);
+    }
+
+    public function exportExcelPerKelas(KehadiranService $service, ImportExportService $ies): StreamedResponse
+    {
+        $sheets = $service->exportRowsPerKelas([
+            'tahun' => $this->selectedTahunAjaranId
+                ? \App\Models\TahunAjaran::find($this->selectedTahunAjaranId)?->tahun
+                : null,
+        ]);
+
+        $this->showExportModal = false;
+
+        return $ies->streamExcelExportPerSheet(
+            'rekap-kehadiran-per-kelas-' . date('Ymd-His') . '.xlsx',
+            $service->getTemplateHeaders(),
+            $sheets
+        );
     }
 
     // ── TEMPLATE ─────────────────────────────

@@ -11,6 +11,7 @@ use Livewire\Component;
 class Asesmen extends Component
 {
     public ?DataSiswa $siswa = null;
+    public ?string $tingkatSiswa = null;
 
     public array $items = [];
 
@@ -24,18 +25,31 @@ class Asesmen extends Component
             abort(403, 'Data siswa tidak ditemukan.');
         }
 
+        $this->tingkatSiswa = $this->siswa->kelas?->tingkat;
+
+        $akpdOptions = collect([
+            'X' => 'https://forms.gle/EiEaJS2VYU6k6AeV8',
+            'XI' => 'https://forms.gle/xNyicyELono4yn9Z7',
+            'XII' => 'https://forms.gle/s5K1thgso3C673DS6',
+        ])
+            ->filter(fn ($route, $tingkat) => $tingkat === $this->tingkatSiswa)
+            ->map(fn ($route, $tingkat) => [
+                'label' => 'Kelas '.$tingkat,
+                'route' => $route,
+            ])
+            ->values()
+            ->all();
+
         $this->items = [
             [
                 'title' => 'AKPD',
                 'description' => 'Angket Kebutuhan Peserta Didik untuk mengetahui kebutuhan dan perkembangan diri.',
                 'route' => 'https://forms.gle/EiEaJS2VYU6k6AeV8',
                 'badge' => 'Kebutuhan',
-                'label' => 'Pilih Kelas AKPD',
-                'options' => [
-                    ['label' => 'Kelas X', 'route' => 'https://forms.gle/EiEaJS2VYU6k6AeV8'],
-                    ['label' => 'Kelas XI', 'route' => 'https://forms.gle/xNyicyELono4yn9Z7'],
-                    ['label' => 'Kelas XII', 'route' => 'https://forms.gle/s5K1thgso3C673DS6'],
-                ],
+                'label' => $this->tingkatSiswa
+                    ? 'Mulai Form Kelas '.$this->tingkatSiswa
+                    : 'Form AKPD belum tersedia',
+                'options' => $akpdOptions,
             ],
             [
                 'title' => 'Gaya Belajar',
@@ -54,9 +68,16 @@ class Asesmen extends Component
             [
                 'title' => 'Sosiometri',
                 'description' => 'Menggambarkan hubungan sosial dan preferensi teman dalam kelompok.',
-                'route' => '#',
+                'route' => 'https://forms.gle/CnY4xW3XH1JfYsgy7',
                 'badge' => 'Sosial',
-                'label' => 'Segera hadir',
+                'label' => 'Mulai Tes',
+            ],
+            [
+                'title' => 'Komulatif Record',
+                'description' => 'Formulir pencatatan data komulatif peserta didik untuk melengkapi kebutuhan layanan BK.',
+                'route' => 'https://docs.google.com/forms/d/e/1FAIpQLSdualGVC376SQ2ErRu3AqQtCeJocFtkb6CVZWCO_7hS2IYAxg/viewform?usp=sharing&ouid=102322238715768057541',
+                'badge' => 'Data Siswa',
+                'label' => 'Isi Komulatif Record',
             ],
             [
                 'title' => 'Tes Bakat Minat',

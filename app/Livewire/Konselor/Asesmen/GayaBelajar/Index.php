@@ -3,6 +3,7 @@
 namespace App\Livewire\Konselor\Asesmen\GayaBelajar;
 
 use App\Models\DataSiswa;
+use App\Models\Kelas;
 use App\Services\Asesmen\GayaBelajarService;
 use App\Services\ImportExportService;
 use Illuminate\Support\Collection;
@@ -40,10 +41,13 @@ class Index extends Component
 
     public string $filterKelas = '';
     public string $filterJurusan = '';
+    public string $filterJenisKelamin = '';
 
     public ?string $selectedTingkat = null;
+    public ?string $selectedKelas = null;
 
     public array $kelasOptions = [];
+    public array $tingkatKelasOptions = [];
     public array $jurusanOptions = [];
 
     public $siswa_id = '';
@@ -104,6 +108,10 @@ class Index extends Component
                 $kelas = explode(' ', $record->siswa?->kelas_label ?? '')[0];
                 if (in_array($kelas, ['X', 'XI', 'XII'])) {
                     $this->pilihTingkat($kelas);
+                    $namaKelas = $record->siswa?->kelas?->nama_kelas;
+                    if ($namaKelas && in_array($namaKelas, $this->tingkatKelasOptions, true)) {
+                        $this->pilihKelas($namaKelas);
+                    }
                 }
                 $this->loadGayaBelajar($this->edit);
             }
@@ -128,6 +136,7 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'jenis_kelamin' => $this->filterJenisKelamin,
             'tingkat' => $this->selectedTingkat,
         ]);
     }
@@ -144,15 +153,40 @@ class Index extends Component
         $this->filterJurusan = '';
 
         $this->loadData();
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = Kelas::query()->where('tingkat', $tingkat)
+            ->orderBy('nama_kelas')->pluck('nama_kelas')->values()->all();
     }
 
     public function kembaliKeTingkat(): void
     {
         $this->selectedTingkat = null;
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = [];
         $this->search = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
 
+        $this->records = collect();
+    }
+
+    public function pilihKelas(string $kelas): void
+    {
+        if (! in_array($kelas, $this->tingkatKelasOptions, true)) {
+            return;
+        }
+
+        $this->selectedKelas = $kelas;
+        $this->filterKelas = $kelas;
+        $this->loadData();
+    }
+
+    public function kembaliKeKelas(): void
+    {
+        $this->selectedKelas = null;
+        $this->filterKelas = '';
+        $this->search = '';
+        $this->filterJurusan = '';
         $this->records = collect();
     }
 
@@ -447,6 +481,11 @@ class Index extends Component
         $this->loadData();
     }
 
+    public function updatedFilterJenisKelamin(): void
+    {
+        $this->loadData();
+    }
+
     public function filterAction(): void
     {
         $this->showFilters = !$this->showFilters;
@@ -457,6 +496,7 @@ class Index extends Component
         $this->search = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
+        $this->filterJenisKelamin = '';
 
         $this->loadData();
     }
@@ -544,6 +584,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'kelas' => $this->filterKelas ?: null,
             'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
             'tingkat' => $this->selectedTingkat ?: null,
         ];
     }

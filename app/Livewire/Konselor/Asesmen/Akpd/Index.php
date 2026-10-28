@@ -21,6 +21,7 @@ class Index extends Component
 
     public bool $showFilters = false;
     public array $selected = [];
+    public bool $selectAll = false;
 
     public $students = [];
 
@@ -40,10 +41,13 @@ class Index extends Component
 
     public string $filterKelas = '';
     public string $filterJurusan = '';
+    public string $filterJenisKelamin = '';
 
     public ?string $selectedTingkat = null;
+    public ?string $selectedKelas = null;
 
     public array $kelasOptions = [];
+    public array $tingkatKelasOptions = [];
     public array $jurusanOptions = [];
 
     public $siswa_id = '';
@@ -87,6 +91,11 @@ class Index extends Component
                 $kelas = explode(' ', $record->siswa?->kelas_label ?? '')[0];
                 if (in_array($kelas, ['X', 'XI', 'XII'])) {
                     $this->pilihTingkat($kelas);
+
+                    $namaKelas = $record->siswa?->kelas?->nama_kelas;
+                    if ($namaKelas && in_array($namaKelas, $this->tingkatKelasOptions, true)) {
+                        $this->pilihKelas($namaKelas);
+                    }
                 }
                 $this->loadAkpd($this->edit);
             }
@@ -102,8 +111,53 @@ class Index extends Component
             'search' => $this->search,
             'kelas' => $this->filterKelas,
             'jurusan' => $this->filterJurusan,
+            'jenis_kelamin' => $this->filterJenisKelamin,
             'tingkat' => $this->selectedTingkat,
         ]);
+
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
+    public function filterAction(): void
+    {
+        $this->showFilters = ! $this->showFilters;
+    }
+
+    public function resetFilters(): void
+    {
+        $this->search = '';
+        $this->filterKelas = '';
+        $this->filterJurusan = '';
+        $this->filterJenisKelamin = '';
+        $this->loadData();
+    }
+
+    public function updatedSelectAll(bool $value): void
+    {
+        $this->selected = $value
+            ? $this->records->pluck('id')->map(fn ($id) => (string) $id)->all()
+            : [];
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterKelas(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterJurusan(): void
+    {
+        $this->loadData();
+    }
+
+    public function updatedFilterJenisKelamin(): void
+    {
+        $this->loadData();
     }
 
     public function pilihTingkat(string $tingkat): void
@@ -118,15 +172,39 @@ class Index extends Component
         $this->filterJurusan = '';
 
         $this->loadData();
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = app(AkpdService::class)->getKelasOptions($tingkat);
     }
 
     public function kembaliKeTingkat(): void
     {
         $this->selectedTingkat = null;
+        $this->selectedKelas = null;
+        $this->tingkatKelasOptions = [];
         $this->search = '';
         $this->filterKelas = '';
         $this->filterJurusan = '';
 
+        $this->records = collect();
+    }
+
+    public function pilihKelas(string $kelas): void
+    {
+        if (! in_array($kelas, $this->tingkatKelasOptions, true)) {
+            return;
+        }
+
+        $this->selectedKelas = $kelas;
+        $this->filterKelas = $kelas;
+        $this->loadData();
+    }
+
+    public function kembaliKeKelas(): void
+    {
+        $this->selectedKelas = null;
+        $this->filterKelas = '';
+        $this->search = '';
+        $this->filterJurusan = '';
         $this->records = collect();
     }
 
@@ -148,7 +226,7 @@ class Index extends Component
     public function nextStep(): void
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
+            'siswa_id' => 'required|integer|exists:data_siswa,id',
             'tanggal' => 'required|date',
             'tahun_pelajaran' => 'nullable|string|max:20',
         ]);
@@ -244,6 +322,13 @@ class Index extends Component
 
         $record = $service->findById($id);
 
+        if (! $record) {
+            session()->flash('error', 'Data AKPD tidak ditemukan.');
+            $this->loadData();
+
+            return;
+        }
+
         $this->editingId = $id;
 
         $this->siswa_id = $record->siswa_id;
@@ -310,7 +395,7 @@ class Index extends Component
     public function save(AkpdService $service): void
     {
         $this->validate([
-            'siswa_id' => 'required|integer',
+            'siswa_id' => 'required|integer|exists:data_siswa,id',
             'tanggal' => 'required|date',
             'tahun_pelajaran' => 'nullable|string|max:20',
             'jawaban' => 'nullable|array',
@@ -440,6 +525,7 @@ class Index extends Component
             'search' => $this->search ?: null,
             'kelas' => $this->filterKelas ?: null,
             'jurusan' => $this->filterJurusan ?: null,
+            'jenis_kelamin' => $this->filterJenisKelamin ?: null,
             'tingkat' => $this->selectedTingkat ?: null,
         ];
     }

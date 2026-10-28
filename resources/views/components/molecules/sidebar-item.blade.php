@@ -7,7 +7,9 @@
 'indent' => '',
 ])
 
-<a href="{{ $linkHref }}" wire:navigate
+<a
+    href="{{ $linkHref }}"
+    wire:navigate
     @class([ 'group/menu flex items-center h-12 w-full px-4' , 'text-gray-600'=> !$active
     ])>
 

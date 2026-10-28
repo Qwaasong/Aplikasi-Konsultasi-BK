@@ -109,7 +109,14 @@ class ProfileTest extends TestCase
     public function test_student_assessment_page_shows_cards_without_landing_redirect(): void
     {
         $user = User::factory()->siswa()->create();
-        DataSiswa::factory()->create(['user_id' => $user->id]);
+        $kelas = Kelas::factory()->create([
+            'nama_kelas' => 'X RPL 1',
+            'tingkat' => 'X',
+        ]);
+        DataSiswa::factory()->create([
+            'user_id' => $user->id,
+            'kelas_id' => $kelas->id,
+        ]);
 
         $response = $this->actingAs($user)->get('/siswa/asesmen');
 
@@ -117,10 +124,9 @@ class ProfileTest extends TestCase
             ->assertOk()
             ->assertSee('AKPD')
             ->assertSee('https://forms.gle/EiEaJS2VYU6k6AeV8')
-            ->assertSee('Kelas XI')
-            ->assertSee('https://forms.gle/xNyicyELono4yn9Z7')
-            ->assertSee('Kelas XII')
-            ->assertSee('https://forms.gle/s5K1thgso3C673DS6')
+            ->assertSee('Kelas X')
+            ->assertDontSee('https://forms.gle/xNyicyELono4yn9Z7')
+            ->assertDontSee('https://forms.gle/s5K1thgso3C673DS6')
             ->assertDontSee('/asesmen/akpd');
     }
 

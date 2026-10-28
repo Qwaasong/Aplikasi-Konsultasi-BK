@@ -16,14 +16,17 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
         </x-slot:search>
 
         <x-slot:actions>
-            <button wire:click="downloadTemplate" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="template" size="md" /> Template
+            <button wire:click="downloadTemplate" title="Template" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="template" size="md" />
+                <span class="hidden sm:inline">Template</span>
             </button>
-            <button wire:click="openImport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="upload" size="md" /> Import
+            <button wire:click="openImport" title="Import" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="upload" size="md" />
+                <span class="hidden sm:inline">Import</span>
             </button>
-            <button wire:click="openExport" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition">
-                <x-atoms.icon variant="download" size="md" /> Export
+            <button wire:click="openExport" title="Export" class="page-header-action text-gray-600 border border-gray-300 hover:bg-gray-50 transition">
+                <x-atoms.icon variant="download" size="md" />
+                <span class="hidden sm:inline">Export</span>
             </button>
         </x-slot:actions>
 
@@ -133,7 +136,11 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
         </div>
 
 
-    {{-- Tabel data (setelah pilih tingkat) --}}
+    {{-- Pilih kelas --}}
+    @elseif(!$selectedKelas)
+        @include('livewire.partials.asesmen.class-selector', ['assessmentName' => 'DCM'])
+
+    {{-- Tabel data (setelah pilih kelas) --}}
     @else
 
         {{-- Header Kelas --}}
@@ -141,7 +148,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
 
             <button
                 type="button"
-                wire:click="kembaliKeTingkat"
+                wire:click="kembaliKeKelas"
                 class="inline-flex items-center text-xs text-gray-500
                        hover:text-brand-teal mb-2">
 
@@ -165,7 +172,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
             </button>
 
             <h2 class="text-lg font-semibold text-gray-800">
-                DCM Kelas {{ $selectedTingkat }}
+                DCM Kelas {{ $selectedKelas }}
             </h2>
 
         </div>
@@ -194,42 +201,21 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
                 Filter Data:
             </span>
 
-            {{-- Filter Kelas --}}
+            {{-- Filter Gender --}}
             <select
-                wire:model.live="filterKelas"
+                wire:model.live="filterJenisKelamin"
                 class="text-xs border border-gray-200 rounded px-2 py-1.5
                        focus:outline-none focus:ring-1 focus:ring-brand-teal
-                       w-28 sm:w-36 pr-8 flex-shrink-0 bg-white cursor-pointer"
+                       w-36 pr-8 flex-shrink-0 bg-white cursor-pointer"
             >
-                <option value="">Semua Kelas</option>
-
-                @foreach($kelasOptions ?? [] as $kelas)
-                    <option value="{{ $kelas }}">
-                        Kelas {{ $kelas }}
-                    </option>
-                @endforeach
-            </select>
-
-
-            {{-- Filter Jurusan --}}
-            <select
-                wire:model.live="filterJurusan"
-                class="text-xs border border-gray-200 rounded px-2 py-1.5
-                       focus:outline-none focus:ring-1 focus:ring-brand-teal
-                       w-32 pr-8 flex-shrink-0 bg-white cursor-pointer"
-            >
-                <option value="">Semua Jurusan</option>
-
-                @foreach($jurusanOptions ?? [] as $jurusan)
-                    <option value="{{ $jurusan }}">
-                        {{ $jurusan }}
-                    </option>
-                @endforeach
+                <option value="">Semua Gender</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
             </select>
 
 
             {{-- Reset Filter --}}
-            @if($search !== '' || $filterKelas !== '' || $filterJurusan !== '')
+            @if($search !== '' || $filterJenisKelamin !== '')
                 <button
                     wire:click="resetFilters"
                     class="text-xs text-brand-teal font-medium
@@ -275,7 +261,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
     {{-- Data Table --}}
     <x-organisms.data-table
         :headers="['Tanggal', 'Siswa', 'Kelas', 'Aksi']"
-        empty="Belum ada data DCM untuk kelas {{ $selectedTingkat }}.">
+        empty="Belum ada data DCM untuk kelas {{ $selectedKelas }}.">
 
         @forelse($records as $record)
 
@@ -359,7 +345,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
     {{-- MODAL IMPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showImportModal)
-        <x-shared.modal name="import-dcm" :show="true" maxWidth="md">
+        <x-shared.modal name="import-dcm" :show="true" model="showImportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Import Data DCM</h2>
@@ -411,7 +397,7 @@ new #[Layout('layouts.app', ['title' => 'Asesmen DCM - Bimbingan Konseling'])] c
     {{-- MODAL EXPORT                              --}}
     {{-- ═══════════════════════════════════════════ --}}
     @if($showExportModal)
-        <x-shared.modal name="export-dcm" :show="true" maxWidth="md">
+        <x-shared.modal name="export-dcm" :show="true" model="showExportModal" maxWidth="md">
             <div class="flex flex-col">
                 <div class="bg-bg-light px-6 py-4 border-b border-gray-100 shrink-0">
                     <h2 class="text-base font-bold text-gray-900">Export Data DCM</h2>

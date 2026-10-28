@@ -20,21 +20,29 @@
 
 <body class="font-sans antialiased">
     <div class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+        {{-- MOBILE NAVIGATION --}}
         <livewire:layout.navigation />
+
+        {{-- DESKTOP SIDEBAR --}}
+        <div class="hidden md:block h-full flex-shrink-0">
+            <livewire:partials.sidebar />
+        </div>
 
         <!-- Page Heading -->
         @if (isset($header))
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                {{ $header }}
+            </div>
+        </header>
         @endif
 
         <!-- Page Content -->
-        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-white">
+        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-white pt-14 md:pt-0">
             {{ $slot }}
         </main>
+
     </div>
 </body>
 
